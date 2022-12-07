@@ -1,0 +1,34 @@
+### Isaac's Git ignore ###
+
+
+# Ignore Figures
+Figures/*
+
+# Keep the folders
+!Figures/.gitkeep 
+
+# Ignore some stuff in Visualizations
+Visualizations/DATA/*
+Visualizations/OUTPUT_DATA/*
+Visualizations/ScientificColourMaps7/*
+
+# Keep the folders
+!Visualizations/DATA/.gitkeep 
+!Visualizations/OUTPUT_DATA/.gitkeep 
+!Visualizations/ScientificColourMaps7/.gitkeep 
+
+# Ignore some stuff in spectral processing
+Spectral-Processing/FINISHED_SPECTRA/*
+Spectral-Processing/GCM-OUTPUT/*
+Spectral-Processing/PLANET_MODELS/*
+Spectral-Processing/Spectra/DATA/*
+Spectral-Processing/Spectra/SCATTERING_DATA/*
+Spectral-Processing/Spectra/OUT/*
+
+# Keep the folders
+!Spectral-Processing/FINISHED_SPECTRA/.gitkeep
+!Spectral-Processing/GCM-OUTPUT/.gitkeep
+!Spectral-Processing/PLANET_MODELS/.gitkeep
+!Spectral-Processing/Spectra/DATA/.gitkeep
+!Spectral-Processing/Spectra/SCATTERING_DATA/.gitkeep
+!Spectral-Processing/Spectra/OUT/.gitkeep
