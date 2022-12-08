@@ -75,9 +75,10 @@ if answer == True:
             sys.stdout.write(line)
 
         # Run the spectra for that folder
-        #os.chdir("../Spectral-Processing-" + str(finished_gcms[i]) + "/Spectra/")        
-        #os.system("sbatch ./Run_sbatch")
-        #os.chdir("../../Spectral-Processing")
+        print("Running " + "../Spectral-Processing-" + str(finished_gcms[i]) + " spectra")
+        os.chdir("../Spectral-Processing-" + str(finished_gcms[i]) + "/Spectra/")        
+        os.system("sbatch ./Run_sbatch")
+        os.chdir("../../Spectral-Processing")
 
 else:
     print("Exit, you chose not to execute this program")

@@ -1,20 +1,53 @@
 # Spectral-Processing
-This is a guide for how to use the files here
 
+*************************************************
+************       USER GUIDE        ************
+*************************************************
+This is a guide for how to use the files here
 
 Recently, Isaac has added a lot of stuff to the files. Hopefully this makes it way easier to use, but it also may cause problems if not documented.
 
+*************************************************
+************         HOW TO RUN      ************
+*************************************************
+
+Spectral-Processing/set_up_spectra_folders.py
+    This will copy the entire spectral-processing for EACH FOLDER and run it
+Spectral-Processing/move_finished_files.py
+    This will move all the finished files back to the central folder again
+Visualizations/create_all_figures.py
+    This will create all the figures that I've so far coded up. Several more need to be added
+
+After all of this the empty folders will probably need to be deleted.
+
+*************************************************
+************         FOLDERS        *************
+*************************************************
+
 First, there are several folders:
+- Figures            || The figures
+- Visualizations     || The code for making the figures
 - FINISHED_SPECTRA   || This is where all the finished output spectra should go
 - GCM-OUTPUT         || This is where all the GCM outputs from the RM-GCM should go
 - PLANET_MODELS      || This is where all the regridded GCMS and interpolations go
-- Spectra            || This is the main folder where the spectral procressing happens. DON'T PUT DATA FILES HERE
+- Spectra            || This is the main folder where the spectral procressing happens. DON'T PUT DATA HERE
 
+
+*************************************************
+************     FILE NAMEING       *************
+*************************************************
 
 One thing is that these files now expect a very specific format for the GCM names. This allows for super efficiency, but you have to be careful.
 
 NORMAL PLANET NAME:
-PLANETNAME_CLOUDTYPE_CLOUDNUMBER_HAZETYPE
+PLANETNAME_CLOUDTYPE_CLOUDNUMBER_HAZETYPE_RADTRANROUTINE_[DENSE]
+
+- PLANETNAME      || GJ1214b for example
+- CLOUDTYPE       || NUCCLOUDS or ALLCLOUDS for example. If empty, then no clouds
+- CLOUDNUMBER     || The int number of clouds plus the word LAYERS. 25LAYERS for example
+- HAZETYPE        || SOOT, THOLIN, or SOOT2X. If empty, no hazes
+- RADTRANROUTINE  || Not used, but good to have for bookkeeping. PICKET or DOGRAY
+- [DENSE]         || Changes the tag MTLX. So any value between 0 and 1
 
 So you would name it something like GJ1214b_NUC_25LAYERS_SOOT_DENSE
 
@@ -29,6 +62,10 @@ Also be very careful if you put different metallities that the model can confuse
 
 Most importantly, check that the data output that is printed to the terminal matches what you want!
 It will print out all the important characterists!
+
+*************************************************
+************          NOTES         *************
+*************************************************
 
 The code currently can NOT do more than one planet system at a time. This is because star radius and effective temp and
 stuff like that needs to be changed per run.
