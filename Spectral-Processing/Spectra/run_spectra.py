@@ -13,6 +13,7 @@ import convert_fort_files
 import re
 import shutil
 import glob
+import grab_input_data
 
 
 # Phases in degrees, inclination in radians (sorry)
@@ -61,21 +62,27 @@ planet_names = ["GJ1214b-CLEAR-1X"]
 for q in range(len(planet_names)):
     planet_name = planet_names[q]
 
+
+    runname     = planet_name + '/Planet_Run'
+    path        = '../GCM-OUTPUT/'
+
+    MOLEF          = grab_input_data.get_input_data(path, runname, "fort.7", "MOLEF")
+    aerosol_layers = int(grab_input_data.get_input_data(path, runname,"fort.7", "AERLAYERS"))
+    grav           = grab_input_data.get_input_data(path, runname, "fort.7","GA")
+    gasconst       = grab_input_data.get_input_data(path, runname, "fort.7","GASCON")
+    R_PLANET       = grab_input_data.get_input_data(path, runname, "fort.7","RADEA")
+    P_ROT          =  (grab_input_data.get_input_data(path, runname, "fort.7","WW") / (2.0 * np.pi) * (24 * 3600)) ** -1.0
+    oom            = grab_input_data.get_input_data(path, runname, "fort.7","OOM_IN")
+    MTLX           = grab_input_data.get_input_data(path, runname, "fort.7","MTLX")
+    HAZES           = grab_input_data.get_input_data(path, runname, "fort.7","HAZES")
+
     print ()
     print ()
     print ("*************************************")
     print ("*************************************")
     print ("RUNNING: " + planet_name)
 
-    if ("CLOUDS".lower() in planet_names[q].lower()):
-        MOLEF = [1.23e-7,0.0,0.0,0.0,4.4e-7,3.26e-5,1.745e-5,9.56e-9,0.0,0.0,1.99e-6,7.83e-8,1.385e-6]
-    else:
-        MOLEF = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-
-    if ("ALL".lower() in planet_names[q].lower()):
-        MOLEF = [1.23e-7,4.06e-8,9.35e-7,3.11e-7,4.4e-7, 3.26e-5,1.745e-5,9.56e-9,1.61e-6,2.94e-5,1.99e-6,7.83e-8,1.385e-6]
-
-
+    # THIS IS A PROBLEM BECAUSE SOOT IS NOT DEFINED IN fort.7
     if ("SOOT".lower() in planet_names[q].lower()):
         HAZE_TYPE = 'soot'
     elif ("THOLIN".lower() in planet_names[q].lower()):
@@ -86,25 +93,18 @@ for q in range(len(planet_names)):
         print ('SOMETHING IS WRONG WITH THE HAZE TYPE')
         exit(0)
 
-
-    if ("25" in planet_names[q]):
-        aerosol_layers = 25
-    elif ("50" in planet_names[q]):
-        aerosol_layers = 50
-    else:
-        aerosol_layers = 0
-    print ("BE CAREFUL, AUTOMATICALLY ASSIGNING NUMBER OF CLOUD LAYERS " + str(aerosol_layers))
-
-    print ("MOLEF", MOLEF)
-    print ("HAZE_TYPE = ", HAZE_TYPE)
-
-    runname     = planet_name + '/Planet_Run'
-    path        = '../GCM-OUTPUT/'
-
     if (HAZE_TYPE == 'soot' or HAZE_TYPE == 'soot-2xpi0' or HAZE_TYPE == 'tholin' or HAZE_TYPE == 'sulfur'):
         HAZES = True
     else:
         HAZES = False
+
+    # Whether  there are clouds
+    # 0 is no clouds, 1 is clouds
+    # This is also important for filling in the correct number of 0s for the input files
+    if any(i > 1e-20 for i in MOLEF):
+        CLOUDS = 1
+    else:
+        CLOUDS = 0
 
     # These values are used mostly for the fort files
     # A couple of them are also used for the spectra
@@ -117,58 +117,33 @@ for q in range(len(planet_names)):
             INITIAL_NTAU = int(float(re.findall(r"[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?", lines_fort26[0])[2]))
     else:
         print ("You need the fort.26 file")
-    
-    if os.path.isfile(path+runname+'/fort.7'):
-        with open(path + runname + '/fort.7') as f:
-            lines = f.readlines()
-    else:
-        print ("You need the fort.7 file")
 
-    # Be careful of these because changes in the fort file can mess this up
-    grav       = float(re.findall(r"[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?", lines[4])[0])
-    gasconst   = float(re.findall(r"[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?", lines[5])[0])
-    R_PLANET   = float(re.findall(r"[+\-]?[^A-Za-z]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)", lines[6])[0])
-    P_ROT      = ((float(re.findall(r"[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?", lines[8])[0]) / (2.0 * np.pi)) * (24 * 3600)) ** -1.0
-    oom        = 7
+    # get all the stellar parameters needed from the excel doc of stellar params
+    # that doc should be in the spectra folder, make sure to update it every once in a while
+    ORB_SEP      = grab_input_data.read_planet_and_star_params(planet_name, "a (au)") * 1.496e11
+    STELLAR_TEMP = grab_input_data.read_planet_and_star_params(planet_name, "T* (K)")
+    R_STAR       = grab_input_data.read_planet_and_star_params(planet_name, "R* (R_sun)") * 695700000
 
-    if ("DENSE".lower() in planet_names[q].lower()):
-        MTLX       = 1.0
-    else:
-        MTLX       = 0.1
-
-
-    print ("Gravity =  ",     grav)
-    print ("Number of OOM = ", oom)
-    print ("Gas Constant = ", gasconst)
-    print ("Planet Radius = ", R_PLANET)
-    print ("Orbital Period = ", P_ROT)
-    print ("MTLX = ", MTLX)
+    print("These are the cloud types in order, and the corresponding amounts")
     print ("KCl, ZnS, Na2S, MnS, Cr, SiO2, Mg2SiO4, VO, Ni, Fe, Ca2SiO4, CaTiO3, Al2O3")
-    print (aerosol_layers, "layers")
-    print ("Haze type:", HAZE_TYPE)
-    print ("GCM Layers = ", INITIAL_NTAU)
-
-
-
-    # Whether  there are clouds
-    # 0 is no clouds, 1 is clouds
-    # This is also important for filling in the correct number of 0s for the input files
-    if any(i > 1e-20 for i in MOLEF):
-        CLOUDS = 1
-    else:
-        CLOUDS = 0
-
-    surfp=100 #surface pressure, in bars
-    tgr  = 1500 #temperature at 100 bars
-    ORB_SEP      = 0.01429 * 1.496e11
-    STELLAR_TEMP = 3250
-    R_STAR       = 0.207 * 695700000
-
-    print ("Surface Pressure = ",surfp)
-    print ("Ground  Temperature = ",tgr)
+    print("MOLEF", MOLEF)
+    print("Gravity =  ",     grav)
+    print("Number of OOM = ", oom)
+    print("Gas Constant = ", gasconst)
+    print("Planet Radius = ", R_PLANET)
+    print("Orbital Period = ", P_ROT)
+    print("MTLX = ", MTLX)
+    print("There are hazes? ", HAZES)
+    print(aerosol_layers, "aerosol layers")
+    print("Haze type:", HAZE_TYPE)
+    print("GCM Layers = ", INITIAL_NTAU)
     print ("Orbital Separation = ",ORB_SEP)
     print ("Star Temp = ",STELLAR_TEMP)
     print ("Star Radius = ",R_STAR)
+
+    # Are these used?
+    surfp = 100 #surface pressure, in bars
+    tgr   = 1500 #temperature at 100 bars
 
     print ("*************************************")
     print ("*************************************")
