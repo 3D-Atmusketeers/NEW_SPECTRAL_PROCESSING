@@ -171,7 +171,7 @@ def print_energy_balances(df, planet_name):
 
 
 
-def plot_phasecurves(planet_names, nlat, nlon, nlev, num_gcms):
+def plot_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len):
     n = len(planet_names)
     colors = pl.cm.viridis(np.linspace(0,1,n))
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15,6), sharex=True, sharey=False)
@@ -199,11 +199,11 @@ def plot_phasecurves(planet_names, nlat, nlon, nlev, num_gcms):
         
         # Plot each phase curve
         ax[0].plot(np.linspace(0, 1, nlon), lw_phase_curve, linewidth=3, linestyle=linestyle_str, color=colors[j]) 
-        ax[1].plot(np.linspace(0, 1, nlon), sw_phase_curve, linewidth=3, linestyle=linestyle_str, color=colors[j],label=planet_names[j][8:])  
+        ax[1].plot(np.linspace(0, 1, nlon), sw_phase_curve, linewidth=3, linestyle=linestyle_str, color=colors[j],label=planet_names[j][planet_name_char_len:])  
         print_energy_balances(df, planet_names[j])
         
         
-    fig.legend(ncol=3, bbox_to_anchor=(0.46, 1.00), loc='center', fontsize=13)
+    fig.legend(ncol=3, bbox_to_anchor=(0.46, 1.00), loc='center', fontsize=10, mode="expand")
 
     ax[0].set_xlim(0.01,0.99)
     ax[1].set_xlim(0.01,0.99)

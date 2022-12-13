@@ -2,7 +2,6 @@
 # coding: utf-8
 
 
-
 import numpy as np
 import pandas as pd
 import numpy as np
@@ -30,6 +29,8 @@ from astropy.modeling import models
 from astropy import units as u
 from astropy.modeling.models import BlackBody
 from astropy.visualization import quantity_support
+import re
+
 
 # GLOBAL PARAMS
 h = 6.6260701e-34
@@ -188,7 +189,7 @@ def plot_planet_spectra_test(planet_names):
 
     i = 0
     for planet_name in planet_names:
-        name = '../FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_0.0_inc_0.00.00.0000.00.dat'
+        name = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_0.0_inc_0.00.00.0000.00.dat'
         spectra0 = pd.read_csv(name, header=None, delim_whitespace=True, names=['Wavelength','Flux', 'Reflected'])
 
         wavelengths = np.asarray(list(spectra0['Wavelength'][10:-10]))
@@ -245,7 +246,7 @@ def plot_filters(planet_names):
     plt.subplots_adjust(hspace=0.05, wspace=0.25)
 
     # Load in a test spectra to get the wavelength ranges
-    spectra = pd.read_csv('../FINISHED_SPECTRA/Spec_0_GJ1214b-HAZES-100X-soot_phase_0.0_inc_0.00.00.0000.00.dat', 
+    spectra = pd.read_csv('../Spectral-Processing/FINISHED_SPECTRA/Spec_0_GJ1214b-HAZES-100X-soot_phase_0.0_inc_0.00.00.0000.00.dat', 
                         header=None, delim_whitespace=True, names=['wavelength','flux', 'reflected'])
 
     # Get only the spectra in the filter ranges we care about
@@ -298,7 +299,7 @@ def plot_spectra_phases(planet_names):
             integrated_signal.append(0)
             integrated_signal_star.append(0)
 
-            file_path = '../FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_0.00.00.0000.00.dat'
+            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_0.00.00.0000.00.dat'
             
             # Load in the planet spectra and convert to per microns
             # The star spectrum is per micron
@@ -380,7 +381,7 @@ def plot_spectra_phases(planet_names):
         return None
 
 
-def plot_phase_curves(planet_names):
+def plot_phase_curves(planet_names, planet_name_char_len):
     # Figure aesthetics
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12, 6),sharex=True, sharey=False)
     plt.subplots_adjust(hspace=0.05, wspace=0.25)
@@ -406,7 +407,7 @@ def plot_phase_curves(planet_names):
             # Load in the planet spectra and convert to per microns
             # The star spectrum is per micron
             
-            file_path = '../FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_0.00.00.0000.00.dat'
+            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_0.00.00.0000.00.dat'
             planet_spectra = pd.read_csv(file_path.format(str(i * rot_val)), header=None, delim_whitespace=True, names=['wavelength','flux', 'reflected'])
             planet_spectra.flux = planet_spectra.flux * (3.0e8 / planet_spectra.wavelength ** 2) / 1e6
                     
@@ -463,11 +464,11 @@ def plot_phase_curves(planet_names):
         phases = np.arange(0, 360, 4*3.75) / 360
         ax.plot(phases,fp_fs_ratio * 1e6,
                 color=my_colors(k / len(planet_names)),
-                linewidth=3,label=planet_name[8:])
+                linewidth=3,label=planet_name[planet_name_char_len:])
 
     # Figure legend stuff
     ax.set_xlim(min(phases),max(phases))    
-    ax.legend(fontsize=14, ncol=4, bbox_to_anchor=(.5, 1.15), loc='upper center')
+    ax.legend(fontsize=9, ncol=3, bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", borderaxespad=0, mode="expand")
     ax.set_xlabel('Orbital Phase')
     ax.set_ylabel(r'F$_p$/F$_s$ (ppm)') #  (W m$^{-2}$)
     plt.savefig('../Figures/GJ_Phase_Curves.jpg', dpi=200, bbox_inches='tight')

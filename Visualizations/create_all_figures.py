@@ -15,26 +15,34 @@ import spectra
 plt.style.use('style.txt')
 
 base = '../Spectral-Processing/PLANET_MODELS/'
-#planet_names = [name for name in os.listdir(base) if os.path.isdir(os.path.join(base, name))]
-planet_names = ["GJ1214b-SOOT-HAZES-1X"]
+#planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUPUT/', name))]
+
+#planet_names = ['GJ1214b-THOLIN-HAZES-1X-CLOUDS-25','GJ1214b-THOLIN-HAZES-100X-CLOUDS-25','GJ1214b-THOLIN-HAZES-1X','GJ1214b-THOLIN-HAZES-100X','GJ1214b-THOLIN-HAZES-100X-CLOUDS-50-DENSE','GJ1214b-THOLIN-HAZES-100X-CLOUDS-50','GJ1214b-THOLIN-HAZES-1X-CLOUDS-50-DENSE','GJ1214b-THOLIN-HAZES-1X-CLOUDS-50']
+#planet_names = ['GJ1214b-SOOT-HAZES-100X-CLOUDS-25', 'GJ1214b-SOOT-HAZES-100X','GJ1214b-SOOT-HAZES-1X-CLOUDS-50-DENSE','GJ1214b-SOOT-HAZES-1X-CLOUDS-25','GJ1214b-SOOT-HAZES-1X-CLOUDS-50','GJ1214b-SOOT-HAZES-1X']
+planet_names = ['GJ1214b-CLEAR-1X','GJ1214b-CLEAR-100X']
+
 
 column_names = ['lat', 'lon', 'level',
                'alt', 'pres', 'temp', 
                'u', 'v', 'w']
 
-df = pd.read_csv(base + planet_names[0] + '.txt', delim_whitespace=True, names=column_names)
+#df = pd.read_csv(base + planet_names[0] + '.txt', delim_whitespace=True, names=column_names)
 
-nlat = len(set(df.lat))
-nlon = len(set(df.lon))
-nlev = len(set(df.level))
+#nlat = len(set(df.lat))
+#nlon = len(set(df.lon))
+#nlev = len(set(df.level))
+
+nlat = 48
+nlon = 96
+nlev = 50
 num_gcms = len(planet_names)
-
-
+planet_name_char_len = 8
+"""
 print ("Plotting the broadband phase curves...")
 print ()
 print ()
 # Plot the broadband phase curves
-broadband_phase_curves.plot_phasecurves(planet_names, nlat, nlon, nlev, num_gcms)
+broadband_phase_curves.plot_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len)
 broadband_phase_curves.plot_reflected_starlight_maps(planet_names, nlat, nlon, nlev, num_gcms)
 
 print ("Plotting the isobaric projections...")
@@ -51,14 +59,14 @@ print ()
 # Plot the ptc curves
 pressure_temperature_condensation_curves.plot_PTC_curves(planet_names, nlat, nlon, nlev, num_gcms, nucleation_lim=True)
 
-
+"""
 print ("Plotting the spectra...")
 print ()
 print ()
 
 # Plot the spectra
-spectra.plot_planet_spectra_test(planet_names)
-spectra.plot_star_spectra_test(planet_names)
-spectra.plot_filters(planet_names)
+#spectra.plot_planet_spectra_test(planet_names)
+#spectra.plot_star_spectra_test(planet_names)
+#spectra.plot_filters(planet_names)
 spectra.plot_spectra_phases(planet_names)
-spectra.plot_phase_curves(planet_names)
+spectra.plot_phase_curves(planet_names, planet_name_char_len)

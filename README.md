@@ -63,6 +63,24 @@ Also be very careful if you put different metallities that the model can confuse
 Most importantly, check that the data output that is printed to the terminal matches what you want!
 It will print out all the important characterists!
 
+
+*************************************************
+********      OPACITY VERSIONS              *****
+*************************************************
+
+This code can work for a number of different resolution and temperature regimes.
+However, this requires swapping out the EOS and opacity files, as well as changing the code itself to read in these.
+I don't think that this is a good idea, but it would be a huge amount of work to change it.
+In the meantime, the code will simply swap out the files that need to be changed.
+These files are in OPAC_CODE_VERSIONS and the different opac and EOS files are in DATA
+
+The files are broken up into the following sets:
+SET_1: The low temp files for GJ1214b 
+SET_2: The files for HD189 + HD209. These are pretty standard hot jupiter files
+SET_3: The high res files, identical to SET_2 but high res
+
+AS YOU ADD STUFF TO THESE SETS PLEASE UPDATE THIS README!!!!
+
 *************************************************
 ************          NOTES         *************
 *************************************************

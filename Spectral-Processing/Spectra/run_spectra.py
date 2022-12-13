@@ -14,7 +14,7 @@ import re
 import shutil
 import glob
 import grab_input_data
-
+import setup_opac_versions
 
 # Phases in degrees, inclination in radians (sorry)
 # An inclination of 0 corresponds to edge on
@@ -46,13 +46,10 @@ ONLY_PHASE = True
 # In the correct directory
 USE_FORT_FILES = True
 
-# There are low resolution spectra and high resolution spectra that can be created
+# There are the different sets of opacity and EOS files
 # There are somethings that need to be changed in the template inputs file to make this happen
 # If you change the underlying data files these might need to be changed
-opacity_files = 'GJ1214b'
-
-# HD209-Table1-No-Clouds-Sponge
-# HD209-Table1-Ya-Clouds-Thin-Nuc-High-TSPD
+opacity_files = 'SET_1'
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
@@ -71,10 +68,13 @@ for q in range(len(planet_names)):
     grav           = grab_input_data.get_input_data(path, runname, "fort.7","GA")
     gasconst       = grab_input_data.get_input_data(path, runname, "fort.7","GASCON")
     R_PLANET       = grab_input_data.get_input_data(path, runname, "fort.7","RADEA")
-    P_ROT          =  (grab_input_data.get_input_data(path, runname, "fort.7","WW") / (2.0 * np.pi) * (24 * 3600)) ** -1.0
+    P_ROT          = (grab_input_data.get_input_data(path, runname, "fort.7","WW") / (2.0 * np.pi) * (24 * 3600)) ** -1.0
     oom            = grab_input_data.get_input_data(path, runname, "fort.7","OOM_IN")
     MTLX           = grab_input_data.get_input_data(path, runname, "fort.7","MTLX")
-    HAZES           = grab_input_data.get_input_data(path, runname, "fort.7","HAZES")
+    HAZES          = grab_input_data.get_input_data(path, runname, "fort.7","HAZES")
+    GAS_CONSTANT_R = 8.314462618
+    GASCON = grab_input_data.get_input_data(path, runname, "fort.7","GASCON")
+    MEAN_MOLECULAR_WEIGHT = np.round((GAS_CONSTANT_R/GASCON) * 1000, 4)
 
     print ()
     print ()
@@ -124,6 +124,7 @@ for q in range(len(planet_names)):
     STELLAR_TEMP = grab_input_data.read_planet_and_star_params(planet_name, "T* (K)")
     R_STAR       = grab_input_data.read_planet_and_star_params(planet_name, "R* (R_sun)") * 695700000
 
+    print("Planet characteristics")
     print("These are the cloud types in order, and the corresponding amounts")
     print ("KCl, ZnS, Na2S, MnS, Cr, SiO2, Mg2SiO4, VO, Ni, Fe, Ca2SiO4, CaTiO3, Al2O3")
     print("MOLEF", MOLEF)
@@ -137,9 +138,14 @@ for q in range(len(planet_names)):
     print(aerosol_layers, "aerosol layers")
     print("Haze type:", HAZE_TYPE)
     print("GCM Layers = ", INITIAL_NTAU)
-    print ("Orbital Separation = ",ORB_SEP)
-    print ("Star Temp = ",STELLAR_TEMP)
-    print ("Star Radius = ",R_STAR)
+    print("Mean Molecular Weight", MEAN_MOLECULAR_WEIGHT)
+
+    print("")
+    print("Star characteristics")
+    print("Orbital Separation = ",ORB_SEP)
+    print("Star Temp = ",STELLAR_TEMP)
+    print("Star Radius = ",R_STAR)
+
 
     # Are these used?
     surfp = 100 #surface pressure, in bars
@@ -189,6 +195,9 @@ for q in range(len(planet_names)):
         for i in range(len(input_paths)):
             output_temp = output_paths[i]
             input_temp  = input_paths[i]
+            
+            # This will copy all the files that need to be changed over with different opac versions
+            setup_opac_versions.replace_files(opacity_files)
 
             # Copy the template for inputs
             try:
@@ -227,6 +236,8 @@ for q in range(len(planet_names)):
             filedata = filedata.replace("<<R_STAR>>",       str(R_STAR))
             filedata = filedata.replace("<<P_ROT>>",        str(P_ROT))
 
+            filedata = filedata.replace("<<MEAN_MOLECULAR_WEIGHT>>", str(MEAN_MOLECULAR_WEIGHT))
+
 
             filedata = filedata.replace("<<HAZE_TYPE>>", "\"" + HAZE_TYPE +"\"")
             if (HAZES == True):
@@ -234,72 +245,11 @@ for q in range(len(planet_names)):
             else:
                 filedata = filedata.replace("<<HAZES>>", str(0))
 
-
-            # This is the part that changes the low-res vs high res
-            if opacity_files == 'high_resolution':
-                filedata = filedata.replace("<<num_pressure_points>>", "17")
-                filedata = filedata.replace("<<num_temperature_points>>", "30")
-                filedata = filedata.replace("<<num_wavelength_points>>", "2598")
-
-                filedata = filedata.replace("<<CHEM_FILE>>", "\"DATA/eos_solar_doppler.dat\"")
-                filedata = filedata.replace("<<CH4_FILE>>",  "\"DATA/opacCH4_hires.dat\"")
-                filedata = filedata.replace("<<CO2_FILE>>",  "\"DATA/opacCO2_hires.dat\"")
-                filedata = filedata.replace("<<CO_FILE>>",   "\"DATA/opacCO_hires.dat\"")
-                filedata = filedata.replace("<<H2O_FILE>>",  "\"DATA/opacH2O_hires.dat\"")
-                filedata = filedata.replace("<<NH3_FILE>>",  "\"DATA/opacNH3_hires.dat\"")
-                filedata = filedata.replace("<<O2_FILE >>",  "\"DATA/opacO2_hires.dat\"")
-                filedata = filedata.replace("<<O3_FILE>>",   "\"DATA/opacO3_hires.dat\"")
-
-
-                eos_df = pd.read_csv("DATA/eos_solar_doppler.dat", skiprows=3, delim_whitespace=True)
-                num_columns = eos_df.shape[1]
-                filedata = filedata.replace("<<NUM_COLS>>", str(num_columns))
-            elif (opacity_files == 'low_resoltion'):
-                filedata = filedata.replace("<<num_pressure_points>>", "13")
-                filedata = filedata.replace("<<num_temperature_points>>", "30")
-                filedata = filedata.replace("<<num_wavelength_points>>", "2598")
-
-                filedata = filedata.replace("<<CHEM_FILE>>", "\"DATA/eos_solar_doppler_2016_cond.dat\"")
-                filedata = filedata.replace("<<CH4_FILE>>",  "\"DATA/opacCH4.dat\"")
-                filedata = filedata.replace("<<CO2_FILE>>",  "\"DATA/opacCO2.dat\"")
-                filedata = filedata.replace("<<CO_FILE>>",   "\"DATA/opacCO.dat\"")
-                filedata = filedata.replace("<<H2O_FILE>>",  "\"DATA/opacH2O.dat\"")
-                filedata = filedata.replace("<<NH3_FILE>>",  "\"DATA/opacNH3.dat\"")
-                filedata = filedata.replace("<<O2_FILE >>",  "\"DATA/opacO2.dat\"")
-                filedata = filedata.replace("<<O3_FILE>>",   "\"DATA/opacO3.dat\"")
-
-                eos_df = pd.read_csv("DATA/eos_solar_doppler_2016_cond.dat", skiprows=3, delim_whitespace=True)
-                num_columns = eos_df.shape[1]
-                filedata = filedata.replace("<<NUM_COLS>>", str(num_columns))
-            elif (opacity_files == 'GJ1214b'):
-                filedata = filedata.replace("<<num_pressure_points>>", "28")
-                filedata = filedata.replace("<<num_temperature_points>>", "49")
-                filedata = filedata.replace("<<num_wavelength_points>>", "11215")
-
-                filedata = filedata.replace("<<CHEM_FILE>>",  "\"DATA/eos_solar_GJ1214b.dat\"")
-                filedata = filedata.replace("<<C2H2_FILE>>",  "\"DATA/opacC2H2.dat\"")
-                filedata = filedata.replace("<<CH4_FILE>>",   "\"DATA/opacCH4.dat\"")
-                filedata = filedata.replace("<<CO_FILE>>",    "\"DATA/opacCO.dat\"")
-                filedata = filedata.replace("<<CO2_FILE>>",   "\"DATA/opacCO2.dat\"")
-                filedata = filedata.replace("<<FeH_FILE>>",   "\"DATA/opacFeH.dat\"")
-                filedata = filedata.replace("<<H2O_FILE>>",   "\"DATA/opacH2O.dat\"")
-                filedata = filedata.replace("<<H2S_FILE>>",   "\"DATA/opacH2S.dat\"")
-                filedata = filedata.replace("<<HCN_FILE>>",   "\"DATA/opacHCN.dat\"")
-                filedata = filedata.replace("<<K_FILE>>",     "\"DATA/opacK.dat\"")
-                filedata = filedata.replace("<<Na_FILE>>",    "\"DATA/opacNa.dat\"")
-                filedata = filedata.replace("<<NH3_FILE>>",   "\"DATA/opacNH3.dat\"")
-                filedata = filedata.replace("<<TiO_FILE>>",   "\"DATA/opacTiO.dat\"")
-                filedata = filedata.replace("<<VO_FILE>>",    "\"DATA/opacVO.dat\"")
-
-                eos_df = pd.read_csv("DATA/eos_solar_GJ1214b.dat", skiprows=3, delim_whitespace=True)
-                num_columns = eos_df.shape[1]
-                filedata = filedata.replace("<<NUM_COLS>>", str(num_columns))
-
-
             # Write the file out again
             with open(inputs_file, 'w') as file:
                 file.write(filedata)
-
+            
+            exit(0)
             # Run Eliza's code
             os.system('make clean')
             os.system('make rt_emission_aerosols.exe')
@@ -313,6 +263,8 @@ for q in range(len(planet_names)):
     inclination_strs = []
     phase_strs = []
     
+
+    """
     # Convert the fort files to the correct format
     if USE_FORT_FILES == True:
         convert_fort_files.convert_to_correct_format(path, runname, planet_name, INITIAL_NTAU, surfp, oom, tgr, grav, gasconst)
@@ -329,13 +281,9 @@ for q in range(len(planet_names)):
 
     # If you already have the Final planet file creates you can commend out run_grid and double planet file
     run_grid.run_all_grid(planet_name, phases, inclinations, system_obliquity, NTAU, NLAT, NLON, grid_lat_min, grid_lat_max, grid_lon_min, grid_lon_max, ONLY_PHASE)
-
+    """
     # Get all the files that you want to run
     input_paths, inclination_strs, phase_strs = get_run_lists(phases, inclinations)
-    
-    print (input_paths)
-    print (inclination_strs)
-    print (phase_strs)
     
     # If you want to manually set these values you can leave them here
     # Normally they will not affect it, unless you manually set them in two_stream.h

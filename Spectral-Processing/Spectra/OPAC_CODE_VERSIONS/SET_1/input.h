@@ -27,7 +27,7 @@ Defines input values and files for 3-D emission spectra
 #define NLAMBDA 11215                       /* Number of wavelength points in grid [4616/2598]   */
 
 // This is the Npressure for low res
-#define NPRESSURE 28    
+#define NPRESSURE 28    /* Number of pressure points in grid   [13/17]   */
 
 #define W0_VAL 0.0
 #define G0_VAL 0.0
@@ -35,17 +35,18 @@ Defines input values and files for 3-D emission spectra
 /* Planet parameters */
 #define INPUT_INCLINATION 0.0  /* Planet inclination in radians            */
 #define INPUT_PHASE 0.0              /* Planet inclination in degrees           */
-#define G 21.2                   /* Planet surface gravity                 */
+#define G 10.65                   /* Planet surface gravity                 */
 
-#define R_PLANET 80000000.0              /* Planet radius at base of atmosphere      */
-#define ORB_SEP 2137784000.0                // This is some distance
+#define R_PLANET 17469282.0              /* Planet radius at base of atmosphere      */
+#define ORB_SEP 2139280000.0                // This is some distance
 #define STELLAR_TEMP 3250      // Stellar Blackbody temperature
-#define R_STAR 144009900.0                  /* Stellar radius                         */
-#define P_ROT  2.2191654612886906                   /* Rotation period in days (= P_ORB for tidally locked planet)    */
+#define R_STAR 136287630.0                  /* Stellar radius                         */
+#define P_ROT  1.4804043752619522                   /* Rotation period in days (= P_ORB for tidally locked planet)    */
 #define HAZE_TYPE "None"
 #define HAZES 0
+
 #define R_VEL 0.0                          /* Radial Velocity                        */
-#define 2.3601          /* Mean molecular weight                  */
+#define MU 2.36                            /* Mean molecular weight                  */
 #define FORMAT 2                           /* FORMAT=1 -> small opacity table        */
                                            /* FORMAT=2 -> large opacity table        */
 
@@ -54,20 +55,20 @@ Defines input values and files for 3-D emission spectra
 #define CHEM_FILE_NCOLS 23 /* total number of EOS file columns, including temperature and pressure.*/
 
 /* Opacities for spectra */
-#define CHEM_FILE   "DATA/SET_1/eos_solar_GJ1214b.dat"
-#define C2H2_FILE   "DATA/SET_1/opacC2H2.dat"
-#define CH4_FILE    "DATA/SET_1/opacCH4.dat"
-#define CO_FILE     "DATA/SET_1/opacCO.dat"
-#define CO2_FILE    "DATA/SET_1/opacCO2.dat"
-#define FeH_FILE    "DATA/SET_1/opacFeH.dat"
-#define H2O_FILE    "DATA/SET_1/opacH2O.dat"
-#define H2S_FILE    "DATA/SET_1/opacH2S.dat"
-#define HCN_FILE    "DATA/SET_1/opacHCN.dat"
-#define K_FILE      "DATA/SET_1/opacK.dat"
-#define Na_FILE     "DATA/SET_1/opacNa.dat"
-#define NH3_FILE    "DATA/SET_1/opacNH3.dat"
-#define TiO_FILE    "DATA/SET_1/opacTiO.dat"
-#define VO_FILE     "DATA/SET_1/opacVO.dat"
+#define CHEM_FILE   "DATA/eos_solar_GJ1214b.dat"
+#define C2H2_FILE   "DATA/opacC2H2.dat"
+#define CH4_FILE    "DATA/opacCH4.dat"
+#define CO_FILE     "DATA/opacCO.dat"
+#define CO2_FILE    "DATA/opacCO2.dat"
+#define FeH_FILE    "DATA/opacFeH.dat"
+#define H2O_FILE    "DATA/opacH2O.dat"
+#define H2S_FILE    "DATA/opacH2S.dat"
+#define HCN_FILE    "DATA/opacHCN.dat"
+#define K_FILE      "DATA/opacK.dat"
+#define Na_FILE     "DATA/opacNa.dat"
+#define NH3_FILE    "DATA/opacNH3.dat"
+#define TiO_FILE    "DATA/opacTiO.dat"
+#define VO_FILE     "DATA/opacVO.dat"
 
 #endif /* !__INPUT_H__ */
 
