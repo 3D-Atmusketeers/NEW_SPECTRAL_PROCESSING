@@ -15,12 +15,7 @@ import spectra
 plt.style.use('style.txt')
 
 base = '../Spectral-Processing/PLANET_MODELS/'
-#planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUPUT/', name))]
-
-#planet_names = ['GJ1214b-THOLIN-HAZES-1X-CLOUDS-25','GJ1214b-THOLIN-HAZES-100X-CLOUDS-25','GJ1214b-THOLIN-HAZES-1X','GJ1214b-THOLIN-HAZES-100X','GJ1214b-THOLIN-HAZES-100X-CLOUDS-50-DENSE','GJ1214b-THOLIN-HAZES-100X-CLOUDS-50','GJ1214b-THOLIN-HAZES-1X-CLOUDS-50-DENSE','GJ1214b-THOLIN-HAZES-1X-CLOUDS-50']
-#planet_names = ['GJ1214b-SOOT-HAZES-100X-CLOUDS-25', 'GJ1214b-SOOT-HAZES-100X','GJ1214b-SOOT-HAZES-1X-CLOUDS-50-DENSE','GJ1214b-SOOT-HAZES-1X-CLOUDS-25','GJ1214b-SOOT-HAZES-1X-CLOUDS-50','GJ1214b-SOOT-HAZES-1X']
-planet_names = ['GJ1214b-CLEAR-1X','GJ1214b-CLEAR-100X']
-
+planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUPUT/', name))]
 
 column_names = ['lat', 'lon', 'level',
                'alt', 'pres', 'temp', 
@@ -28,16 +23,13 @@ column_names = ['lat', 'lon', 'level',
 
 #df = pd.read_csv(base + planet_names[0] + '.txt', delim_whitespace=True, names=column_names)
 
-#nlat = len(set(df.lat))
-#nlon = len(set(df.lon))
-#nlev = len(set(df.level))
+nlat = len(set(df.lat))
+nlon = len(set(df.lon))
+nlev = len(set(df.level))
 
-nlat = 48
-nlon = 96
-nlev = 50
 num_gcms = len(planet_names)
 planet_name_char_len = 8
-"""
+
 print ("Plotting the broadband phase curves...")
 print ()
 print ()
@@ -56,10 +48,10 @@ cloud_coverage_isobars.plot_cloud_coverage_isobars(planet_names, nlat, nlon, nle
 print ("Plotting the pressure temperature condensation curves...")
 print ()
 print ()
+
 # Plot the ptc curves
 pressure_temperature_condensation_curves.plot_PTC_curves(planet_names, nlat, nlon, nlev, num_gcms, nucleation_lim=True)
 
-"""
 print ("Plotting the spectra...")
 print ()
 print ()

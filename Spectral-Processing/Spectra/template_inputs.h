@@ -23,11 +23,11 @@ Defines input values and files for 3-D emission spectra
 #define NLAT  <<NLAT>>                           /* Number of latitude points in 3-D  grid */
 #define NLON  <<NLON>>                           /* Number of longitude points in 3-D grid */
 
-#define NTEMP 49                           /* Number of temperature points in grid   */
-#define NLAMBDA 11215                       /* Number of wavelength points in grid [4616/2598]   */
+#define NTEMP 30                           /* Number of temperature points in grid   */
+#define NLAMBDA 2598                       /* Number of wavelength points in grid [4616/2598]   */
 
 // This is the Npressure for low res
-#define NPRESSURE 28    
+#define NPRESSURE 17    /* Number of pressure points in grid   [13/17]   */
 
 #define W0_VAL <<W0_VAL>>
 #define G0_VAL <<G0_VAL>>
@@ -37,37 +37,70 @@ Defines input values and files for 3-D emission spectra
 #define INPUT_PHASE <<phase>>              /* Planet inclination in degrees           */
 #define G <<GRAVITY_SI>>                   /* Planet surface gravity                 */
 
-#define R_PLANET <<R_PLANET>>              /* Planet radius at base of atmosphere      */
-#define ORB_SEP <<ORB_SEP>>                // This is some distance
-#define STELLAR_TEMP <<STELLAR_TEMP>>      // Stellar Blackbody temperature
-#define R_STAR <<R_STAR>>                  /* Stellar radius                         */
-#define P_ROT  <<P_ROT>>                   /* Rotation period in days (= P_ORB for tidally locked planet)    */
+#define R_PLANET <<R_PLANET>>                 /* Planet radius at base of atmosphere      */
+#define ORB_SEP <<ORB_SEP>>                  // This is some distance
+#define STELLAR_TEMP <<STELLAR_TEMP>>                // Stellar Blackbody temperature
+#define R_STAR <<R_STAR>>                    /* Stellar radius                         */
+#define P_ROT  <<P_ROT>>                        /* Rotation period in days (= P_ORB for tidally locked planet)    */
 #define HAZE_TYPE <<HAZE_TYPE>>
 #define HAZES <<HAZES>>
+
 #define R_VEL 0.0                          /* Radial Velocity                        */
-#define <<MEAN_MOLECULAR_WEIGHT>>          /* Mean molecular weight                  */
+#define MU <<MEAN_MOLECULAR_WEIGHT>>          /* Mean molecular weight                  */
 #define FORMAT 2                           /* FORMAT=1 -> small opacity table        */
                                            /* FORMAT=2 -> large opacity table        */
 
-#define ABUND_TRACK_IND 10 /* if test visualize, the index of the mapped species in the EOS file */
-#define CHEM_FILE_NCOLS_USED 23 /* number of EOS columns to use (rest discarded). including T and P. */
-#define CHEM_FILE_NCOLS 23 /* total number of EOS file columns, including temperature and pressure.*/
+/* Aerosol properties (calculated by the Mischenko Mie code) */
+
+#define PI0_KCl 0.74
+#define G0_KCl 0.15
+#define QE_KCl 0.12
+#define PI0_ZnS 0.74
+#define G0_ZnS 0.15
+#define QE_ZnS 0.12
+#define PI0_Na2S 0.74
+#define G0_Na2S 0.15
+#define QE_Na2S 0.12
+#define PI0_MnS 0.74
+#define G0_MnS 0.15
+#define QE_MnS 0.12
+#define PI0_Cr 0.74
+#define G0_Cr 0.15
+#define QE_Cr 0.12
+#define PI0_SiO2 0.74
+#define G0_SiO2 0.15
+#define QE_SiO2 0.12
+#define PI0_Mg2SiO4 0.74
+#define G0_Mg2SiO4 0.15
+#define QE_Mg2SiO4 0.12
+#define PI0_VO 0.74
+#define G0_VO 0.15
+#define QE_VO 0.12
+#define PI0_Ni 0.74
+#define G0_Ni 0.15
+#define QE_Ni 0.12
+#define PI0_Fe 0.74
+#define G0_Fe 0.15
+#define QE_Fe 0.12
+#define PI0_CaSiO4 0.74
+#define G0_CaSiO4 0.15
+#define QE_CaSiO4 0.12
+#define PI0_CaTiO3 0.74
+#define G0_CaTiO3 0.15
+#define QE_CaTiO3 0.15
+#define PI0_Al2O3 0.74
+#define G0_Al2O3 0.15
+#define QE_Al2O3 0.12
 
 /* Opacities for spectra */
-#define CHEM_FILE   "DATA/SET_1/eos_solar_GJ1214b.dat"
-#define C2H2_FILE   "DATA/SET_1/opacC2H2.dat"
-#define CH4_FILE    "DATA/SET_1/opacCH4.dat"
-#define CO_FILE     "DATA/SET_1/opacCO.dat"
-#define CO2_FILE    "DATA/SET_1/opacCO2.dat"
-#define FeH_FILE    "DATA/SET_1/opacFeH.dat"
-#define H2O_FILE    "DATA/SET_1/opacH2O.dat"
-#define H2S_FILE    "DATA/SET_1/opacH2S.dat"
-#define HCN_FILE    "DATA/SET_1/opacHCN.dat"
-#define K_FILE      "DATA/SET_1/opacK.dat"
-#define Na_FILE     "DATA/SET_1/opacNa.dat"
-#define NH3_FILE    "DATA/SET_1/opacNH3.dat"
-#define TiO_FILE    "DATA/SET_1/opacTiO.dat"
-#define VO_FILE     "DATA/SET_1/opacVO.dat"
+#define CHEM_FILE   "DATA/SET_3/eos_solar_doppler.dat"
+#define CH4_FILE    "DATA/SET_3/opacCH4_hires.dat"
+#define CO2_FILE    "DATA/SET_3/opacCO2_hires.dat"
+#define CO_FILE     "DATA/SET_3/opacCO_hires.dat"
+#define H2O_FILE    "DATA/SET_3/opacH2O_hires.dat"
+#define NH3_FILE    "DATA/SET_3/opacNH3_hires.dat"
+#define O2_FILE     "DATA/SET_3/opacO2_hires.dat"
+#define O3_FILE     "DATA/SET_3/opacO3_hires.dat"
 
 #endif /* !__INPUT_H__ */
 

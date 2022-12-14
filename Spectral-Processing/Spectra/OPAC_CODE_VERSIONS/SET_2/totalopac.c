@@ -324,7 +324,7 @@ void TotalOpac() {
 
   /* H2 - H2 */
 
-  f1 = fopen("DATA/H2_H2.dat", "r");
+  f1 = fopen("DATA/SET_2/H2_H2.dat", "r");
   if(f1 == NULL){
     printf("\totalopac.c:\nError opening file: H2-H2 CIA -- No such file or directory\n\n");
     exit(1);
@@ -357,7 +357,7 @@ void TotalOpac() {
 
   /* H2 - He */
 
-  f1 = fopen("DATA/H2_He.dat", "r");
+  f1 = fopen("DATA/SET_2/H2_He.dat", "r");
   if(f1 == NULL){
     printf("\totalopac.c:\nError opening file: H2-He CIA -- No such file or directory\n\n");
     exit(1);
@@ -391,7 +391,7 @@ void TotalOpac() {
 
   /* H2 - CH4 */
 
-  f1 = fopen("DATA/H2_CH4.dat", "r");
+  f1 = fopen("DATA/SET_2/H2_CH4.dat", "r");
   if(f1 == NULL){
     printf("\totalopac.c:\nError opening file: H2-CH4 CIA -- No such file or directory\n\n");
     exit(1);

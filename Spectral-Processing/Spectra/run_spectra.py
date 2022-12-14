@@ -4,7 +4,6 @@ from shutil import copyfile
 from sys import exit
 import os
 import sys
-import pandas as pd
 import numpy as np
 import run_grid
 import altitude_regridding
@@ -12,13 +11,13 @@ import add_clouds
 import convert_fort_files
 import re
 import shutil
-import glob
 import grab_input_data
 import setup_opac_versions
 
 # Phases in degrees, inclination in radians (sorry)
 # An inclination of 0 corresponds to edge on
 phases = [0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0, 195.0, 210.0, 225.0, 240.0, 255.0, 270.0, 285.0, 300.0, 315.0, 330.0, 345.0]
+phases = [0.0]
 inclinations = [0.0]
 system_obliquity = 0
 
@@ -49,11 +48,11 @@ USE_FORT_FILES = True
 # There are the different sets of opacity and EOS files
 # There are somethings that need to be changed in the template inputs file to make this happen
 # If you change the underlying data files these might need to be changed
-opacity_files = 'SET_1'
+opacity_files = 'SET_3'
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-CLEAR-1X"]
+planet_names = ["HD189-DOGRAY"]
 
 
 for q in range(len(planet_names)):
@@ -87,11 +86,8 @@ for q in range(len(planet_names)):
         HAZE_TYPE = 'soot'
     elif ("THOLIN".lower() in planet_names[q].lower()):
         HAZE_TYPE = 'tholin'
-    elif ("CLEAR".lower() in planet_names[q].lower()):
-        HAZE_TYPE = 'None'
     else:
-        print ('SOMETHING IS WRONG WITH THE HAZE TYPE')
-        exit(0)
+        HAZE_TYPE = 'None'
 
     if (HAZE_TYPE == 'soot' or HAZE_TYPE == 'soot-2xpi0' or HAZE_TYPE == 'tholin' or HAZE_TYPE == 'sulfur'):
         HAZES = True
@@ -249,7 +245,6 @@ for q in range(len(planet_names)):
             with open(inputs_file, 'w') as file:
                 file.write(filedata)
             
-            exit(0)
             # Run Eliza's code
             os.system('make clean')
             os.system('make rt_emission_aerosols.exe')
@@ -262,8 +257,6 @@ for q in range(len(planet_names)):
     output_paths = []
     inclination_strs = []
     phase_strs = []
-    
-
     """
     # Convert the fort files to the correct format
     if USE_FORT_FILES == True:
@@ -299,8 +292,16 @@ for q in range(len(planet_names)):
 print("Moving the files out of the clean directory")
 for filename in os.listdir('DATA'):
     if re.match(r'init_*', filename):
-        shutil.move(os.path.join('DATA', filename), '../PLANET_MODELS')
+        # If the file already exists, don't do anything. Maybe delete it eventually?
+        if os.path.isfile('../PLANET_MODELS' + filename):
+            pass
+        else:
+            shutil.move(os.path.join('DATA', filename), '../PLANET_MODELS')
 
 for filename in os.listdir('OUT'):
     if re.match(r'Spec_*', filename):
-        shutil.move(os.path.join('OUT', filename), '../FINISHED_SPECTRA')
+        # If the file already exists, don't do anything. Maybe delete it eventually?
+        if os.path.isfile('../FINISHED_SPECTRA' + filename):
+            pass
+        else:
+            shutil.move(os.path.join('OUT', filename), '../FINISHED_SPECTRA')

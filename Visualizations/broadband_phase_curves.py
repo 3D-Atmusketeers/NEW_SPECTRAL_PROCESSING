@@ -159,7 +159,7 @@ def print_energy_balances(df, planet_name):
     total_lwin  = sum(df.lwin)
     total_swin  = sum(df.swin)
     
-    with open('DATA/Energy_Balances.txt', 'a+') as f:
+    with open('OUTPUT_DATA/Energy_Balances_' + planet_name + '.txt', 'a+') as f:
         f.write('******************** \n')
         f.write(planet_name + '\n')
         f.write("Energy Out / Energy In: " + str(np.round((total_lwout + total_swout) / (total_lwin  + total_swin), 3)) + "\n")

@@ -65,21 +65,19 @@ def read_planet_and_star_params(planet_name, column_name_str):
     row_names = df.Name.values
 
     # Get the planet name from the input string
-    planet_name_base = re.split(r"[_|-]", planet_name)
+    planet_name_base = re.split(r"[_|-]", planet_name)[0]
+
 
     # check if any of the row names are a substring of the input string
     found = False
     for row_name in row_names:
-        if row_name in planet_name_base:
+        if row_name in planet_name_base or planet_name_base in row_name:
             found = True
             break
 
     if not found:
         print("The planet name isn't in the dataframe")
     else:
-        # define the column name
-        column_name = column_name_str
-
         # return the value for the row with the planet name
         # and the column name set as the string calling name
         value = list(df.loc[df['Name'] == row_name][column_name_str])[0]

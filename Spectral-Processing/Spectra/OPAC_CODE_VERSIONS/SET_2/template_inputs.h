@@ -46,7 +46,7 @@ Defines input values and files for 3-D emission spectra
 #define HAZES <<HAZES>>
 
 #define R_VEL 0.0                          /* Radial Velocity                        */
-#define <<MEAN_MOLECULAR_WEIGHT>>          /* Mean molecular weight                  */
+#define MU <<MEAN_MOLECULAR_WEIGHT>>          /* Mean molecular weight                  */
 #define FORMAT 2                           /* FORMAT=1 -> small opacity table        */
                                            /* FORMAT=2 -> large opacity table        */
 
