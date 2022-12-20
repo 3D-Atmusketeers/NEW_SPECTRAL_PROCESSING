@@ -11,17 +11,14 @@ import broadband_phase_curves
 import cloud_coverage_isobars
 import pressure_temperature_condensation_curves
 import spectra
+import re
 
 plt.style.use('style.txt')
 
 base = '../Spectral-Processing/PLANET_MODELS/'
-planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUPUT/', name))]
-
-column_names = ['lat', 'lon', 'level',
-               'alt', 'pres', 'temp', 
-               'u', 'v', 'w']
-
-#df = pd.read_csv(base + planet_names[0] + '.txt', delim_whitespace=True, names=column_names)
+planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
+column_names = ['lat', 'lon', 'level','alt', 'pres', 'temp', 'u', 'v', 'w']
+df = pd.read_csv(base + planet_names[0] + '.txt', delim_whitespace=True, names=column_names)
 
 nlat = len(set(df.lat))
 nlon = len(set(df.lon))
@@ -30,35 +27,48 @@ nlev = len(set(df.level))
 num_gcms = len(planet_names)
 planet_name_char_len = 8
 
-print ("Plotting the broadband phase curves...")
-print ()
-print ()
+
+# code to check whether the names are a list
+if isinstance(planet_names, list):
+  pass
+else:
+    planet_names = [planet_names]
+
+#print ("Plotting the broadband phase curves...")
+#print ()
+#print ()
 # Plot the broadband phase curves
-broadband_phase_curves.plot_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len)
+broadband_phase_curves.plot_thermal_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len)
+broadband_phase_curves.plot_reflected_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len)
 broadband_phase_curves.plot_reflected_starlight_maps(planet_names, nlat, nlon, nlev, num_gcms)
 
-print ("Plotting the isobaric projections...")
-print ()
-print ()
+#print ("Plotting the isobaric projections...")
+#print ()
+#print ()
 # Plot the isobaric cloud maps
-pressure_lev_bar = 1e-2
-cloud_coverage_isobars.plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, pressure_lev_bar)
+# If the extra_pressure level is greater than 0, its plots it also
+# If it is 0, then it plots the IR photosphere pressure
+#cloud_coverage_isobars.plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, extra_pressure_level_bar=0)
+#cloud_coverage_isobars.plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, extra_pressure_level_bar=0.1)
 
-
-print ("Plotting the pressure temperature condensation curves...")
-print ()
-print ()
+#print ("Plotting the pressure temperature condensation curves...")
+#print ()
+#print ()
 
 # Plot the ptc curves
 pressure_temperature_condensation_curves.plot_PTC_curves(planet_names, nlat, nlon, nlev, num_gcms, nucleation_lim=True)
 
-print ("Plotting the spectra...")
-print ()
-print ()
+#print ("Plotting the spectra...")
+#print ()
+#print ()
 
 # Plot the spectra
 #spectra.plot_planet_spectra_test(planet_names)
 #spectra.plot_star_spectra_test(planet_names)
 #spectra.plot_filters(planet_names)
-spectra.plot_spectra_phases(planet_names)
-spectra.plot_phase_curves(planet_names, planet_name_char_len)
+spectra.plot_spectra_simple(planet_names, num_phases=24)
+spectra.plot_spectra_phases(planet_names, num_phases=24, transmission_filter_name='MIRI', planet_only_bool=False)
+spectra.plot_phase_curves(planet_names, planet_name_char_len, num_phases=24, transmission_filter_name='MIRI')
+
+
+

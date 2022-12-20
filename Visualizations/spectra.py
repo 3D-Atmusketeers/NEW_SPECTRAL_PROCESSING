@@ -39,31 +39,38 @@ c = 3e8
 STAR_RADIUS   = 0.215 * 695700000
 PLANET_RADIUS = 1.7469282e7
 
-def get_filter(which_filter='MIRI'):
+def get_filter(which_filter):
     #df_5 = {'wav': np.linspace(5e-6, 6e-6, 500), 'transmission': np.linspace(1, 1, 500)}
-    df_5_12 = {'wav': np.linspace(5e-6, 12e-6, 500), 'transmission': np.linspace(1, 1, 500)}
+    
 
     #filter_3_6 = pd.read_csv('DATA/filter_3.6.dat', delim_whitespace=True, skiprows=3, names=['wav', 'transmission'])
     #filter_4_5 = pd.read_csv('DATA/filter_4.5.dat', delim_whitespace=True, skiprows=3, names=['wav', 'transmission'])
     #filter_5_0 = pd.DataFrame(data=df_5)
-    filter_5_12 = pd.read_csv('DATA/MIRI_BANDPASS.txt', delim_whitespace=True, skiprows=1, names=['wav', 'transmission'])
+    
 
     # Put the filters in meters
     #filter_3_6.wav = filter_3_6.wav / 1e6
     #filter_4_5.wav = filter_4_5.wav / 1e6
-    filter_5_12.wav = filter_5_12.wav / 1e6
+    
 
     # Interpolate the filters
     #f_3_6 = interpolate.interp1d(filter_3_6.wav, filter_3_6.transmission)
     #f_4_5 = interpolate.interp1d(filter_4_5.wav, filter_4_5.transmission)
     #f_5_0 = interpolate.interp1d(filter_5_0.wav, filter_5_0.transmission)
+
+
     if which_filter == 'MIRI':
+        df_5_12 = {'wav': np.linspace(5e-6, 12e-6, 500), 'transmission': np.linspace(1, 1, 500)}
+        filter_5_12 = pd.read_csv('DATA/MIRI_BANDPASS.txt', delim_whitespace=True, skiprows=1, names=['wav', 'transmission'])
+        filter_5_12.wav = filter_5_12.wav / 1e6
         f_5_12 = interpolate.interp1d(filter_5_12.wav, filter_5_12.transmission)
+        return filter_5_12, f_5_12
     else:
         print ("Filters other than MIRI are not written in yet")
         exit(0)
+        
 
-    return filter_5_12, f_5_12
+    
 
 
 def get_star_spectra():
@@ -272,18 +279,62 @@ def plot_filters(planet_names):
     plt.clf()
     return None
 
-
-
-
-def plot_spectra_phases(planet_names):
-    planet_only_bool = False
-
+def plot_spectra_simple(planet_names, num_phases):
     cm_name = 'batlow'
     cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
     cm_file  = np.roll(cm_file, 140, axis=0)
     my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
 
-    filter_5_12, f_5_12 = get_filter(which_filter='MIRI')
+    for k, planet_name in enumerate(planet_names):
+        # Figure aesthetics
+        fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12, 6),sharex=True, sharey=False)
+        plt.subplots_adjust(hspace=0.05, wspace=0.25)
+
+
+        for i in range(num_phases):
+            # Get the phase value
+            rot_val = 360. / num_phases
+            
+            # Get the file path
+            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_0.00.00.0000.00.dat'
+            
+            # Load in the planet spectra
+            planet_spectra = pd.read_csv(file_path.format(str(i * rot_val)), header=None, delim_whitespace=True, names=['wavelength','flux', 'reflected'])
+    
+            # Reset the index
+            planet_spectra = planet_spectra.reset_index(drop=True)
+
+            ax.plot(planet_spectra.wavelength * 1e6,
+                    planet_spectra.flux,
+                    color=my_colors(i / num_phases),
+                    linewidth=3,
+                    label=str(np.round(rot_val * i / 360., 3)))
+        
+        # Do somet figure stuff
+        ax.set_xlim(min(planet_spectra.wavelength*1e6),max(planet_spectra.wavelength*1e6))  
+        #ax.legend(fontsize=14, ncol=6, bbox_to_anchor=(.5, 1.15), loc='upper center')
+        
+        ax.legend(fontsize=12, loc=(0,1.08), ncol=5, mode='expand', title='Orbital Phase', title_fontsize=16)
+
+        ax.set_xlabel('Wavelength ($\mu$m)')
+        ax.set_ylabel(r'Flux (W/m$^2$/$\mu m$)') #  (W m$^{-2}$)
+        plt.savefig('../Figures/Planet_Simple_Spectra_{}.jpg'.format(planet_name), dpi=200, bbox_inches='tight')
+        plt.clf()
+
+    return None
+
+
+def plot_spectra_phases(planet_names, num_phases, transmission_filter_name, planet_only_bool):
+    cm_name = 'batlow'
+    cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
+    cm_file  = np.roll(cm_file, 140, axis=0)
+    my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
+     
+    # I currently only have MIRI coded in
+    if transmission_filter_name == 'MIRI':
+        filt, interp_function = get_filter(which_filter=transmission_filter_name)
+    else:
+        pass
 
     for k, planet_name in enumerate(planet_names):
         # Figure aesthetics
@@ -293,7 +344,6 @@ def plot_spectra_phases(planet_names):
         integrated_signal     = []
         integrated_signal_star = []
 
-        num_phases = 2
         for i in range(num_phases):
             rot_val = 360. / num_phases
             integrated_signal.append(0)
@@ -305,21 +355,20 @@ def plot_spectra_phases(planet_names):
             # The star spectrum is per micron
             planet_spectra = pd.read_csv(file_path.format(str(i * rot_val)), header=None, delim_whitespace=True, names=['wavelength','flux', 'reflected'])
             planet_spectra.flux = planet_spectra.flux * (3.0e8 / planet_spectra.wavelength ** 2) / 1e6
-
-            # Select the filter
-            # Only use the data points within the filter wavelength range that we want
-            filt = filter_5_12
-            interp_function = f_5_12
-            planet_spectra  = planet_spectra[(planet_spectra['wavelength'] > np.amin(filt.wav)) & (planet_spectra['wavelength'] < np.amax(filt.wav))] 
-
-            # get the star_spectra
+    
+            # Get the star spectra
             star_spectra = get_star_spectra()   
-            star_spectra = star_spectra[(star_spectra['wavelength'] > np.amin(filt.wav)) & (star_spectra['wavelength'] < np.amax(filt.wav))]  
+            
+            if transmission_filter_name == 'MIRI':
+                # Only use the data points within the filter wavelength range that we want
+                planet_spectra  = planet_spectra[(planet_spectra['wavelength'] > np.amin(filt.wav)) & (planet_spectra['wavelength'] < np.amax(filt.wav))] 
+                star_spectra = star_spectra[(star_spectra['wavelength'] > np.amin(filt.wav)) & (star_spectra['wavelength'] < np.amax(filt.wav))]  
+            else:
+                pass
 
             # Reset the indexes of the planet and star dataframes
             planet_spectra = planet_spectra.reset_index(drop=True)
             #star_spectra   = star_spectra.reset_index(drop=True)
-
 
             if planet_only_bool:
                 # Convolve the planet and star down to a lower resolution
@@ -327,9 +376,9 @@ def plot_spectra_phases(planet_names):
 
                 ax.plot(planet_spectra.wavelength * 1e6,
                         reduced_planet,
-                        color=my_colors(i / 24),
+                        color=my_colors(i / num_phases),
                         linewidth=3,
-                        label='Phase: ' + str(rot_val * i) +'$^\circ$')
+                        label=str(np.round(rot_val * i / 360., 3)))
 
                 pd.DataFrame({'Wave (microns)':planet_spectra.wavelength * 1e6,
                         'Planet_Flux SI/micron':reduced_planet}).to_csv('OUTPUT_DATA/Planet_White_Light_Phase_{}_Spectra_{}.txt'.format(str(i * rot_val), planet_name), sep=' ')
@@ -349,10 +398,13 @@ def plot_spectra_phases(planet_names):
                 regridded_star_spectrum = fnc_star_converter(planet_spectra.wavelength)
 
 
-                # Calculate the total signal, and the star signal 
-                signal      = (regridded_star_spectrum * STAR_RADIUS**2. + reduced_planet * PLANET_RADIUS**2.)                         * (planet_spectra.wavelength / h*c) * interp_function(planet_spectra.wavelength)
-
-                signal_star = (regridded_star_spectrum * STAR_RADIUS**2.)                         * (planet_spectra.wavelength / h*c) * interp_function(planet_spectra.wavelength)
+                # Calculate the total signal, and the star signal
+                if transmission_filter_name == 'MIRI':
+                    signal      = (regridded_star_spectrum * STAR_RADIUS**2. + reduced_planet * PLANET_RADIUS**2.) * (planet_spectra.wavelength / h*c) * interp_function(planet_spectra.wavelength)
+                    signal_star = (regridded_star_spectrum * STAR_RADIUS**2.) * (planet_spectra.wavelength / h*c) * interp_function(planet_spectra.wavelength)
+                else:
+                    signal      = (regridded_star_spectrum * STAR_RADIUS**2. + reduced_planet * PLANET_RADIUS**2.) * (planet_spectra.wavelength / h*c) * 1.
+                    signal_star = (regridded_star_spectrum * STAR_RADIUS**2.) * (planet_spectra.wavelength / h*c)  * 1.
 
 
                 # Divide out the two integrated signals
@@ -361,27 +413,22 @@ def plot_spectra_phases(planet_names):
                 ax.plot(planet_spectra.wavelength * 1e6, fp_fs_ratio * 1e6,
                         color=my_colors(i / num_phases),
                         linewidth=3,
-                        label='Phase: ' + str(rot_val * i) +'$^\circ$')
-                    
-                    
+                        label=str(np.round(rot_val * i / 360., 3)))
             
-    ax.set_xlim(5,12)  
-    ax.legend(fontsize=14, ncol=6, bbox_to_anchor=(.5, 1.15), loc='upper center')
+    ax.set_xlim(min(planet_spectra.wavelength*1e6),max(planet_spectra.wavelength*1e6))  
+    ax.legend(fontsize=12, loc=(0,1.08), ncol=5, mode='expand', title='Orbital Phase', title_fontsize=18)
     ax.set_xlabel('Wavelength ($\mu$m)')
 
     if planet_only_bool:
         ax.set_ylabel(r'Planet Flux (W/m$^2$/$\mu m$)') #  (W m$^{-2}$)
         plt.savefig('../Figures/Planet_White_Light_Spectra_{}.jpg'.format(planet_name), dpi=200, bbox_inches='tight')
-
     else:
         ax.set_ylabel(r'F$_p$/F$_s$ (ppm)') #  (W m$^{-2}$)
         plt.savefig('../Figures/Ratio_White_Light_Spectra_{}.jpg'.format(planet_name), dpi=200, bbox_inches='tight')
+    return None
 
 
-        return None
-
-
-def plot_phase_curves(planet_names, planet_name_char_len):
+def plot_phase_curves(planet_names, planet_name_char_len,  num_phases, transmission_filter_name):
     # Figure aesthetics
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12, 6),sharex=True, sharey=False)
     plt.subplots_adjust(hspace=0.05, wspace=0.25)
@@ -391,14 +438,18 @@ def plot_phase_curves(planet_names, planet_name_char_len):
     cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
     cm_file  = np.roll(cm_file, 140, axis=0)
     my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
-
-    filter_5_12, f_5_12 = get_filter(which_filter='MIRI')
+    
+    # I currently only have MIRI coded in
+    if transmission_filter_name == 'MIRI':
+        filt, interp_function = get_filter(which_filter=transmission_filter_name)
+    else:
+        pass
 
     for k, planet_name in enumerate(planet_names):
         integrated_signal     = []
         integrated_signal_star = []
 
-        num_phases = 24
+        
         for i in range(num_phases):
             rot_val = 360. / num_phases
             integrated_signal.append(0)
@@ -411,20 +462,36 @@ def plot_phase_curves(planet_names, planet_name_char_len):
             planet_spectra = pd.read_csv(file_path.format(str(i * rot_val)), header=None, delim_whitespace=True, names=['wavelength','flux', 'reflected'])
             planet_spectra.flux = planet_spectra.flux * (3.0e8 / planet_spectra.wavelength ** 2) / 1e6
                     
-            # Select the filter
-            # Only use the data points within the filter wavelength range that we want
-            filt = filter_5_12
-            interp_function = f_5_12
-            planet_spectra  = planet_spectra[(planet_spectra['wavelength'] > np.amin(filt.wav)) & (planet_spectra['wavelength'] < np.amax(filt.wav))] 
+            # Get the star spectra
+            star_spectra = get_star_spectra()   
+  
+            if transmission_filter_name == 'MIRI':
+                planet_spectra  = planet_spectra[(planet_spectra['wavelength'] > np.amin(filt.wav)) & (planet_spectra['wavelength'] < np.amax(filt.wav))] 
+                star_spectra    = star_spectra[(star_spectra['wavelength'] > np.amin(filt.wav)) & (star_spectra['wavelength'] < np.amax(filt.wav))]  
 
-            # Get the stellar spectra
-            star_spectra = get_star_spectra()
-            star_spectra    = star_spectra[(star_spectra['wavelength'] > np.amin(filt.wav)) & (star_spectra['wavelength'] < np.amax(filt.wav))]  
-        
-            # Reset the indexes of the planet and star dataframes
-            planet_spectra = planet_spectra.reset_index(drop=True)
-            star_spectra   = star_spectra.reset_index(drop=True)
+                # Reset the indexes of the planet and star dataframes
+                planet_spectra = planet_spectra.reset_index(drop=True)
+                star_spectra   = star_spectra.reset_index(drop=True)
 
+            else:
+                pass
+
+            # Regrid the star to the same wavelength grid as the planet
+            fnc_star_converter      = interpolate.interp1d(star_spectra.wavelength, star_spectra.flux, fill_value='extrapolate')
+            regridded_star_spectrum = fnc_star_converter(planet_spectra.wavelength)
+            
+            if transmission_filter_name == 'MIRI':
+                signal      = (regridded_star_spectrum * STAR_RADIUS**2. + planet_spectra.flux * PLANET_RADIUS**2.) \
+                            * (planet_spectra.wavelength / h*c) * interp_function(planet_spectra.wavelength)
+
+                signal_star = (regridded_star_spectrum * STAR_RADIUS**2.) \
+                            * (planet_spectra.wavelength / h*c) * interp_function(planet_spectra.wavelength)
+            else:
+                signal      = (regridded_star_spectrum * STAR_RADIUS**2. + planet_spectra.flux * PLANET_RADIUS**2.) \
+                        * (planet_spectra.wavelength / h*c) * 1.
+
+                signal_star = (regridded_star_spectrum * STAR_RADIUS**2.) \
+                        * (planet_spectra.wavelength / h*c) * 1.
             
             # Convolve the planet and star down to a lower resolution
             #reduced_planet = np.asarray(reduceSpectralResolution(list(planet_spectra.wavelength),
@@ -439,12 +506,19 @@ def plot_phase_curves(planet_names, planet_name_char_len):
             regridded_star_spectrum = fnc_star_converter(planet_spectra.wavelength)
     
         
-            # Calculate the total signal, and the star signal 
-            signal      = (regridded_star_spectrum * STAR_RADIUS**2. + planet_spectra.flux * PLANET_RADIUS**2.) \
-                        * (planet_spectra.wavelength / h*c) * interp_function(planet_spectra.wavelength)
+            if transmission_filter_name == 'MIRI':
+                signal      = (regridded_star_spectrum * STAR_RADIUS**2. + planet_spectra.flux * PLANET_RADIUS**2.) \
+                            * (planet_spectra.wavelength / h*c) * interp_function(planet_spectra.wavelength)
 
-            signal_star = (regridded_star_spectrum * STAR_RADIUS**2.) \
-                        * (planet_spectra.wavelength / h*c) * interp_function(planet_spectra.wavelength)
+                signal_star = (regridded_star_spectrum * STAR_RADIUS**2.) \
+                            * (planet_spectra.wavelength / h*c) * interp_function(planet_spectra.wavelength)
+            else:
+                signal      = (regridded_star_spectrum * STAR_RADIUS**2. + planet_spectra.flux * PLANET_RADIUS**2.) \
+                            * (planet_spectra.wavelength / h*c) * 1.
+
+                signal_star = (regridded_star_spectrum * STAR_RADIUS**2.) \
+                            * (planet_spectra.wavelength / h*c) * 1.
+
             
             # Integrate the total signal and the star signal
             integrated_signal[i]      = trapz(signal, x=planet_spectra.wavelength)
@@ -464,13 +538,14 @@ def plot_phase_curves(planet_names, planet_name_char_len):
         phases = np.arange(0, 360, 4*3.75) / 360
         ax.plot(phases,fp_fs_ratio * 1e6,
                 color=my_colors(k / len(planet_names)),
-                linewidth=3,label=planet_name[planet_name_char_len:])
+                linewidth=3, label=planet_name)
 
     # Figure legend stuff
-    ax.set_xlim(min(phases),max(phases))    
-    ax.legend(fontsize=9, ncol=3, bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", borderaxespad=0, mode="expand")
+    ax.set_xlim(min(phases),max(phases))   
+    ax.legend(fontsize=12, loc=(0,1.08), ncol=2, mode='expand')
+    #ax.legend(fontsize=9, ncol=3, bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", borderaxespad=0, mode="expand")
     ax.set_xlabel('Orbital Phase')
     ax.set_ylabel(r'F$_p$/F$_s$ (ppm)') #  (W m$^{-2}$)
-    plt.savefig('../Figures/GJ_Phase_Curves.jpg', dpi=200, bbox_inches='tight')
+    plt.savefig('../Figures/{}Phase_Curves.jpg'.format(planet_names[0][:planet_name_char_len]), dpi=200, bbox_inches='tight')
     plt.clf()
     return None

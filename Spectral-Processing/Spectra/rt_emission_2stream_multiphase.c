@@ -1517,6 +1517,12 @@ int RT_Emit_3D(double PHASE)
                     {
                         atmos.incident_frac[l][m][NTAU-10] = 0;
                     }
+                    
+                    //printf("\n\n");
+                    //for (j = kmin; j<NTAU; j++)
+                    //{
+                    //    printf("%d %0.3e %0.3e %0.3e %0.3e \n", j, dtau_em[l][m][j], tau_em[l][m][j], temperature_3d[l][m][j], kappa_nu_array[l][m][j]);
+                    //}
 
                     //if (tau_em[l][m][kmin] < 1e10)
                     //{

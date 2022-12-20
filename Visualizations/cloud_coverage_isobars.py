@@ -9,9 +9,59 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from scipy.interpolate import interp2d
 import matplotlib.colors as colors
+import re
 
+def get_input_data(path, runname, input_file, input_param):
+    # define the input_param and the regex pattern
+    pattern = r"\b" + input_param + r"\s+(.*)"
 
-def plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, pressure_lev_bar):
+    # compile the regex pattern
+    regex = re.compile(pattern)
+
+    # open the file and read its contents
+    with open(path + runname + "/" + input_file, "r") as f:
+        text = f.readlines()
+
+    # find all the matches in the text
+    for line in text:
+        # skip lines that contain an exclamation point
+        if "!" in line:
+            continue
+
+        # find matches on the current line
+        matches = regex.findall(line)
+
+        # print the matches
+        for match in matches:
+            # extract the values from the match, including scientific notation
+            if (input_param == 'RADEA'):
+                values = re.findall(r"[+\-]?[^A-Za-z]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)", match)
+            else:
+                values = re.findall(r"[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?", match)
+
+            if len(values) == 0:
+                # define the regex pattern
+                pattern = r"\b(T|F|True|False)\b"
+
+                # compile the regex pattern
+                bool_regex = re.compile(pattern)
+
+                # find all the matches in the string
+                bool_match = bool_regex.findall(line)
+                return bool_match
+            
+            elif len(values) == 1:
+                values = [float(i) for i in values]
+
+                # if there is only one number, print it
+                return values[0]
+            else:
+                values = [float(i) for i in values]
+
+                # if there are multiple values, print the list
+                return values
+
+def plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, extra_pressure_level_bar):
     # temp colormap
     cm_name = 'lajolla'
     cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
@@ -43,9 +93,20 @@ def plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, pressu
     nlevel = nlev
     nparams = len(column_names)  
 
-    P_phots = [pressure_lev_bar] * len(planet_names) # Photospheric pressure in bars
 
     for ind, planet_name in enumerate(planet_names):
+        gravity = get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name,'/Planet_Run/fort.7' ,'GA')
+        ir_absorbtion_coefficient = get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name,'/Planet_Run/fort.7' ,'ABSLW')
+        ir_photosphere_pressure_bars = (2./3.) * (gravity/ir_absorbtion_coefficient) / 10000
+        ir_photosphere_pressure_bars = np.round(ir_photosphere_pressure_bars, 3)
+        
+        if (extra_pressure_level_bar == 0):
+            pressure_lev_bar = ir_photosphere_pressure_bars
+        else:
+            pressure_lev_bar = extra_pressure_level_bar
+
+        P_phots = [pressure_lev_bar] * len(planet_names) # Photospheric pressure in bars
+
         plt.clf()
         fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(12,9))
         plt.subplots_adjust(wspace=0.01, hspace=0.015)
@@ -208,4 +269,4 @@ def plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, pressu
             cloud_cbar.set_label('Cloud Optical Depth, 5.0 $\\mu$m', fontsize=26)
 
             plt.savefig('../Figures/Cloud_Coverage_Isobars_{}_bar_{}.png'.format(P_phots[0], planet_name), bbox_inches='tight', dpi=250)
-            
+        

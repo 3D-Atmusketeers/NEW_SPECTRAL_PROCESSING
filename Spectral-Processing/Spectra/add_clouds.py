@@ -106,7 +106,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
     for j in range(len(CLOUD_MOLAR_MASSES)):
         FMOLW[j] = CLOUD_MOLAR_MASSES[j] / (GAS_CONSTANT_R/GASCON)
 
-    CORFACT = [0.0,0.05, 0.1, 0.15, 0.2, 0.25, 0.40, 0.55, 0.70, 0.85,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000]
+    CORFACT = [0.005,0.018,0.050,0.135,.367,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.000]
 
     TconKCl     = [617.032,621.573,626.038,630.552,635.053, 639.555,644.050,648.556,653.049,657.552,662.043,666.609,671.436,676.532,681.879,687.233,692.462,697.665,702.916,708.306,713.767,719.366,725.024,730.775,736.460,742.266,748.065,753.932,759.779,765.571, 771.346,777.201,783.301,789.715,796.379,803.117,809.863,816.737,823.798,831.052,838.426,845.980,853.873,862.074,870.494,878.913,887.351,895.768,904.198,912.867,917.385]
     TconZnS     = [708.296,712.010,716.704,719.507,722.309,727.329,730.718,736.323,739.126,744.731,747.534,753.139,755.942,761.547,764.350,769.955,772.758,778.363,783.969,788.079,792.377,797.982,803.587,806.390, 811.995,815.183,823.206,828.812,834.364,840.022, 845.628,851.233,856.839,862.444,868.049,873.655,879.260,884.865,890.471,896.076,901.682,907.287,915.695,921.897,929.708,936.547,943.722,949.327,955.732,963.063, 966.143]
@@ -190,12 +190,9 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
 
 
     QE_OPPR  = np.array([qe0, qe1,qe2,qe3,qe4,qe5,qe6,qe7,qe8,qe9,qe10,qe11,qe12,tau_haze])
-
     PI0_OPPR = np.array([pi00, pi01,pi02,pi03,pi04,pi05,pi06,pi07,pi08,pi09,pi010,pi011,pi012,pi0_haze])
     G0_OPPR  = np.array([g00, g01,g02,g03,g04,g05,g06,g07,g08,g09,g010,g011,g012,g0_haze])
-
-    Tconds = np.array([TconKCl,TconZnS,TconNa2S,TCONMnS,TconCr,TCONSiO2,TCONMg2SiO4,
-                       TconVO,TconNi,TCONFe,TconCa2SiO4,TconCaTiO3,TCONAl2O3])
+    Tconds = np.array([TconKCl,TconZnS,TconNa2S,TCONMnS,TconCr,TCONSiO2,TCONMg2SiO4,TconVO,TconNi,TCONFe,TconCa2SiO4,TconCaTiO3,TCONAl2O3])
 
     G = grav
 
@@ -218,12 +215,20 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
             i = len(df) - z - 1
             layer_index   = np.abs(input_pressure_array_cgs - df['pressure(bars)'][i]*1e6).argmin()
             particle_size = particle_size_vs_layer_array_in_meters[layer_index]
+          
 
             # This is in SI
-            dpg           = (df['pressure(bars)'][i]*1e5/G)
+            if (i % INITIAL_NTAU == 0):
+                delta_pres = (df['pressure(bars)'][i+1]-df['pressure(bars)'][i]) / 2.
+            else:
+                delta_pres = (df['pressure(bars)'][i]-df['pressure(bars)'][i-1])
+
+            dpg = delta_pres * 1e5 / G
+            
             CLOUD_INDEX = 0
             cond_fact = (min(max((Tconds[CLOUD_INDEX][layer_index]-df['temp(k)'][i]) / 10.0, 0.0), 1.0))
             df['tau1'][i] = dpg * MOLEF[CLOUD_INDEX]*3./4./particle_size/DENSITY[CLOUD_INDEX]*FMOLW[CLOUD_INDEX]*cond_fact*MTLX*CORFACT[layer_index]
+
             if (df['tau1'][i] > 0):
                 df['g01'][i]  = 1
                 df['pi01'][i] = 1
@@ -235,9 +240,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
                 df['pi01'][i] = 0
             if (layer_index == INITIAL_NTAU-1):
                 max_cloud_level1 = 0
-
-
-
+            
             CLOUD_INDEX = 1
             cond_fact = (min(max((Tconds[CLOUD_INDEX][layer_index]-df['temp(k)'][i]) / 10.0, 0.0), 1.0))
             df['tau2'][i] = dpg * MOLEF[CLOUD_INDEX]*3./4./particle_size/DENSITY[CLOUD_INDEX]*FMOLW[CLOUD_INDEX]*cond_fact*MTLX*CORFACT[layer_index]
@@ -456,7 +459,13 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
             size_loc      = np.abs(input_particle_size_array_in_meters  - particle_size).argmin()
 
             # This is in SI
-            dpg           = (df_copy['pressure(bars)'][i]*1e5/G)
+            if (i % INITIAL_NTAU == 0):
+                delta_pres = (df['pressure(bars)'][i+1]-df['pressure(bars)'][i]) / 2.
+            else:
+                delta_pres = (df['pressure(bars)'][i]-df['pressure(bars)'][i-1])
+
+            dpg = delta_pres * 1e5 / G
+
             CLOUD_INDEX = 0
             cond_fact = (min(max((Tconds[CLOUD_INDEX][layer_index]-df_copy['temp(k)'][i]) / 10.0, 0.0), 1.0))
             df_copy['tau1'][i] = dpg * MOLEF[CLOUD_INDEX]*3./4./particle_size/DENSITY[CLOUD_INDEX]*FMOLW[CLOUD_INDEX]*cond_fact*MTLX*CORFACT[layer_index]*QE_OPPR[CLOUD_INDEX][size_loc][wav_loc]

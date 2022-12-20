@@ -171,10 +171,12 @@ def print_energy_balances(df, planet_name):
 
 
 
-def plot_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len):
+
+
+def plot_thermal_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len):
     n = len(planet_names)
     colors = pl.cm.viridis(np.linspace(0,1,n))
-    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15,6), sharex=True, sharey=False)
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10,6), sharex=True, sharey=False)
     plt.subplots_adjust(wspace=0.275, hspace=0.1)
 
     energy_out_thermal = []     
@@ -198,24 +200,68 @@ def plot_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_l
             exit(0)
         
         # Plot each phase curve
-        ax[0].plot(np.linspace(0, 1, nlon), lw_phase_curve, linewidth=3, linestyle=linestyle_str, color=colors[j]) 
-        ax[1].plot(np.linspace(0, 1, nlon), sw_phase_curve, linewidth=3, linestyle=linestyle_str, color=colors[j],label=planet_names[j][planet_name_char_len:])  
+        ax.plot(np.linspace(0, 1, nlon), lw_phase_curve, linewidth=3, linestyle=linestyle_str, color=colors[j], label=planet_names[j][planet_name_char_len:]) 
+        #ax.plot(np.linspace(0, 1, nlon), sw_phase_curve, linewidth=3, linestyle=linestyle_str, color=colors[j],label=planet_names[j][planet_name_char_len:])  
         print_energy_balances(df, planet_names[j])
         
         
-    fig.legend(ncol=3, bbox_to_anchor=(0.46, 1.00), loc='center', fontsize=10, mode="expand")
+    ax.legend(fontsize=10, loc=(0,1.05), ncol=2, mode='expand')
 
-    ax[0].set_xlim(0.01,0.99)
-    ax[1].set_xlim(0.01,0.99)
-    ax[0].set_xlabel('Orbital Phase', fontsize=24)
-    ax[1].set_xlabel('Orbital Phase', fontsize=24)
-    ax[0].set_ylabel(r'Thermal Flux (W m$^{-2}$)', fontsize=24)
-    ax[1].set_ylabel(r'Reflected Flux (W m$^{-2}$)', fontsize=24)
-
-    plt.savefig('../Figures/broadband_phasecurves.png', bbox_inches='tight', dpi=100)
+    ax.set_xlim(0.01,0.99)
+    ax.set_xlabel('Orbital Phase', fontsize=24)
+    ax.set_xlabel('Orbital Phase', fontsize=24)
+    ax.set_ylabel(r'Thermal Flux (W m$^{-2}$)', fontsize=24)
+    plt.savefig('../Figures/broadband_thermal_phasecurves.png', bbox_inches='tight', dpi=100)
     plt.clf()
 
     return None
+
+
+
+def plot_reflected_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len):
+    n = len(planet_names)
+    colors = pl.cm.viridis(np.linspace(0,1,n))
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10,6), sharex=True, sharey=False)
+    plt.subplots_adjust(wspace=0.275, hspace=0.1)
+
+    energy_out_thermal = []     
+    energy_out_sw      = []
+    energy_in_sw       = []
+
+    for j, planet_name in enumerate(planet_names):
+        df = get_planet_df(planet_names[j], nlat=48, nlon=96, nlev=50,base='../Spectral-Processing/GCM-OUTPUT/')    
+        lw_phase_curve, sw_phase_curve, swin_phase_curve, lon_df = get_phase_curve(df)
+        
+        if (j % 4 == 0):
+            linestyle_str = 'solid'
+        elif (j % 4 == 1):
+            linestyle_str = 'dashed'
+        elif (j % 4 == 2):
+            linestyle_str = 'dotted'
+        elif (j % 4 == 3):
+            linestyle_str = 'dashdot'
+        else:
+            print ("math error")
+            exit(0)
+        
+        # Plot each phase curve
+        #ax.plot(np.linspace(0, 1, nlon), lw_phase_curve, linewidth=3, linestyle=linestyle_str, color=colors[j]) 
+        ax.plot(np.linspace(0, 1, nlon), sw_phase_curve, linewidth=3, linestyle=linestyle_str, color=colors[j],label=planet_names[j][planet_name_char_len:])  
+        print_energy_balances(df, planet_names[j])
+        
+        
+    ax.legend(fontsize=10, loc=(0,1.05), ncol=2, mode='expand')
+
+    ax.set_xlim(0.01,0.99)
+    ax.set_xlim(0.01,0.99)
+    ax.set_xlabel('Orbital Phase', fontsize=24)
+    ax.set_ylabel(r'Reflected Flux (W m$^{-2}$)', fontsize=24)
+
+    plt.savefig('../Figures/broadband_reflected_phasecurves.png', bbox_inches='tight', dpi=100)
+    plt.clf()
+
+    return None
+
 
 
 

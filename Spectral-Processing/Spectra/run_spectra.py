@@ -17,7 +17,6 @@ import setup_opac_versions
 # Phases in degrees, inclination in radians (sorry)
 # An inclination of 0 corresponds to edge on
 phases = [0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0, 195.0, 210.0, 225.0, 240.0, 255.0, 270.0, 285.0, 300.0, 315.0, 330.0, 345.0]
-phases = [0.0]
 inclinations = [0.0]
 system_obliquity = 0
 
@@ -48,11 +47,11 @@ USE_FORT_FILES = True
 # There are the different sets of opacity and EOS files
 # There are somethings that need to be changed in the template inputs file to make this happen
 # If you change the underlying data files these might need to be changed
-opacity_files = 'SET_3'
+opacity_files = 'SET_1'
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["HD189-DOGRAY"]
+planet_names = ["GJ1214b-SOOT-HAZES-1X"]
 
 
 for q in range(len(planet_names)):
@@ -71,6 +70,7 @@ for q in range(len(planet_names)):
     oom            = grab_input_data.get_input_data(path, runname, "fort.7","OOM_IN")
     MTLX           = grab_input_data.get_input_data(path, runname, "fort.7","MTLX")
     HAZES          = grab_input_data.get_input_data(path, runname, "fort.7","HAZES")
+
     GAS_CONSTANT_R = 8.314462618
     GASCON = grab_input_data.get_input_data(path, runname, "fort.7","GASCON")
     MEAN_MOLECULAR_WEIGHT = np.round((GAS_CONSTANT_R/GASCON) * 1000, 4)
@@ -265,8 +265,7 @@ for q in range(len(planet_names)):
     else:
         pass
 
-    add_clouds.add_clouds_to_gcm_output(path, runname, planet_name, grav,
-                                        MTLX, CLOUDS, MOLEF, aerosol_layers, INITIAL_NTAU, gasconst, HAZE_TYPE, HAZES)
+    add_clouds.add_clouds_to_gcm_output(path, runname, planet_name, grav,MTLX, CLOUDS, MOLEF, aerosol_layers, INITIAL_NTAU, gasconst, HAZE_TYPE, HAZES)
 
     # Regrid the file to constant altitude and the correct number of layers
     altitude_regridding.regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, INITIAL_NTAU, NLON, NTAU, HAZES)
@@ -289,19 +288,12 @@ for q in range(len(planet_names)):
                 run_exo(input_paths, inclination_strs, phase_strs, doppler_val)
 
 
+
 print("Moving the files out of the clean directory")
 for filename in os.listdir('DATA'):
     if re.match(r'init_*', filename):
-        # If the file already exists, don't do anything. Maybe delete it eventually?
-        if os.path.isfile('../PLANET_MODELS' + filename):
-            pass
-        else:
-            shutil.move(os.path.join('DATA', filename), '../PLANET_MODELS')
+        shutil.move(os.path.join('DATA', filename), os.path.join('../PLANET_MODELS', filename))
 
 for filename in os.listdir('OUT'):
     if re.match(r'Spec_*', filename):
-        # If the file already exists, don't do anything. Maybe delete it eventually?
-        if os.path.isfile('../FINISHED_SPECTRA' + filename):
-            pass
-        else:
-            shutil.move(os.path.join('OUT', filename), '../FINISHED_SPECTRA')
+        shutil.move(os.path.join('OUT', filename), os.path.join('../FINISHED_SPECTRA', filename))
