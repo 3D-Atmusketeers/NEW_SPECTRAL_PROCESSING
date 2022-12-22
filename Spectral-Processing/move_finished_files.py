@@ -35,6 +35,7 @@ def query_yes_no(question, default="no"):
         else:
             sys.stdout.write("Please respond with 'yes' or 'no' " "(or 'y' or 'n').\n")
 
+
 print("THIS HAS TO BE RUN IN PYTHON3, SORRY")
 print ("All the files are run, and now you want to put everything is one folder?")
 print("")

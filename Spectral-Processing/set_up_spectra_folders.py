@@ -35,7 +35,8 @@ def query_yes_no(question, default="no"):
         else:
             sys.stdout.write("Please respond with 'yes' or 'no' " "(or 'y' or 'n').\n")
 
-
+print("MAKE SURE TO SET THE PHASES AND THE OPACITY SET IN RUN_SPECTRA.PY!!!")
+print("")
 print("This is an important file, and has the capability of generating a lot of data in the wrong places")
 print("")
 print("Put this folder in the same folder as the directory of GCMS that you want to be run.")

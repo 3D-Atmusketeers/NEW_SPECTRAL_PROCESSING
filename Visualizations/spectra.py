@@ -177,45 +177,76 @@ def reduceSpectralResolution(x, y, R_low, R_high=None, lambda_mid=None, n=4):
 
 
 # ## Spectra Test
-def plot_planet_spectra_test(planet_names):
-    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12, 6),sharex=True, sharey=False)
-    plt.subplots_adjust(hspace=0.05, wspace=0.25)
+def plot_planet_spectra_blackbody_comparison(planet_names, black_body_temperatures, num_phases):
+    """
+    plot the planet spectra, compared to a blackbody
+    planet names: list of strings
+    black_body_temperatures: list of floats
+    """
 
-    temps = [250, 500, 750, 1000]
-    colors_bb = pl.cm.Greys(np.linspace(0,1,len(temps) + 3))
+    colors_bb = pl.cm.Greys(np.linspace(0,1,len(black_body_temperatures) + 2))
 
-    j = 0
-    for temp in temps:
-        bb = BlackBody(temperature=temp*u.K)
-        wav = np.linspace(0.5, 20.0, 1000) * u.um
-        flux = bb(wav) * np.pi * u.sr
-        ax.plot(wav, flux * 1e6, color=colors_bb[j + 3], alpha=0.6, linewidth=3, label='Temp: ' + str(temp))
-        j = j + 1
+    cm_name = 'batlow'
+    cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
+    cm_file  = np.roll(cm_file, 140, axis=0)
+    my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
 
-        
 
-    i = 0
-    for planet_name in planet_names:
-        name = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_0.0_inc_0.00.00.0000.00.dat'
-        spectra0 = pd.read_csv(name, header=None, delim_whitespace=True, names=['Wavelength','Flux', 'Reflected'])
+    for k, planet_name in enumerate(planet_names):
+        # Figure aesthetics
+        fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12, 6),sharex=True, sharey=False)
+        plt.subplots_adjust(hspace=0.05, wspace=0.25)
 
-        wavelengths = np.asarray(list(spectra0['Wavelength'][10:-10]))
-        fluxes      = np.asarray(list(spectra0['Flux'][10:-10]))
+
+        for i in range(num_phases):
+            # Get the phase value
+            rot_val = 360. / num_phases
             
+            # Get the file path
+            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_0.00.00.0000.00.dat'
+            
+            # Load in the planet spectra
+            planet_spectra = pd.read_csv(file_path.format(str(i * rot_val)), header=None, delim_whitespace=True, names=['wavelength','flux', 'reflected'])
+    
+            # Reset the index
+            planet_spectra = planet_spectra.reset_index(drop=True)
 
-        ax.plot(wavelengths*1e6, fluxes*1e9,label=planet_name, linewidth=1.)
-        ax.legend(fontsize=12)
-        i = i + 1    
+            ax.plot(planet_spectra.wavelength * 1e6,
+                    planet_spectra.flux,
+                    color=my_colors(i / num_phases),
+                    linewidth=3,
+                    label="Planet Spectra at phase: " + str(np.round(rot_val * i / 360., 3)))
 
-    ax.set_ylim(1e-3, 2)
-    ax.set_yscale('log')
-    ax.set_xlim(0.0, 20.0)
-    fig.text(0.03, 0.5, r"Flux (10$^{-6}$ erg/s/cm$^2$/Hz)", size=26, va='center', rotation='vertical')
-    fig.text(0.5, 0.01, r"Wavelength ($\mu m$)", size=26, ha='center')
+            # Plot the blackbody temperatures
+            j = 0
+            for temp in black_body_temperatures:
+                bb = BlackBody(temperature=temp*u.K)
+                wav = np.linspace(0.5, 20.0, 1000) * u.um
+                flux = bb(wav) * np.pi * u.sr
 
-    plt.savefig('../Figures/spectra_test.jpg', dpi=200, bbox_inches='tight')
-    plt.clf()
+                # Convert to si, same as the output of the emission code
+                flux = flux.to(u.J / (u.m * u.m * u.Hz * u.s))
 
+                ax.plot(wav, flux,
+                        color=colors_bb[j + 2],
+                        alpha=0.8,
+                        linewidth=2, 
+                        linestyle='dashed',
+                        label='Blackbody at: ' + str(temp) + 'K')
+                j = j + 1
+        
+        # Center the y value
+        center_y_val = int(np.log10(np.mean(planet_spectra.flux)))
+
+        # Do somet figure stuff
+        ax.set_ylim(10 ** (center_y_val - 2), 10 ** (center_y_val + 2))
+        ax.set_yscale('log')
+        ax.set_xlim(min(planet_spectra.wavelength*1e6),max(planet_spectra.wavelength*1e6))          
+        ax.legend(fontsize=12, loc=(0,1.05), ncol=2, mode='expand', title_fontsize=16)
+        ax.set_xlabel('Wavelength ($\mu$m)')
+        ax.set_ylabel(r'Flux (W/m$^2 Hz$)') #  (W m$^{-2}$)
+        plt.savefig('../Figures/planet_spectra_blackbody_comparison_{}.jpg'.format(planet_name), dpi=200, bbox_inches='tight')
+        plt.clf()        
     return None
 
 
@@ -311,11 +342,8 @@ def plot_spectra_simple(planet_names, num_phases):
                     label=str(np.round(rot_val * i / 360., 3)))
         
         # Do somet figure stuff
-        ax.set_xlim(min(planet_spectra.wavelength*1e6),max(planet_spectra.wavelength*1e6))  
-        #ax.legend(fontsize=14, ncol=6, bbox_to_anchor=(.5, 1.15), loc='upper center')
-        
+        ax.set_xlim(min(planet_spectra.wavelength*1e6),max(planet_spectra.wavelength*1e6))          
         ax.legend(fontsize=12, loc=(0,1.08), ncol=5, mode='expand', title='Orbital Phase', title_fontsize=16)
-
         ax.set_xlabel('Wavelength ($\mu$m)')
         ax.set_ylabel(r'Flux (W/m$^2$/$\mu m$)') #  (W m$^{-2}$)
         plt.savefig('../Figures/Planet_Simple_Spectra_{}.jpg'.format(planet_name), dpi=200, bbox_inches='tight')
@@ -534,9 +562,17 @@ def plot_phase_curves(planet_names, planet_name_char_len,  num_phases, transmiss
         # Save the data
         pd.DataFrame({'Phase':np.arange(0, 360, rot_val), 'fp_fs_ratio':fp_fs_ratio*1e6}).to_csv('OUTPUT_DATA/Phase_Curve_{}.txt'.format(planet_name), sep=' ')
         
+        if ("SOOT".lower() in planet_name.lower()):
+            linestyle_str = 'dotted'
+        elif ("THOLIN".lower() in planet_name.lower()):
+            linestyle_str = 'dashed'
+        else:
+            linestyle_str = 'solid'
+        
         # Plot the data
         phases = np.arange(0, 360, 4*3.75) / 360
         ax.plot(phases,fp_fs_ratio * 1e6,
+                linestyle=linestyle_str,
                 color=my_colors(k / len(planet_names)),
                 linewidth=3, label=planet_name)
 
