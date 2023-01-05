@@ -2,11 +2,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-from matplotlib import rcParams, rc
-from matplotlib import ticker, cm
 
-
-def plot_aerosol_maps(planet_names, nlat, nlon, nlev):
+def plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, cloud_wavelength):
     # cloud colormap
     cm_name = 'devon' 
     cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
@@ -55,7 +52,7 @@ def plot_aerosol_maps(planet_names, nlat, nlon, nlev):
                                     df["aero_sw_tau_9"] + df["aero_sw_tau_10"] + df["aero_sw_tau_11"] + df["aero_sw_tau_12"] + \
                                     df["aero_sw_tau_13"]
 
-        optical_depth = df["total_optical_depth"].values.reshape(48, nlev)
+        optical_depth = df["total_optical_depth"].values.reshape(nlat, nlev)
         
         return optical_depth
 
@@ -71,24 +68,24 @@ def plot_aerosol_maps(planet_names, nlat, nlon, nlev):
         plt.subplots_adjust(wspace=0.02, hspace=0.1)
 
         lats = np.linspace(-90, 90, nlat)
-        pressures = np.logspace(-5, 2, nlev)
+        pressures = np.logspace(2 - num_orders_of_magnitude, 2, nlev)
 
         optical_depths1 = get_optical_depth(file1, nlat, nlon, nlev)
 
-        optical_depths1[optical_depths1 < 1e-4] = 1e-4
-        # , levels=np.linspace(-4,3,15)
+        #optical_depths1[optical_depths1 < 1e-4] = 1e-4
 
-        mp1 = axes.contourf(lats, pressures, np.log10(optical_depths1.T), cmap=my_colors, levels=100)
+        mp1 = axes.contourf(lats, pressures, optical_depths1.T, cmap=my_colors, levels=100)
 
         axes.set_yscale("log")
-        axes.set_ylim(1e2, 1e-5)
+        axes.set_ylim(1e2, 10 ** (2 - num_orders_of_magnitude))
 
         #cbar = fig.colorbar(mp1, ax=axes.ravel().tolist(), location='top', aspect=50, pad=0.02)
         cbar = fig.colorbar(mp1, aspect=20, pad=0.02)
-        cbar.set_label(r'log$_{10}$(Aerosol Optical Depth per bar at 2.3 $\mu$m)', size=20, labelpad=10)
+        cbar.set_label(r'log$_{10}$(Aerosol Optical Depth per bar at ' + str(cloud_wavelength) + ' $\mu$m)',
+                                                                                             size=20, labelpad=10)
         cbar.ax.tick_params(labelsize=22)  # set your label size here
 
         fig.text(0.5, 0.04, r"Latitude (degrees)", size=28, ha='center')
         fig.text(0.0, 0.45, r"Pressure (bar)", size=28, va='center', rotation='vertical')
 
-        plt.savefig('../Figures/Aerosol_Maps_{}.png'.format(planet_name), bbox_inches='tight', dpi=250)
+        plt.savefig('../Figures/Aerosol_Maps_{}.png'.format(planet_name), bbox_inches='tight', dpi=100)

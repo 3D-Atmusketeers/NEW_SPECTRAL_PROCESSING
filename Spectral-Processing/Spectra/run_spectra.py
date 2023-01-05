@@ -16,7 +16,7 @@ import setup_opac_versions
 
 # Phases in degrees, inclination in radians (sorry)
 # An inclination of 0 corresponds to edge on
-phases = [105.0]
+phases = [0.0]
 inclinations = [0.0]
 system_obliquity = 0
 
@@ -53,6 +53,21 @@ opacity_files = 'SET_1'
 # They should be pretty big files, and don't include the .txt with the names here
 planet_names = ["GJ1214b-THOLIN-HAZES-1X"]
 
+# Set the wavelength to evaluate the clouds at for plotting!
+# This could be put in a better place I think
+wavelength_grid = np.loadtxt('SCATTERING_DATA/wavelength_array_for_cloud_scattering_data_in_microns.txt')
+if opacity_files == 'SET_1':
+    cloud_wavelength = 5.0
+    wav_loc = np.absolute(wavelength_grid-cloud_wavelength).argmin()
+elif opacity_files == 'SET_2':
+    cloud_wavelength = 2.3
+    wav_loc = np.absolute(wavelength_grid-cloud_wavelength).argmin()
+elif opacity_files == 'SET_3':
+    cloud_wavelength = 2.3
+    wav_loc = np.absolute(wavelength_grid-cloud_wavelength).argmin()
+else:
+    print("YOU NEED TO SET WHICH OPACITY SET YOU'RE USING")
+    exit(0)
 
 for q in range(len(planet_names)):
     planet_name = planet_names[q]
@@ -258,6 +273,7 @@ for q in range(len(planet_names)):
     inclination_strs = []
     phase_strs = []
 
+
     # Convert the fort files to the correct format
     if USE_FORT_FILES == True:
         convert_fort_files.convert_to_correct_format(path, runname, planet_name, INITIAL_NTAU, surfp, oom, tgr, grav, gasconst)
@@ -265,7 +281,10 @@ for q in range(len(planet_names)):
     else:
         pass
 
-    add_clouds.add_clouds_to_gcm_output(path, runname, planet_name, grav,MTLX, CLOUDS, MOLEF, aerosol_layers, INITIAL_NTAU, gasconst, HAZE_TYPE, HAZES)
+    add_clouds.add_clouds_to_gcm_output(path, runname, planet_name,
+                                        grav, MTLX, CLOUDS, MOLEF,
+                                        aerosol_layers, INITIAL_NTAU,
+                                        gasconst, HAZE_TYPE, HAZES, wav_loc)
 
     # Regrid the file to constant altitude and the correct number of layers
     altitude_regridding.regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, INITIAL_NTAU, NLON, NTAU, HAZES)
@@ -286,8 +305,6 @@ for q in range(len(planet_names)):
         for W0_VAL in W0_VALS:
             for doppler_val in dopplers:
                 run_exo(input_paths, inclination_strs, phase_strs, doppler_val)
-
-
 
 print("Moving the files out of the clean directory")
 for filename in os.listdir('DATA'):

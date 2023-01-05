@@ -6,7 +6,7 @@ pd.options.mode.chained_assignment = None  # default='warn'
 
 
 def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOLEF,
-                             aerosol_layers, INITIAL_NTAU, GASCON, HAZE_TYPE, HAZES):
+                             aerosol_layers, INITIAL_NTAU, GASCON, HAZE_TYPE, HAZES, wav_loc):
     column_names = ['lat' , 'lon', 'level' , 'altitude(m)',
                     'pressure(bars)', 'temp(k)',
                     'EW vel(m/s)','NS vel','vert vel']
@@ -434,10 +434,8 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
     np.savetxt(planet_file_with_clouds, df.values, fmt=' '.join(['%5.4f']*2 + ['%3d']*1 + ['%9.4E']*6 + ['%9.4E']*42 + ['\t']))
 
     print ("Adding Clouds, with scattering params, this is just for the graphing stuff to have a copy")
+    print ("THE CLOUDS ARE BEING EVALUATED AT THIS WAVELENGTH!!!!", str(wav_loc))
     if CLOUDS == 1:
-        # This is 5.0 microns
-        wav_loc = 368
-
         max_cloud_level1 = 0
         max_cloud_level2 = 0
         max_cloud_level3 = 0
@@ -673,7 +671,6 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
             layer_index   = np.abs(input_pressure_array_cgs - df['pressure(bars)'][i]*1e6).argmin()
 
             # This is 5.0 microns
-            wav_loc = 368
             haze_layer_index = np.abs(haze_pressure_array_pascals - df_copy['pressure(bars)'][i]*1e6).argmin() # Both of these are in PA
 
             df_copy['tau_haze'][i] = df_copy['pressure(bars)'][layer_index] * QE_OPPR[13][haze_layer_index][wav_loc]

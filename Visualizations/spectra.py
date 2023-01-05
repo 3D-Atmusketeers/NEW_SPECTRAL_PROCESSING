@@ -221,7 +221,7 @@ def plot_planet_spectra_blackbody_comparison(planet_names, black_body_temperatur
             j = 0
             for temp in black_body_temperatures:
                 bb = BlackBody(temperature=temp*u.K)
-                wav = np.linspace(0.5, 20.0, 1000) * u.um
+                wav = np.linspace(0.5, 30.0, 1000) * u.um
                 flux = bb(wav) * np.pi * u.sr
 
                 # Convert to si, same as the output of the emission code
@@ -283,9 +283,9 @@ def plot_filters(planet_names):
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12, 6))
     plt.subplots_adjust(hspace=0.05, wspace=0.25)
 
-    # Load in a test spectra to get the wavelength ranges
-    spectra = pd.read_csv('../Spectral-Processing/FINISHED_SPECTRA/Spec_0_GJ1214b-HAZES-100X-soot_phase_0.0_inc_0.00.00.0000.00.dat', 
-                        header=None, delim_whitespace=True, names=['wavelength','flux', 'reflected'])
+    file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_names[0] + '_phase_{}_inc_0.00.00.0000.00.dat'
+    spectra = pd.read_csv(file_path.format(str(0.0)), header=None, delim_whitespace=True, names=['wavelength','flux', 'reflected'])
+
 
     # Get only the spectra in the filter ranges we care about
     #spectra_3_6  = spectra[(spectra['wavelength'] > np.amin(filter_3_6.wav)) & (spectra['wavelength'] < np.amax(filter_3_6.wav))]  
@@ -570,7 +570,7 @@ def plot_phase_curves(planet_names, planet_name_char_len,  num_phases, transmiss
             linestyle_str = 'solid'
         
         # Plot the data
-        phases = np.arange(0, 360, 4*3.75) / 360
+        phases = np.linspace(0, 360, num_phases) / 360
         ax.plot(phases,fp_fs_ratio * 1e6,
                 linestyle=linestyle_str,
                 color=my_colors(k / len(planet_names)),

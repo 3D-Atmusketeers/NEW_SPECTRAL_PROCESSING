@@ -1213,7 +1213,7 @@ int RT_Emit_3D(double PHASE)
                             pressure = 9.99e9;
                         }
 
-                        if(atmos.T_3d[o][c][j] < 100.0 || atmos.T_3d[o][c+1][j] < 100.0)
+                        if(atmos.T_3d[o][c][j] < 201.0 || atmos.T_3d[o][c+1][j] < 201.0)
                         {
                             temperature = 0.0;
                         }
@@ -1238,7 +1238,7 @@ int RT_Emit_3D(double PHASE)
                             delta_lam = atmos.lambda[i]*v_los/CLIGHT;
                             Locate(NLAMBDA, atmos.lambda, atmos.lambda[i]+delta_lam, &ii);
 
-                            if(temperature < 100.0 || atmos.lambda[i]+delta_lam >= atmos.lambda[NLAMBDA-1] || atmos.lambda[i]+delta_lam <= atmos.lambda[0])
+                            if(temperature < 201.0 || atmos.lambda[i]+delta_lam >= atmos.lambda[NLAMBDA-1] || atmos.lambda[i]+delta_lam <= atmos.lambda[0])
                             {
                                 kappa_nu = 0.0;
                             }
@@ -1323,7 +1323,7 @@ int RT_Emit_3D(double PHASE)
                         /* No Doppler Effects at all */
                         else
                         {
-                            if(temperature < 100.0)
+                            if(temperature < 200.0)
                             {
                                 kappa_nu = 0.0;
                             }
@@ -1501,7 +1501,7 @@ int RT_Emit_3D(double PHASE)
                     kmin = 0;
                     for (j = 0; j<NTAU; j++)
                     {
-                        if (dtau_em[l][m][j] < 1e-10 || tau_em[l][m][j] < 1e-10 || temperature_3d[l][m][j] < 250 || kappa_nu_array[l][m][j] < 1e-10)
+                        if (dtau_em[l][m][j] < 1e-10 || tau_em[l][m][j] < 1e-10 || temperature_3d[l][m][j] < 200 || kappa_nu_array[l][m][j] < 1e-10)
                         {
                           kmin = j+1;
                         }
@@ -1517,15 +1517,7 @@ int RT_Emit_3D(double PHASE)
                     {
                         atmos.incident_frac[l][m][NTAU-10] = 0;
                     }
-                    
-                    //printf("\n\n");
-                    //for (j = kmin; j<NTAU; j++)
-                    //{
-                    //    printf("%d %0.3e %0.3e %0.3e %0.3e \n", j, dtau_em[l][m][j], tau_em[l][m][j], temperature_3d[l][m][j], kappa_nu_array[l][m][j]);
-                    //}
 
-                    //if (tau_em[l][m][kmin] < 1e10)
-                    //{
                     two_stream(NTAU, kmin, pi0_tot[l][m], \
                                asym_tot[l][m], temperature_3d[l][m], tau_em[l][m], \
                                CLIGHT / atmos.lambda[i], \
@@ -1535,12 +1527,6 @@ int RT_Emit_3D(double PHASE)
                     // The first index is the thermal intensity, the second is the reflected light
                     intensity[l][m] = intensity_vals[0] + intensity_vals[1];
                     reflected_intensity[l][m] = intensity_vals[1];
-                    //}
-                    //else
-                    //{
-                    //    intensity[l][m] = 0;
-                    //    reflected_intensity[l][m] = 0;
-                    //}
 
                     if (reflected_intensity[l][m] < 1e-50)
                     {
@@ -1552,7 +1538,9 @@ int RT_Emit_3D(double PHASE)
                     {
                         tau_sum = 0.0;
                         j = kmin;
-                        while(tau_sum < 1000 && j <NTAU)
+
+                        // This should get the tau = 2/3 level
+                        while(tau_sum < 0.6666666 && j <NTAU)
                         {
                             tau_sum = tau_sum + dtau_em[l][m][j];
                             j = j + 1;
