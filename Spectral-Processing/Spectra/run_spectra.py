@@ -51,7 +51,7 @@ opacity_files = 'SET_1'
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-THOLIN-HAZES-1X"]
+planet_names = ["GJ1214b-CLEAR-100X"]
 
 # Set the wavelength to evaluate the clouds at for plotting!
 # This could be put in a better place I think
@@ -85,6 +85,28 @@ for q in range(len(planet_names)):
     oom            = grab_input_data.get_input_data(path, runname, "fort.7","OOM_IN")
     MTLX           = grab_input_data.get_input_data(path, runname, "fort.7","MTLX")
     HAZES          = grab_input_data.get_input_data(path, runname, "fort.7","HAZES")
+
+    # Necessary for choosing the chem table!
+    MET_X_SOLAR    = 10.0 ** grab_input_data.get_input_data(path, runname, "fort.7","METALLICITY")
+
+    if (opacity_files == "SET_1"):
+        if (0.9 * MET_X_SOLAR <= 1.0 <= 1.1 * MET_X_SOLAR):
+            chemistry_file_path = "DATA/SET_1/ordered_1x_solar_metallicity_chem.dat"
+        elif (0.9 * MET_X_SOLAR <= 100.0 <= 1.1 * MET_X_SOLAR):
+            chemistry_file_path = "DATA/SET_1/ordered_100x_solar_metallicity_chem.dat"
+        elif (0.9 * MET_X_SOLAR <= 300.0 <= 1.1 * MET_X_SOLAR):
+            chemistry_file_path = "DATA/SET_1/ordered_300x_solar_metallicity_chem.dat"
+        elif (0.9 * MET_X_SOLAR <= 3000.0 <= 1.1 * MET_X_SOLAR):
+            chemistry_file_path = "DATA/SET_1/ordered_3000x_solar_metallicity_chem.dat"
+        else:
+            print("Error in choosing which metallicy the chemistry file should be")
+
+    elif (opacity_files == "SET_2"):
+        chemistry_file_path = "DATA/SET_2/eos_solar_doppler.dat"
+    elif (opacity_files == "SET_3"):
+        chemistry_file_path = "DATA/SET_3/eos_solar_doppler.dat"
+    else:
+        print("Error in choosing the chemistry file!")
 
     GAS_CONSTANT_R = 8.314462618
     GASCON = grab_input_data.get_input_data(path, runname, "fort.7","GASCON")
@@ -150,6 +172,9 @@ for q in range(len(planet_names)):
     print("Haze type:", HAZE_TYPE)
     print("GCM Layers = ", INITIAL_NTAU)
     print("Mean Molecular Weight", MEAN_MOLECULAR_WEIGHT)
+    print("")
+    print("Be careful to make sure that your chemistry file is correct!")
+    print("METALLICITY = ", MET_X_SOLAR, chemistry_file_path)
 
     print("")
     print("Star characteristics")
@@ -208,7 +233,7 @@ for q in range(len(planet_names)):
             input_temp  = input_paths[i]
             
             # This will copy all the files that need to be changed over with different opac versions
-            setup_opac_versions.replace_files(opacity_files)
+            setup_opac_versions.replace_files(opacity_files, MET_X_SOLAR)
 
             # Copy the template for inputs
             try:
@@ -225,11 +250,12 @@ for q in range(len(planet_names)):
                 filedata = file.read()
 
             # Replace the input and output paths
-            filedata = filedata.replace("<<output_file>>", "\"" + output_temp + str(W0_VAL) + str(G0_VAL) +"\"")
+            filedata = filedata.replace("<<output_file>>", "\"" + output_temp + str(W0_VAL) + str(G0_VAL) + "\"")
             filedata = filedata.replace("<<input_file>>", "\"" + input_temp + "\"")
             filedata = filedata.replace("<<doppler>>", str(doppler_val))
             filedata = filedata.replace("<<inclination>>", inclination_strs[i])
             filedata = filedata.replace("<<phase>>", phase_strs[i])
+            filedata = filedata.replace("<<CHEMISTRY_FILE>>", "\"" + chemistry_file_path + "\"")
 
             filedata = filedata.replace("<<CLOUDS>>", str(CLOUDS))
             filedata = filedata.replace("<<NTAU>>", str(NTAU))

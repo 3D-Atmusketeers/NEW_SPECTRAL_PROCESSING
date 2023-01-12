@@ -11,57 +11,8 @@ from scipy.interpolate import interp2d
 import matplotlib.colors as colors
 import re
 
-def get_input_data(path, runname, input_file, input_param):
-    # define the input_param and the regex pattern
-    pattern = r"\b" + input_param + r"\s+(.*)"
 
-    # compile the regex pattern
-    regex = re.compile(pattern)
-
-    # open the file and read its contents
-    with open(path + runname + "/" + input_file, "r") as f:
-        text = f.readlines()
-
-    # find all the matches in the text
-    for line in text:
-        # skip lines that contain an exclamation point
-        if "!" in line:
-            continue
-
-        # find matches on the current line
-        matches = regex.findall(line)
-
-        # print the matches
-        for match in matches:
-            # extract the values from the match, including scientific notation
-            if (input_param == 'RADEA'):
-                values = re.findall(r"[+\-]?[^A-Za-z]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)", match)
-            else:
-                values = re.findall(r"[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?", match)
-
-            if len(values) == 0:
-                # define the regex pattern
-                pattern = r"\b(T|F|True|False)\b"
-
-                # compile the regex pattern
-                bool_regex = re.compile(pattern)
-
-                # find all the matches in the string
-                bool_match = bool_regex.findall(line)
-                return bool_match
-            
-            elif len(values) == 1:
-                values = [float(i) for i in values]
-
-                # if there is only one number, print it
-                return values[0]
-            else:
-                values = [float(i) for i in values]
-
-                # if there are multiple values, print the list
-                return values
-
-def plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, extra_pressure_level_bar):
+def plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, cloud_wavelength,gravity, ir_absorbtion_coefficient, extra_pressure_level_bar):
     # temp colormap
     cm_name = 'lajolla'
     cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
@@ -95,8 +46,6 @@ def plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, extra_
 
 
     for ind, planet_name in enumerate(planet_names):
-        gravity = get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name,'/Planet_Run/fort.7' ,'GA')
-        ir_absorbtion_coefficient = get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name,'/Planet_Run/fort.7' ,'ABSLW')
         ir_photosphere_pressure_bars = (2./3.) * (gravity/ir_absorbtion_coefficient) / 10000
         ir_photosphere_pressure_bars = np.round(ir_photosphere_pressure_bars, 3)
         
@@ -163,7 +112,7 @@ def plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, extra_
                 k = 0
 
                 while k <= int(pressure_ind[i][j]):                
-                    taus[i][j] += data[i][j][k][9] + data[i][j][k][12] + data[i][j][k][15] + data[i][j][k][18]                            + data[i][j][k][21] + data[i][j][k][24] + data[i][j][k][27] + data[i][j][k][30]                            + data[i][j][k][33] + data[i][j][k][36] + data[i][j][k][39] + data[i][j][k][42] + data[i][j][k][45]
+                    taus[i][j] += data[i][j][k][9] + data[i][j][k][12] + data[i][j][k][15] + data[i][j][k][18] + data[i][j][k][21] + data[i][j][k][24] + data[i][j][k][27] + data[i][j][k][30]                            + data[i][j][k][33] + data[i][j][k][36] + data[i][j][k][39] + data[i][j][k][42] + data[i][j][k][45]
                     
                     # The hazes are optical depth per bar
                     #taus[i][j] += data[i][j][k][48] * (data[i][j][k+1][4] - data[i][j][k][4])            
@@ -266,7 +215,7 @@ def plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, extra_
 
 
             cloud_cbar = fig.colorbar(cloud_map, aspect=30, pad=0.015, orientation = 'horizontal')
-            cloud_cbar.set_label('Cloud Optical Depth, 5.0 $\\mu$m', fontsize=26)
+            cloud_cbar.set_label('Cloud Optical Depth, ' + str(cloud_wavelength) + ' $\\mu$m', fontsize=26)
 
             plt.savefig('../Figures/Cloud_Coverage_Isobars_{}_bar_{}.png'.format(P_phots[0], planet_name), bbox_inches='tight', dpi=250)
         

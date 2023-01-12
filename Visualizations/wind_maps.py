@@ -53,7 +53,7 @@ def plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
 
         temp_cbar.set_label('E-W Wind Speed (m/s)', size=26)
 
-        fig.text(0.5, 0.05, r"Latitude (degrees)", size=30,  ha='center')
+        fig.text(0.5, 0.03, r"Latitude (degrees)", size=30,  ha='center')
         fig.text(0.0, 0.5, r"Pressure (bar)", size=30,  va='center', rotation='vertical')
 
         plt.savefig('../Figures/wind_maps_{}.png'.format(planet_name), bbox_inches='tight', dpi=100)

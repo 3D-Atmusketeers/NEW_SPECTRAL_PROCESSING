@@ -2,7 +2,7 @@ import re
 import os
 import shutil
 
-def replace_files(opacity_files):
+def replace_files(opacity_files, MET_X_SOLAR):
     if os.path.exists("opac.h"):
         os.remove("opac.h")
     shutil.copy('OPAC_CODE_VERSIONS/' + opacity_files + '/opac.h', "opac.h")

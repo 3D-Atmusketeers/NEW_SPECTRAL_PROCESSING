@@ -93,7 +93,7 @@ Defines input values and files for 3-D emission spectra
 #define QE_Al2O3 0.12
 
 /* Opacities for spectra */
-#define CHEM_FILE   "DATA/SET_2/eos_solar_doppler.dat"
+#define CHEM_FILE   <<CHEMISTRY_FILE>>
 #define CH4_FILE    "DATA/SET_2/opacCH4.dat"
 #define CO2_FILE    "DATA/SET_2/opacCO2.dat"
 #define CO_FILE     "DATA/SET_2/opacCO.dat"

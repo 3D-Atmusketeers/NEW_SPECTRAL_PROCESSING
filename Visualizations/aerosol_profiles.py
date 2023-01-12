@@ -6,64 +6,11 @@ from matplotlib import rcParams, rc
 from matplotlib import ticker, cm
 import re
 
-
-def get_input_data(path, runname, input_file, input_param):
-    # define the input_param and the regex pattern
-    pattern = r"\b" + input_param + r"\s+(.*)"
-
-    # compile the regex pattern
-    regex = re.compile(pattern)
-
-    # open the file and read its contents
-    with open(path + runname + "/" + input_file, "r") as f:
-        text = f.readlines()
-
-    # find all the matches in the text
-    for line in text:
-        # skip lines that contain an exclamation point
-        if "!" in line:
-            continue
-
-        # find matches on the current line
-        matches = regex.findall(line)
-
-        # print the matches
-        for match in matches:
-            # extract the values from the match, including scientific notation
-            if (input_param == 'RADEA'):
-                values = re.findall(r"[+\-]?[^A-Za-z]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)", match)
-            else:
-                values = re.findall(r"[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?", match)
-
-            if len(values) == 0:
-                # define the regex pattern
-                pattern = r"\b(T|F|True|False)\b"
-
-                # compile the regex pattern
-                bool_regex = re.compile(pattern)
-
-                # find all the matches in the string
-                bool_match = bool_regex.findall(line)
-                return bool_match
-            
-            elif len(values) == 1:
-                values = [float(i) for i in values]
-
-                # if there is only one number, print it
-                return values[0]
-            else:
-                values = [float(i) for i in values]
-
-                # if there are multiple values, print the list
-                return values
-def plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
+def plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, gravity, ir_absorbtion_coefficient):
 
     colors = ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#42d4f4', '#f032e6', '#fabed4', '#469990', '#dcbeff', '#9A6324', '#fffac8', '#800000', '#aaffc3', '#000075', '#a9a9a9', '#ffffff', '#000000']
 
     for planet_name in planet_names:
-
-        gravity = get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name,'/Planet_Run/fort.7' ,'GA')
-        ir_absorbtion_coefficient = get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name,'/Planet_Run/fort.7' ,'ABSLW')
         ir_photosphere_pressure_bars = (2./3.) * (gravity/ir_absorbtion_coefficient) / 10000
         ir_photosphere_pressure_bars = np.round(ir_photosphere_pressure_bars, 3)
 
@@ -113,8 +60,9 @@ def plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude
                                 'aero_tau_13', 'sw_asym_13', 'sw_pi0_13',
                                 'haze_tau_optical_depth_per_bar', 'haze_asym', 'haze_pi0'))
         
-        df1 = df1[(df1['lat'] == 1.86)  & (df1['lon'] == 0.0)].reset_index(drop=True)
-        df2 = df2[(df2['lat'] == 1.86)  & (df2['lon'] == 180.0)].reset_index(drop=True)
+        df1 = df1[(df1['lat'] == 1.8556)  & (df1['lon'] == 0.0)].reset_index(drop=True)
+        df2 = df2[(df2['lat'] == 1.8556)  & (df2['lon'] == 180.0)].reset_index(drop=True)
+        
 
         fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(14,11))
         plt.subplots_adjust(wspace=0.25, hspace=0.15)

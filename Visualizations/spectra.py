@@ -576,6 +576,8 @@ def plot_phase_curves(planet_names, planet_name_char_len,  num_phases, transmiss
                 color=my_colors(k / len(planet_names)),
                 linewidth=3, label=planet_name)
 
+        print(fp_fs_ratio * 1e6)
+
     # Figure legend stuff
     ax.set_xlim(min(phases),max(phases))   
     ax.legend(fontsize=12, loc=(0,1.08), ncol=2, mode='expand')

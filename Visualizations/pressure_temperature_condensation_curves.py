@@ -151,8 +151,8 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_gcms, nucleation_lim):
 
         
         axes.invert_yaxis()
-        axes.xaxis.set_ticks_position('top')
-        axes.xaxis.set_label_position('top')
+        axes.xaxis.set_ticks_position('bottom')
+        axes.xaxis.set_label_position('bottom')
         
         
         # tp labels

@@ -54,7 +54,7 @@ Defines input values and files for 3-D emission spectra
 #define CHEM_FILE_NCOLS 23 /* total number of EOS file columns, including temperature and pressure.*/
 
 /* Opacities for spectra */
-#define CHEM_FILE   "DATA/SET_1/eos_solar_GJ1214b.dat"
+#define CHEM_FILE   <<CHEMISTRY_FILE>>
 #define C2H2_FILE   "DATA/SET_1/opacC2H2.dat"
 #define CH4_FILE    "DATA/SET_1/opacCH4.dat"
 #define CO_FILE     "DATA/SET_1/opacCO.dat"
