@@ -8,6 +8,7 @@ font.family : serif
 font.serif : Palatino
 font.size : 28
 axes.labelsize : 28
+axes.color_cycle    : 332288, 88CCEE, 44AA99, 117733, 999933, DDCC77, CC6677, 882255, AA4499
 xtick.direction : in 
 ytick.direction : in
 xtick.top : True

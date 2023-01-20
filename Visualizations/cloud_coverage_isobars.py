@@ -1,18 +1,17 @@
 #!/usr/bin/env python
 
+# get the data from the fort.7 files
+import grab_input_data
+
 ### ----- IMPORT LIBRARIES ----- ###
-import numpy as np 
-import matplotlib as mpl
-from matplotlib import rcParams, rc
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt 
 import matplotlib.colors as mcolors
-from scipy.interpolate import interp2d
-import matplotlib.colors as colors
-import re
 
 
-def plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, cloud_wavelength,gravity, ir_absorbtion_coefficient, extra_pressure_level_bar):
+
+def plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, cloud_wavelength, extra_pressure_level_bar):
     # temp colormap
     cm_name = 'lajolla'
     cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
@@ -46,6 +45,9 @@ def plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, cloud_
 
 
     for ind, planet_name in enumerate(planet_names):
+        gravity = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name,'/Planet_Run/fort.7' ,'GA')
+        ir_absorbtion_coefficient = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name,'/Planet_Run/fort.7' ,'ABSLW')
+
         ir_photosphere_pressure_bars = (2./3.) * (gravity/ir_absorbtion_coefficient) / 10000
         ir_photosphere_pressure_bars = np.round(ir_photosphere_pressure_bars, 3)
         

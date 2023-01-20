@@ -67,7 +67,6 @@ def read_planet_and_star_params(planet_name, column_name_str):
     # Get the planet name from the input string
     planet_name_base = re.split(r"[_|-]", planet_name)[0]
 
-
     # check if any of the row names are a substring of the input string
     found = False
     for row_name in row_names:

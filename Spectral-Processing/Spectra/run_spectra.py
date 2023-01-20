@@ -44,14 +44,23 @@ ONLY_PHASE = True
 # In the correct directory
 USE_FORT_FILES = True
 
-# There are the different sets of opacity and EOS files
-# There are somethings that need to be changed in the template inputs file to make this happen
-# If you change the underlying data files these might need to be changed
-opacity_files = 'SET_1'
+
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
 planet_names = ["GJ1214b-CLEAR-100X"]
+
+
+# There are the different sets of opacity and EOS files
+# There are somethings that need to be changed in the template inputs file to make this happen
+# If you change the underlying data files these might need to be changed
+if any(substring in planet_names[0].upper() for substring in ["GJ1214"]):
+    opacity_files = 'SET_1'
+elif any(substring in planet_names[0].upper() for substring in ["HD209", "HD189"]):
+    opacity_files = 'SET_3'
+else:
+    print("Something is going wrong with how the opacity files are being chosen")
+    exit(0)
 
 # Set the wavelength to evaluate the clouds at for plotting!
 # This could be put in a better place I think
@@ -89,6 +98,7 @@ for q in range(len(planet_names)):
     # Necessary for choosing the chem table!
     MET_X_SOLAR    = 10.0 ** grab_input_data.get_input_data(path, runname, "fort.7","METALLICITY")
 
+
     if (opacity_files == "SET_1"):
         if (0.9 * MET_X_SOLAR <= 1.0 <= 1.1 * MET_X_SOLAR):
             chemistry_file_path = "DATA/SET_1/ordered_1x_solar_metallicity_chem.dat"
@@ -100,7 +110,6 @@ for q in range(len(planet_names)):
             chemistry_file_path = "DATA/SET_1/ordered_3000x_solar_metallicity_chem.dat"
         else:
             print("Error in choosing which metallicy the chemistry file should be")
-
     elif (opacity_files == "SET_2"):
         chemistry_file_path = "DATA/SET_2/eos_solar_doppler.dat"
     elif (opacity_files == "SET_3"):
@@ -175,6 +184,7 @@ for q in range(len(planet_names)):
     print("")
     print("Be careful to make sure that your chemistry file is correct!")
     print("METALLICITY = ", MET_X_SOLAR, chemistry_file_path)
+    print("USING opacity set: ", opacity_files)
 
     print("")
     print("Star characteristics")
@@ -332,6 +342,7 @@ for q in range(len(planet_names)):
             for doppler_val in dopplers:
                 run_exo(input_paths, inclination_strs, phase_strs, doppler_val)
 
+"""
 print("Moving the files out of the clean directory")
 for filename in os.listdir('DATA'):
     if re.match(r'init_*', filename):
@@ -340,3 +351,4 @@ for filename in os.listdir('DATA'):
 for filename in os.listdir('OUT'):
     if re.match(r'Spec_*', filename):
         shutil.move(os.path.join('OUT', filename), os.path.join('../FINISHED_SPECTRA', filename))
+"""

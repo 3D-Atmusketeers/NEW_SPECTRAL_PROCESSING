@@ -47,13 +47,12 @@ def plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, c
 
         df = df[(df['lon'] == 0)].reset_index(drop=True)
         df = df.groupby(['lat', 'pres']).mean().reset_index()
+
         df["total_optical_depth"] = df["aero_sw_tau_1"] + df["aero_sw_tau_2"] + df["aero_sw_tau_3"] + df["aero_sw_tau_4"] + \
                                     df["aero_sw_tau_5"] + df["aero_sw_tau_6"] + df["aero_sw_tau_7"] + df["aero_sw_tau_8"] + \
                                     df["aero_sw_tau_9"] + df["aero_sw_tau_10"] + df["aero_sw_tau_11"] + df["aero_sw_tau_12"] + \
                                     df["aero_sw_tau_13"]
-
         optical_depth = df["total_optical_depth"].values.reshape(nlat, nlev)
-        
         return optical_depth
 
 
@@ -71,9 +70,6 @@ def plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, c
         pressures = np.logspace(2 - num_orders_of_magnitude, 2, nlev)
 
         optical_depths1 = get_optical_depth(file1, nlat, nlon, nlev)
-
-        #optical_depths1[optical_depths1 < 1e-4] = 1e-4
-
         mp1 = axes.contourf(lats, pressures, optical_depths1.T, cmap=my_colors, levels=100)
 
         axes.set_yscale("log")
@@ -81,7 +77,7 @@ def plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, c
 
         #cbar = fig.colorbar(mp1, ax=axes.ravel().tolist(), location='top', aspect=50, pad=0.02)
         cbar = fig.colorbar(mp1, aspect=20, pad=0.02)
-        cbar.set_label(r'log$_{10}$(Aerosol Optical Depth per bar at ' + str(cloud_wavelength) + ' $\mu$m)',
+        cbar.set_label(r'Aerosol Optical Depth per bar at ' + str(cloud_wavelength) + ' $\mu$m',
                                                                                              size=20, labelpad=10)
         cbar.ax.tick_params(labelsize=22)  # set your label size here
 

@@ -13,7 +13,7 @@ import pandas as pd
 from scipy.interpolate import interp1d
 import math
 
-def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_gcms, nucleation_lim):
+def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_gcms):
     base = '../Spectral-Processing/PLANET_MODELS/'
 
     column_names = ['lat', 'lon', 'level',
@@ -37,10 +37,14 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_gcms, nucleation_lim):
         fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(12,8))
         plt.subplots_adjust(wspace=0.02, hspace=0.03)
 
-        if 'CLOUDS' in planet_name:
+        if ('CLOUDS'.lower() in planet_name.lower()):
             clouds = True
         else:
             clouds = False
+            
+        nucleation_lim = False
+        if ("NUC".lower() in planet_name.lower()):
+            nucleation_lim = True
 
         df = pd.read_csv(base + planet_name + '.txt', names = column_names, delim_whitespace=True)
         df.lon = df.lon.mask(df.lon >= 180.0, df.lon - 360.0)
@@ -122,7 +126,7 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_gcms, nucleation_lim):
             f_catio3 = interp1d(press_con,catio3,  fill_value='extrapolate')
             f_al2o3 = interp1d( press_con,al2o3, fill_value='extrapolate')
             
-            colors=['#4b006e', '#3f9b0b', '#75bbfd', '#ff81c0', 'brown', '#fb2943', '#029386', 'orange']
+            colors=['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#fabed4', '#469990', '#dcbeff', '#9A6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#a9a9a9', '#ffffff']
 
             axes.semilogy(f_kcl(new_pressures), new_pressures, lw=3, label='KCl', color=colors[0])
             axes.semilogy(f_cr(new_pressures), new_pressures, lw=3, label='Cr', color=colors[1])
@@ -135,11 +139,11 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_gcms, nucleation_lim):
 
 
             if nucleation_lim == False:
-                axes.semilogy(f_fe(new_pressures), new_pressures, lw=3, label=r'Fe', color='darkgreen')
-                axes.semilogy(f_na2s(new_pressures), new_pressures, lw=3, label=r'Na$_2$S', color='mediumseagreen')
-                axes.semilogy(f_mns(new_pressures), new_pressures, lw=3, label=r'MnS', color='lightseagreen')
-                axes.semilogy(f_zns(new_pressures), new_pressures, lw=3, label=r'ZnS', color='teal')
-                axes.semilogy(f_ni(new_pressures), new_pressures, lw=3, label=r'Ni', color='steelblue')
+                axes.semilogy(f_fe(new_pressures), new_pressures, lw=3, label=r'Fe', color=colors[8])
+                axes.semilogy(f_na2s(new_pressures), new_pressures, lw=3, label=r'Na$_2$S', color=colors[9])
+                axes.semilogy(f_mns(new_pressures), new_pressures, lw=3, label=r'MnS', color=colors[10])
+                axes.semilogy(f_zns(new_pressures), new_pressures, lw=3, label=r'ZnS', color=colors[11])
+                axes.semilogy(f_ni(new_pressures), new_pressures, lw=3, label=r'Ni', color=colors[12])
                 
             axes.legend(fontsize=14, ncol=2, labelspacing=0.0, loc='lower left')
 
@@ -147,8 +151,8 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_gcms, nucleation_lim):
 
         
         axes.set_ylim([1.01e-5, 1.00e+2])
-        axes.set_xlim([min_temp,max_temp])
-
+        #axes.set_xlim([min_temp,max_temp])
+        axes.set_xlim([250,3000])
         
         axes.invert_yaxis()
         axes.xaxis.set_ticks_position('bottom')
@@ -166,7 +170,7 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_gcms, nucleation_lim):
         tp_cbar.set_label('Lon (deg)', fontsize=24, labelpad=5)
 
 
-        fig.text(0.5, 0.95, r"Temperature (K)", size=24, ha='center')
+        fig.text(0.5, 0.03, r"Temperature (K)", size=24, ha='center')
 
 
         print('Creating plot DONE')

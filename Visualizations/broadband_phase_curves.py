@@ -5,11 +5,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from scipy.interpolate import interp1d
-from scipy.interpolate import griddata
 from scipy import interpolate
 import matplotlib.pylab as pl
-import seaborn as sns
 import re
 
 
@@ -147,7 +144,7 @@ def get_phase_curve(df, nlat=48, nlon=96, nlev=50):
     
     return lw_curve_final, sw_curve_final, swin_curve_final, lon_df
 
-def print_energy_balances(df, planet_name):
+def print_energy_balances(df, planet_name, sw_phase_curve, lw_phase_curve, nlon):
     df.swin = df.swin * np.cos((df['lat'] * (np.pi / 180.0))) 
     df.lwin = df.lwin * np.cos((df['lat'] * (np.pi / 180.0)))
 
@@ -158,14 +155,25 @@ def print_energy_balances(df, planet_name):
     total_swout = sum(df.swout)
     total_lwin  = sum(df.lwin)
     total_swin  = sum(df.swin)
+
+    orbital_phases = np.linspace(0, 1.0, nlon - 1)
+    new_orbital_phases = np.linspace(0, 1.0, 100000)
+
+    # Have to do :-1 because there is an extra 0
+    sw_f = interpolate.interp1d(orbital_phases, sw_phase_curve[:-1], kind='quadratic')
+    sw_interpolated_phase_curve = sw_f(new_orbital_phases)
+
+    lw_f = interpolate.interp1d(orbital_phases, lw_phase_curve[:-1], kind='quadratic')
+    lw_interpolated_phase_curve = lw_f(new_orbital_phases)
     
-    with open('OUTPUT_DATA/Energy_Balances_' + planet_name + '.txt', 'a+') as f:
+    with open('OUTPUT_DATA/Energy_Balances_' + planet_name + '.txt', 'w') as f:
         f.write('******************** \n')
         f.write(planet_name + '\n')
         f.write("Energy Out / Energy In: " + str(np.round((total_lwout + total_swout) / (total_lwin  + total_swin), 3)) + "\n")
         f.write("BA: " + str(np.round(total_swout / total_swin, 3)) + "\n")
+        f.write("Reflected Light Phase Curve Peak at: " + str(np.round(np.argmax(sw_interpolated_phase_curve) / 100000, 4)) + "\n")
+        f.write("Thermal Light Phase Curve Peak at: " + str(np.round(np.argmax(lw_interpolated_phase_curve) / 100000, 4)) + "\n")
         f.write('\n\n')
-    
     return None
 
 
@@ -173,38 +181,30 @@ def print_energy_balances(df, planet_name):
 
 
 
-def plot_thermal_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len):
+def plot_thermal_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len, two_sets_of_planets):
     n = len(planet_names)
-    colors = pl.cm.viridis(np.linspace(0,1,n))
+    colors = pl.cm.tab10(np.linspace(0,1,int(n/2)))
+
+    colors = ['black', '#7e1e9c', '#15b01a', '#75bbfd', '#653700', '#e50000', '#f97306']
+
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10,6), sharex=True, sharey=False)
     plt.subplots_adjust(wspace=0.275, hspace=0.1)
 
-    energy_out_thermal = []     
-    energy_out_sw      = []
-    energy_in_sw       = []
-
     for j, planet_name in enumerate(planet_names):
+        z = j
         df = get_planet_df(planet_names[j], nlat=48, nlon=96, nlev=50,base='../Spectral-Processing/GCM-OUTPUT/')    
         lw_phase_curve, sw_phase_curve, swin_phase_curve, lon_df = get_phase_curve(df)
         
-        if (j % 4 == 0):
-            linestyle_str = 'solid'
-        elif (j % 4 == 1):
+        linestyle_str = 'solid'
+        if ("PICKET".lower() in planet_name.lower()):
             linestyle_str = 'dashed'
-        elif (j % 4 == 2):
-            linestyle_str = 'dotted'
-        elif (j % 4 == 3):
-            linestyle_str = 'dashdot'
-        else:
-            print ("math error")
-            exit(0)
-        
+
+        if two_sets_of_planets:
+            if z >= int(n/2):
+                z = j - int(n/2)
         # Plot each phase curve
-        ax.plot(np.linspace(0, 1, nlon), lw_phase_curve, linewidth=3, linestyle=linestyle_str, color=colors[j], label=planet_names[j][planet_name_char_len:]) 
-        #ax.plot(np.linspace(0, 1, nlon), sw_phase_curve, linewidth=3, linestyle=linestyle_str, color=colors[j],label=planet_names[j][planet_name_char_len:])  
-        print_energy_balances(df, planet_names[j])
-        
-        
+        ax.plot(np.linspace(0, 1, nlon), lw_phase_curve, linewidth=3, color=colors[z], linestyle=linestyle_str, label=planet_names[j])
+
     ax.legend(fontsize=10, loc=(0,1.05), ncol=2, mode='expand')
 
     ax.set_xlim(0.01,0.99)
@@ -218,36 +218,30 @@ def plot_thermal_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_nam
 
 
 
-def plot_reflected_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len):
+def plot_reflected_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len, two_sets_of_planets):
     n = len(planet_names)
-    colors = pl.cm.viridis(np.linspace(0,1,n))
+    colors = pl.cm.rainbow(np.linspace(0,1,int(n/2)))
+    colors = ['black', '#7e1e9c', '#15b01a', '#75bbfd', '#653700', '#e50000', '#f97306']
+
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10,6), sharex=True, sharey=False)
     plt.subplots_adjust(wspace=0.275, hspace=0.1)
 
-    energy_out_thermal = []     
-    energy_out_sw      = []
-    energy_in_sw       = []
 
     for j, planet_name in enumerate(planet_names):
+        z = j
         df = get_planet_df(planet_names[j], nlat=48, nlon=96, nlev=50,base='../Spectral-Processing/GCM-OUTPUT/')    
         lw_phase_curve, sw_phase_curve, swin_phase_curve, lon_df = get_phase_curve(df)
         
-        if (j % 4 == 0):
-            linestyle_str = 'solid'
-        elif (j % 4 == 1):
+        linestyle_str = 'solid'
+        if ("PICKET".lower() in planet_name.lower()):
             linestyle_str = 'dashed'
-        elif (j % 4 == 2):
-            linestyle_str = 'dotted'
-        elif (j % 4 == 3):
-            linestyle_str = 'dashdot'
-        else:
-            print ("math error")
-            exit(0)
-        
-        # Plot each phase curve
-        #ax.plot(np.linspace(0, 1, nlon), lw_phase_curve, linewidth=3, linestyle=linestyle_str, color=colors[j]) 
-        ax.plot(np.linspace(0, 1, nlon), sw_phase_curve, linewidth=3, linestyle=linestyle_str, color=colors[j],label=planet_names[j][planet_name_char_len:])  
-        print_energy_balances(df, planet_names[j])
+
+        if two_sets_of_planets:
+            if z >= int(n/2):
+                z = j - int(n/2)
+
+        ax.plot(np.linspace(0, 1, nlon), sw_phase_curve, linewidth=3, color=colors[z], linestyle=linestyle_str, label=planet_names[j])
+        print_energy_balances(df, planet_names[j], sw_phase_curve, lw_phase_curve, nlon)
         
         
     ax.legend(fontsize=10, loc=(0,1.05), ncol=2, mode='expand')
@@ -265,7 +259,7 @@ def plot_reflected_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_n
 
 
 
-def plot_reflected_starlight_maps(planet_names, nlat, nlon, nlev, num_gcms):
+def plot_reflected_starlight_maps(planet_names, nlat, nlon, nlev, num_gcms, two_sets_of_planets):
     for j, planet_name in enumerate(planet_names):
         df = get_planet_df(planet_names[j], nlat=48, nlon=96, nlev=50,base='../Spectral-Processing/GCM-OUTPUT/')
         

@@ -434,7 +434,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
     np.savetxt(planet_file_with_clouds, df.values, fmt=' '.join(['%5.4f']*2 + ['%3d']*1 + ['%9.4E']*6 + ['%9.4E']*42 + ['\t']))
 
     print ("Adding Clouds, with scattering params, this is just for the graphing stuff to have a copy")
-    print ("THE CLOUDS ARE BEING EVALUATED AT THIS WAVELENGTH!!!!", str(wav_loc))
+    print ("THE CLOUDS ARE BEING EVALUATED AT THIS WAVELENGTH index!!!!", str(wav_loc))
     if CLOUDS == 1:
         max_cloud_level1 = 0
         max_cloud_level2 = 0

@@ -5,9 +5,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import re
 
-# get the data from the fort.7 files
-import grab_input_data
-
 # These are the plotting codes that Isaac wrote
 # If they're broken, venmo isaac-malsky
 # I wont' fix them, but I'll appreciate the money
@@ -15,6 +12,8 @@ import broadband_phase_curves
 import cloud_coverage_isobars
 import pressure_temperature_condensation_curves
 import spectra
+
+import grab_input_data
 
 import aerosol_maps
 import aerosol_profiles
@@ -27,10 +26,22 @@ plt.style.use('style.txt')
 
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
-planet_names = ['GJ1214b-CLEAR-100X']
+planet_names = ["HD189-PICKET",
+                "HD189-PICKET-NUC-CLOUDS",
+                "HD189-PICKET-NUC-COMPACT"]
 
 
-opacity_files = 'SET_1'
+# There are the different sets of opacity and EOS files
+# There are somethings that need to be changed in the template inputs file to make this happen
+# If you change the underlying data files these might need to be changed
+if any(substring in planet_names[0].upper() for substring in ["GJ1214b"]):
+    opacity_files = 'SET_1'
+elif any(substring in planet_names[0].upper() for substring in ["HD209", "HD189"]):
+    opacity_files = 'SET_3'
+else:
+    print("Something is going wrong with how the opacity files are being chosen")
+    exit(0)
+
 if opacity_files == 'SET_1':
     cloud_wavelength = 5.0
 elif opacity_files == 'SET_2':
@@ -41,14 +52,13 @@ else:
     print("YOU NEED TO SET WHICH OPACITY SET YOU'RE USING")
     exit(0)
 
+
 # Get the number of GCMS
 num_gcms = len(planet_names)
 
 
 # Get the number of orders of magnitude
 num_orders_of_magnitude = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_names[0], "fort.7", "OOM_IN")
-gravity = get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name,'/Planet_Run/fort.7' ,'GA')
-ir_absorbtion_coefficient = get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name,'/Planet_Run/fort.7' ,'ABSLW')
 
 
 # Get the planet name from the input string
@@ -83,9 +93,9 @@ else:
 print ("Plotting the broadband phase curves...")
 print ()
 print ()
-broadband_phase_curves.plot_thermal_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len)
-broadband_phase_curves.plot_reflected_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len)
-broadband_phase_curves.plot_reflected_starlight_maps(planet_names, nlat, nlon, nlev, num_gcms)
+broadband_phase_curves.plot_thermal_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len, two_sets_of_planets=True)
+broadband_phase_curves.plot_reflected_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len, two_sets_of_planets=True)
+#broadband_phase_curves.plot_reflected_starlight_maps(planet_names, nlat, nlon, nlev, num_gcms, two_sets_of_planets=False)
 
 
 # Plot the isobaric cloud maps
@@ -94,12 +104,8 @@ broadband_phase_curves.plot_reflected_starlight_maps(planet_names, nlat, nlon, n
 print ("Plotting the isobaric projections...")
 print ()
 print ()
-cloud_coverage_isobars.plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, cloud_wavelength, gravity, ir_absorbtion_coefficient,
-                                                   extra_pressure_level_bar=0)
-cloud_coverage_isobars.plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, cloud_wavelength, gravity, ir_absorbtion_coefficient,
-                                                   extra_pressure_level_bar=0.1)
-cloud_coverage_isobars.plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, cloud_wavelength, gravity, ir_absorbtion_coefficient,
-                                                   extra_pressure_level_bar=0.001)
+cloud_coverage_isobars.plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, cloud_wavelength,extra_pressure_level_bar=0)
+cloud_coverage_isobars.plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, cloud_wavelength,extra_pressure_level_bar=0.001)
 
 
 
@@ -107,23 +113,23 @@ cloud_coverage_isobars.plot_cloud_coverage_isobars(planet_names, nlat, nlon, nle
 print ("Plotting the pressure temperature condensation curves...")
 print ()
 print ()
-pressure_temperature_condensation_curves.plot_PTC_curves(planet_names, nlat, nlon, nlev, num_gcms, nucleation_lim=True)
+pressure_temperature_condensation_curves.plot_PTC_curves(planet_names, nlat, nlon, nlev, num_gcms)
+
+
+# Plot other planet characteristics
+aerosol_maps.plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, cloud_wavelength)
+aerosol_profiles.plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
+wind_maps.plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
 
 
 # Plot the spectra
 print ("Plotting the spectra...")
 print ()
 print ()
-spectra.plot_planet_spectra_blackbody_comparison(planet_names, black_body_temperatures=np.linspace(200, 1000, 9), num_phases=1)
-spectra.plot_star_spectra_test(planet_names)
-spectra.plot_filters(planet_names)
-spectra.plot_spectra_simple(planet_names, num_phases=1)
-spectra.plot_spectra_phases(planet_names, num_phases=1, transmission_filter_name='MIRI', planet_only_bool=False)
-
-spectra.plot_phase_curves(planet_names, planet_name_char_len, num_phases=1, transmission_filter_name='MIRI')
-
-# Plot other stuff
-aerosol_maps.plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, cloud_wavelength)
-aerosol_profiles.plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, gravity, ir_absorbtion_coefficient)
-wind_maps.plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
-emission_maps.plot_emission_maps(planet_names, nlat, nlon, nlev)
+#spectra.plot_planet_spectra_blackbody_comparison(planet_names, black_body_temperatures=np.linspace(200, 1000, 9), num_phases=1)
+#spectra.plot_star_spectra_test(planet_names)
+#spectra.plot_filters(planet_names)
+#spectra.plot_spectra_simple(planet_names, num_phases=24)
+#spectra.plot_spectra_phases(planet_names, num_phases=24, transmission_filter_name='MIRI', planet_only_bool=False)
+#spectra.plot_phase_curves(planet_names, planet_name_char_len, num_phases=1, transmission_filter_name='MIRI')
+#emission_maps.plot_emission_maps(planet_names, nlat, nlon, nlev)
