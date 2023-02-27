@@ -45,22 +45,22 @@ ONLY_PHASE = True
 USE_FORT_FILES = True
 
 
-
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-CLEAR-100X"]
+planet_names = ["HD209-PICKET", "HD209-PICKET-NUC-CLOUDS"]
 
+opacity_files = 'SET_1'
 
 # There are the different sets of opacity and EOS files
 # There are somethings that need to be changed in the template inputs file to make this happen
 # If you change the underlying data files these might need to be changed
-if any(substring in planet_names[0].upper() for substring in ["GJ1214"]):
-    opacity_files = 'SET_1'
-elif any(substring in planet_names[0].upper() for substring in ["HD209", "HD189"]):
-    opacity_files = 'SET_3'
-else:
-    print("Something is going wrong with how the opacity files are being chosen")
-    exit(0)
+#if any(substring in planet_names[0].upper() for substring in ["GJ1214"]):
+#    opacity_files = 'SET_1'
+#elif any(substring in planet_names[0].upper() for substring in ["HD209", "HD189"]):
+#    opacity_files = 'SET_3'
+#else:
+#    print("Something is going wrong with how the opacity files are being chosen")
+#    exit(0)
 
 # Set the wavelength to evaluate the clouds at for plotting!
 # This could be put in a better place I think
@@ -81,23 +81,25 @@ else:
 for q in range(len(planet_names)):
     planet_name = planet_names[q]
 
-
     runname     = planet_name + '/Planet_Run'
     path        = '../GCM-OUTPUT/'
 
-    MOLEF          = grab_input_data.get_input_data(path, runname, "fort.7", "MOLEF")
     aerosol_layers = int(grab_input_data.get_input_data(path, runname,"fort.7", "AERLAYERS"))
     grav           = grab_input_data.get_input_data(path, runname, "fort.7","GA")
     gasconst       = grab_input_data.get_input_data(path, runname, "fort.7","GASCON")
     R_PLANET       = grab_input_data.get_input_data(path, runname, "fort.7","RADEA")
-    P_ROT          = (grab_input_data.get_input_data(path, runname, "fort.7","WW") / (2.0 * np.pi) * (24 * 3600)) ** -1.0
+    P_ROT          = (grab_input_data.get_input_data(path, runname, "fort.7","WW") / (2.0*np.pi)*(24*3600)) ** -1.0
     oom            = grab_input_data.get_input_data(path, runname, "fort.7","OOM_IN")
     MTLX           = grab_input_data.get_input_data(path, runname, "fort.7","MTLX")
-    HAZES          = grab_input_data.get_input_data(path, runname, "fort.7","HAZES")
+
 
     # Necessary for choosing the chem table!
     MET_X_SOLAR    = 10.0 ** grab_input_data.get_input_data(path, runname, "fort.7","METALLICITY")
+    HAZES          = grab_input_data.get_input_data(path, runname, "fort.7","HAZES")
+    MOLEF          = grab_input_data.get_input_data(path, runname, "fort.7", "MOLEF")
 
+    #MET_X_SOLAR = 1.0
+    #HAZES       = False
 
     if (opacity_files == "SET_1"):
         if (0.9 * MET_X_SOLAR <= 1.0 <= 1.1 * MET_X_SOLAR):
@@ -157,14 +159,23 @@ for q in range(len(planet_names)):
         with open(path + runname + '/fort.26') as f:
             lines_fort26 = f.readlines()
             INITIAL_NTAU = int(float(re.findall(r"[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?", lines_fort26[0])[2]))
+    elif os.path.isfile(path+runname+'/fort.2600'):
+        with open(path + runname + '/fort.2600') as f:
+            lines_fort26 = f.readlines()
+            INITIAL_NTAU = int(float(re.findall(r"[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?", lines_fort26[0])[2]))
     else:
-        print ("You need the fort.26 file")
+        print()
+        print("!!!!!!!!!! You need the fort.26 or fort.2600 file !!!!!!!!!!!")
+        print()
+        exit(0)
 
     # get all the stellar parameters needed from the excel doc of stellar params
     # that doc should be in the spectra folder, make sure to update it every once in a while
-    ORB_SEP      = grab_input_data.read_planet_and_star_params(planet_name, "a (au)") * 1.496e11
-    STELLAR_TEMP = grab_input_data.read_planet_and_star_params(planet_name, "T* (K)")
-    R_STAR       = grab_input_data.read_planet_and_star_params(planet_name, "R* (R_sun)") * 695700000
+
+    star_name    = grab_input_data.read_planet_and_star_params(planet_name, "Name")
+    ORB_SEP      = float(grab_input_data.read_planet_and_star_params(planet_name, "a (au)")) * 1.496e11
+    STELLAR_TEMP = float(grab_input_data.read_planet_and_star_params(planet_name, "T* (K)"))
+    R_STAR       = float(grab_input_data.read_planet_and_star_params(planet_name, "R* (R_sun)")) * 695700000
 
     print("Planet characteristics")
     print("These are the cloud types in order, and the corresponding amounts")
@@ -188,6 +199,8 @@ for q in range(len(planet_names)):
 
     print("")
     print("Star characteristics")
+    print("!!!!!   MAKE SURE TO CHECK THESE, IT IS HARD TO STRING MATCH  !!!!!!!")
+    print("You matched", star_name, "on planet", planet_name)
     print("Orbital Separation = ",ORB_SEP)
     print("Star Temp = ",STELLAR_TEMP)
     print("Star Radius = ",R_STAR)
@@ -309,7 +322,6 @@ for q in range(len(planet_names)):
     inclination_strs = []
     phase_strs = []
 
-
     # Convert the fort files to the correct format
     if USE_FORT_FILES == True:
         convert_fort_files.convert_to_correct_format(path, runname, planet_name, INITIAL_NTAU, surfp, oom, tgr, grav, gasconst)
@@ -325,10 +337,10 @@ for q in range(len(planet_names)):
     # Regrid the file to constant altitude and the correct number of layers
     altitude_regridding.regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, INITIAL_NTAU, NLON, NTAU, HAZES)
     print ("Regridded the planet to constant altitude")
-
+    
     # If you already have the Final planet file creates you can commend out run_grid and double planet file
     run_grid.run_all_grid(planet_name, phases, inclinations, system_obliquity, NTAU, NLAT, NLON, grid_lat_min, grid_lat_max, grid_lon_min, grid_lon_max, ONLY_PHASE)
-
+    """
     # Get all the files that you want to run
     input_paths, inclination_strs, phase_strs = get_run_lists(phases, inclinations)
     
@@ -341,6 +353,7 @@ for q in range(len(planet_names)):
         for W0_VAL in W0_VALS:
             for doppler_val in dopplers:
                 run_exo(input_paths, inclination_strs, phase_strs, doppler_val)
+    """
 
 """
 print("Moving the files out of the clean directory")

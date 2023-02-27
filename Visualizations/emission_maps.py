@@ -3,7 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt 
 from mpl_toolkits.basemap import Basemap
 import matplotlib.colors as mcolors
-from matplotlib import ticker
 
 try:
     from inspect import cleandoc as dedent

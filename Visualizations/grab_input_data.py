@@ -10,7 +10,7 @@ def get_input_data(path, runname, input_file, input_param):
     regex = re.compile(pattern)
 
     # open the file and read its contents
-    with open(path + runname + "/" + input_file, "r") as f:
+    with open(path + runname + "/Planet_Run/" + input_file, "r") as f:
         text = f.readlines()
 
     # find all the matches in the text

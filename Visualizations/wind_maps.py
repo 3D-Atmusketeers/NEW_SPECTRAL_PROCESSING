@@ -1,14 +1,17 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
+import matplotlib.colors as colors
+import matplotlib
+import sys
+
 
 def plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
     # temp colormap
     cm_name = 'cork'
     cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
     cm_file = np.flip(cm_file, axis=0)
-    my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
+    my_colors = colors.LinearSegmentedColormap.from_list(cm_name, cm_file)
 
     def get_wind_speeds(file):
         df = pd.read_csv(file,
@@ -29,7 +32,7 @@ def plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
     # define your scale, with white at zero
     #vmin = -1000
     #vmax = 6000
-    #norm = mcolors.DivergingNorm(vmin=vmin, vcenter=0, vmax=vmax)
+    #norm = colors.DivergingNorm(vmin=vmin, vcenter=0, vmax=vmax)
 
     for planet_name in planet_names:
         plt.clf()
@@ -41,12 +44,19 @@ def plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
 
         u_data_1 = get_wind_speeds('../Spectral-Processing/PLANET_MODELS/' + planet_name + '.txt')
 
+
+        matplotlib_version = matplotlib.__version__.split('.')
+        if float(matplotlib_version[1]) < 2:
+            my_norm = colors.DivergingNorm(0)
+        else:
+            my_norm = colors.TwoSlopeNorm(0)
+
         mp1 = axes.contourf(lats, pressures, u_data_1.T,
                             #cmap='RdBu_r',
                             cmap=my_colors,
                             levels=100,
                             #levels=[-2000, -1000, 0, 1000, 2000, 3000, 4000, 5000, 6000, 7000],
-                            norm=mcolors.DivergingNorm(0))
+                            norm=my_norm)
         axes.contour(lats, pressures, u_data_1.T, levels=[0], colors='black', linewidths=3, linestyles='dashed')
 
 

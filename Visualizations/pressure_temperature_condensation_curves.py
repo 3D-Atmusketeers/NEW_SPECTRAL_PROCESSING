@@ -13,7 +13,7 @@ import pandas as pd
 from scipy.interpolate import interp1d
 import math
 
-def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_gcms):
+def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_gcms, num_orders_of_magnitude):
     base = '../Spectral-Processing/PLANET_MODELS/'
 
     column_names = ['lat', 'lon', 'level',
@@ -69,14 +69,14 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_gcms):
 
         # adjust tick marks on both axes
 
-        axes.tick_params(axis='both',
-                    which='both',
-                    direction='in',
-                    top = True,
-                    right = True)
-        axes.tick_params(axis='both',
-                    which='major',
-                    length=5)
+        #axes.tick_params(axis='both',
+        #            which='both',
+        #            direction='in',
+        #            top = True,
+        #            right = True)
+        #axes.tick_params(axis='both',
+        #            which='major',
+        #            length=5)
 
 
         # plot all TP-profiles (expensive)
@@ -150,11 +150,12 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_gcms):
 
 
         
-        axes.set_ylim([1.01e-5, 1.00e+2])
-        #axes.set_xlim([min_temp,max_temp])
-        axes.set_xlim([250,3000])
+        #axes.set_ylim([1.01e-5, 1.00e+2])
+        axes.set_ylim(0.99e2, 10 ** (2 - num_orders_of_magnitude))
+        axes.set_xlim([max(0,min_temp-50),max_temp + 50])
+        #axes.set_xlim([250,3000])
         
-        axes.invert_yaxis()
+        #axes.invert_yaxis()
         axes.xaxis.set_ticks_position('bottom')
         axes.xaxis.set_label_position('bottom')
         

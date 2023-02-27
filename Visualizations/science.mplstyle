@@ -1,0 +1,48 @@
+
+figure.figsize: 12,8
+figure.dpi : 100
+
+lines.linewidth : 3.0
+axes.linewidth: 2
+font.size : 28
+axes.labelsize : 28
+xtick.direction : in 
+ytick.direction : in
+xtick.top : False
+ytick.right : False
+
+xtick.major.size:    10    # major tick size in points
+xtick.minor.size:    5       # minor tick size in points
+xtick.major.width:   3     # major tick width in points
+xtick.minor.width:   1     # minor tick width in points
+
+ytick.major.size:    10     # major tick size in points
+ytick.minor.size:    5       # minor tick size in points
+ytick.major.width:   3     # major tick width in points
+ytick.minor.width:   1     # minor tick width in points
+
+xtick.major.pad : 6
+xtick.minor.pad : 6
+ytick.major.pad : 6
+ytick.minor.pad : 6
+
+xtick.labelsize : 20
+ytick.labelsize : 20
+legend.fontsize : 17
+legend.frameon : True
+
+
+savefig.bbox : tight
+savefig.dpi : 100
+
+# Rainbow color cycle
+#axes.prop_cycle: cycler('color', ["black", "332288","88CCEE","44AA99","117733","999933","DDCC77","CC6677","882255","AA4499","brown","fd3c06","gray"])
+
+# Not good for colorblind people
+axes.prop_cycle: cycler('color', ['black', '7e1e9c', '15b01a', '448ee4', 'ff7fa7', '029386',   'ed872d',   'ae1717',   'gray'])
+
+font.family : serif
+font.serif : Palatino
+text.usetex : True
+
+#ax.tick_params(axis='x', which='major', pad=6)

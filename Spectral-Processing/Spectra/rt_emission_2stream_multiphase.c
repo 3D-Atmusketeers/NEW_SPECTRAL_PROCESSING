@@ -1499,6 +1499,8 @@ int RT_Emit_3D(double PHASE)
                 {
                     // Find min vert level for 2stream //
                     kmin = 0;
+
+
                     for (j = 0; j<NTAU; j++)
                     {
                         if (dtau_em[l][m][j] < 1e-10 || tau_em[l][m][j] < 1e-10 || temperature_3d[l][m][j] < 200 || kappa_nu_array[l][m][j] < 1e-10)
@@ -1506,6 +1508,15 @@ int RT_Emit_3D(double PHASE)
                           kmin = j+1;
                         }
                     }
+
+
+                    //for (j = kmin; j<NTAU; j++)
+                    //{
+                    //    printf("%d %.3e %.3e %.3e %.3e\n", j, dtau_em[l][m][j], tau_em[l][m][j], kappa_nu_array[l][m][j], temperature_3d[l][m][j]);
+                    //}
+
+
+
 
                     if (kmin >= NTAU)
                     {

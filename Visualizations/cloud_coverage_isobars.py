@@ -45,8 +45,8 @@ def plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, cloud_
 
 
     for ind, planet_name in enumerate(planet_names):
-        gravity = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name,'/Planet_Run/fort.7' ,'GA')
-        ir_absorbtion_coefficient = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name,'/Planet_Run/fort.7' ,'ABSLW')
+        gravity = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name, 'fort.7' ,'GA')
+        ir_absorbtion_coefficient = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name,'fort.7' ,'ABSLW')
 
         ir_photosphere_pressure_bars = (2./3.) * (gravity/ir_absorbtion_coefficient) / 10000
         ir_photosphere_pressure_bars = np.round(ir_photosphere_pressure_bars, 3)
@@ -180,7 +180,10 @@ def plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, cloud_
 
             cloud_map = axes.contourf(lons, lats,
                                       np.concatenate([taus,taus], axis=1),
-                                      cmap=cloud_colors, levels=5)
+                                      cmap=cloud_colors, levels=100)
+
+            axes.set_xticks(axes.get_xticks()[::2])
+
 
             # format axes
             #for ax in axes:#.flatten():

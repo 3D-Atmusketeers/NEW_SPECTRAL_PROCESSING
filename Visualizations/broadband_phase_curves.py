@@ -9,7 +9,6 @@ from scipy import interpolate
 import matplotlib.pylab as pl
 import re
 
-
 def get_planet_df(planet_name, nlat, nlon, nlev, base):
     runfile = base + planet_name + '/Planet_Run/fort.62'
 
@@ -183,8 +182,6 @@ def print_energy_balances(df, planet_name, sw_phase_curve, lw_phase_curve, nlon)
 
 def plot_thermal_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len, two_sets_of_planets):
     n = len(planet_names)
-    colors = pl.cm.tab10(np.linspace(0,1,int(n/2)))
-
     colors = ['black', '#7e1e9c', '#15b01a', '#75bbfd', '#653700', '#e50000', '#f97306']
 
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10,6), sharex=True, sharey=False)
@@ -196,12 +193,11 @@ def plot_thermal_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_nam
         lw_phase_curve, sw_phase_curve, swin_phase_curve, lon_df = get_phase_curve(df)
         
         linestyle_str = 'solid'
-        if ("PICKET".lower() in planet_name.lower()):
-            linestyle_str = 'dashed'
-
         if two_sets_of_planets:
             if z >= int(n/2):
                 z = j - int(n/2)
+                linestyle_str = 'dashed'
+
         # Plot each phase curve
         ax.plot(np.linspace(0, 1, nlon), lw_phase_curve, linewidth=3, color=colors[z], linestyle=linestyle_str, label=planet_names[j])
 
@@ -233,12 +229,10 @@ def plot_reflected_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_n
         lw_phase_curve, sw_phase_curve, swin_phase_curve, lon_df = get_phase_curve(df)
         
         linestyle_str = 'solid'
-        if ("PICKET".lower() in planet_name.lower()):
-            linestyle_str = 'dashed'
-
         if two_sets_of_planets:
             if z >= int(n/2):
                 z = j - int(n/2)
+                linestyle_str = 'dashed'
 
         ax.plot(np.linspace(0, 1, nlon), sw_phase_curve, linewidth=3, color=colors[z], linestyle=linestyle_str, label=planet_names[j])
         print_energy_balances(df, planet_names[j], sw_phase_curve, lw_phase_curve, nlon)
