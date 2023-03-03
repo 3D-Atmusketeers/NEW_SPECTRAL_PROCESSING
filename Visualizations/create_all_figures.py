@@ -26,7 +26,7 @@ plt.style.use('science.mplstyle')
 
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
-#planet_names = ['HD209-PICKET-NUC-CLOUDS']
+planet_names = ['Taub']
 
 # There are the different sets of opacity and EOS files
 # There are somethings that need to be changed in the template inputs file to make this happen
@@ -58,6 +58,10 @@ num_gcms = len(planet_names)
 # Get the number of orders of magnitude
 num_orders_of_magnitude = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_names[0], "fort.7", "OOM_IN")
 
+planet_radii = []
+for planet_name in planet_names:
+    planet_radii.append(float(grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name, "fort.7","RADEA")))
+
 # Get the planet name from the input string
 planet_name_base = re.split(r"[_|-]", planet_names[0])[0]
 planet_name_char_len = len(planet_name_base) + 1
@@ -84,7 +88,7 @@ if isinstance(planet_names, list):
 else:
     planet_names = [planet_names]
 
-
+"""
 # Plot the broadband phase curves
 print ("Plotting the broadband phase curves...")
 print ()
@@ -116,15 +120,48 @@ aerosol_maps.plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_mag
 aerosol_profiles.plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
 wind_maps.plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
 
+# Plotting the emission maps
+#emission_maps.plot_emission_maps(planet_names, nlat, nlon, nlev)
+"""
 
 # Plot the spectra
 print ("Plotting the spectra...")
 print ()
 print ()
-#spectra.plot_planet_spectra_blackbody_comparison(planet_names, black_body_temperatures=np.linspace(250, 2250, 5), num_phases=1)
-#spectra.plot_star_spectra_test(planet_names)
-#spectra.plot_filters(planet_names)
-#spectra.plot_spectra_simple(planet_names, num_phases=24)
-#spectra.plot_spectra_phases(planet_names, num_phases=24, transmission_filter_name='MIRI', planet_only_bool=True)
-#spectra.plot_phase_curves(planet_names, planet_name_char_len, num_phases=24, transmission_filter_name='MIRI', planet_only_bool=False)
-#emission_maps.plot_emission_maps(planet_names, nlat, nlon, nlev)
+spectra.plot_planet_spectra_blackbody_comparison(planet_names,
+                                                 black_body_temperatures=np.linspace(500, 2000, 4),
+                                                 num_phases=4)
+spectra.plot_star_spectra_test(planet_names)
+spectra.plot_filters(planet_names)
+spectra.plot_spectra_simple(planet_names, num_phases=24)
+
+# If resolution is set to 0, don't convolve at all
+spectra.plot_fp_spectra(planet_names,
+                            planet_radii,
+                            num_phases=24,
+                            transmission_filter_name='None',
+                            wav_subset=[2e-6, 3e-6],
+                            resolution=500)
+
+spectra.plot_fp_fs_spectra(planet_names,
+                            planet_radii,
+                            num_phases=24,
+                            transmission_filter_name='None',
+                            wav_subset=[2e-6, 3e-6],
+                            resolution=500)
+
+# If resolution is set to 0, don't convolve at all
+spectra.plot_fp_phase_curves(planet_names,
+                          planet_name_char_len,
+                          num_phases=24,
+                          transmission_filter_name='None',
+                          wav_subset=[2e-6,3e-6])
+
+spectra.plot_fp_fs_phase_curves(planet_names,
+                          planet_name_char_len,
+                          planet_radii,
+                          num_phases=24,
+                          transmission_filter_name='None',
+                          wav_subset=[2e-6,3e-6])
+
+

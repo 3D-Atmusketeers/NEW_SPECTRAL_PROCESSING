@@ -1270,7 +1270,7 @@ int RT_Emit_3D(double PHASE)
                             delta_lam = atmos.lambda[i]*v_los/CLIGHT;
                             Locate(NLAMBDA, atmos.lambda, atmos.lambda[i]+delta_lam, &ii);
 
-                            if(temperature < 250.0 || atmos.lambda[i]+delta_lam >= atmos.lambda[NLAMBDA-1] || atmos.lambda[i]+delta_lam <= atmos.lambda[0])
+                            if(temperature < 201.0 || atmos.lambda[i]+delta_lam >= atmos.lambda[NLAMBDA-1] || atmos.lambda[i]+delta_lam <= atmos.lambda[0])
                             {
                                 kappa_nu = 0.0;
                             }
@@ -1300,7 +1300,7 @@ int RT_Emit_3D(double PHASE)
                             delta_lam = atmos.lambda[i]*v_los/CLIGHT;
                             Locate(NLAMBDA, atmos.lambda, atmos.lambda[i]+delta_lam, &ii);
 
-                            if(temperature < 250.0 || atmos.lambda[i]+delta_lam >= atmos.lambda[NLAMBDA-1] || atmos.lambda[i]+delta_lam <= atmos.lambda[0])
+                            if(temperature < 201.0 || atmos.lambda[i]+delta_lam >= atmos.lambda[NLAMBDA-1] || atmos.lambda[i]+delta_lam <= atmos.lambda[0])
                             {
                                 kappa_nu = 0.0;
                             }
@@ -1323,7 +1323,7 @@ int RT_Emit_3D(double PHASE)
                         /* No Doppler Effects at all */
                         else
                         {
-                            if(temperature < 200.0)
+                            if(temperature < 201.0)
                             {
                                 kappa_nu = 0.0;
                             }
@@ -1509,15 +1509,6 @@ int RT_Emit_3D(double PHASE)
                         }
                     }
 
-
-                    //for (j = kmin; j<NTAU; j++)
-                    //{
-                    //    printf("%d %.3e %.3e %.3e %.3e\n", j, dtau_em[l][m][j], tau_em[l][m][j], kappa_nu_array[l][m][j], temperature_3d[l][m][j]);
-                    //}
-
-
-
-
                     if (kmin >= NTAU)
                     {
                         intensity[l][m] = 0;
@@ -1539,11 +1530,21 @@ int RT_Emit_3D(double PHASE)
                     intensity[l][m] = intensity_vals[0] + intensity_vals[1];
                     reflected_intensity[l][m] = intensity_vals[1];
 
+
+                    //if (l == 14 && m == 34)
+                    //{
+                    //    for (j = kmin; j<NTAU; j++)
+                    //    {
+                    //        printf("%d %.3e %.3e %.3e %.3e %.3e\n", j, dtau_em[l][m][j], tau_em[l][m][j], kappa_nu_array[l][m][j], intensity[l][m], atmos.lambda[i]);
+                    //    }
+                    //}
+
+
+
                     if (reflected_intensity[l][m] < 1e-50)
                     {
                         reflected_intensity[l][m] = 0.0;
                     }
-
 
                     if (i % 1000 == 1)
                     {

@@ -182,7 +182,7 @@ def print_energy_balances(df, planet_name, sw_phase_curve, lw_phase_curve, nlon)
 
 def plot_thermal_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len, two_sets_of_planets):
     n = len(planet_names)
-    colors = ['black', '#7e1e9c', '#15b01a', '#75bbfd', '#653700', '#e50000', '#f97306']
+    #colors = ['black', '#7e1e9c', '#15b01a', '#75bbfd', '#653700', '#e50000', '#f97306']
 
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10,6), sharex=True, sharey=False)
     plt.subplots_adjust(wspace=0.275, hspace=0.1)
@@ -216,8 +216,8 @@ def plot_thermal_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_nam
 
 def plot_reflected_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len, two_sets_of_planets):
     n = len(planet_names)
-    colors = pl.cm.rainbow(np.linspace(0,1,int(n/2)))
-    colors = ['black', '#7e1e9c', '#15b01a', '#75bbfd', '#653700', '#e50000', '#f97306']
+    #colors = pl.cm.rainbow(np.linspace(0,1,int(n/2)))
+    #colors = ['black', '#7e1e9c', '#15b01a', '#75bbfd', '#653700', '#e50000', '#f97306']
 
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10,6), sharex=True, sharey=False)
     plt.subplots_adjust(wspace=0.275, hspace=0.1)

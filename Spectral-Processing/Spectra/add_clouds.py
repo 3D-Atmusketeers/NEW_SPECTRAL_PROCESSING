@@ -214,7 +214,8 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
         max_cloud_level11 = 0
         max_cloud_level12 = 0
         max_cloud_level13 = 0
-        for z in tqdm(range(len(df))):
+        for z in range(len(df)):
+
             i = len(df) - z - 1
             layer_index   = np.abs(input_pressure_array_cgs - df['pressure(bars)'][i]*1e6).argmin()
             particle_size = particle_size_vs_layer_array_in_meters[layer_index]
@@ -234,8 +235,8 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
             if (df['tau1'][i] > 0):
                 df['g01'][i]  = 1
                 df['pi01'][i] = 1
-            if (df['tau1'][i] != 0):
-                max_cloud_level1   = max(layer_index - aerosol_layers, 0, max_cloud_level1)
+            if (df['tau1'][i] > 1e-10):
+                max_cloud_level1   = max(layer_index - aerosol_layers + 1, 0, max_cloud_level1)
             if (layer_index <= max_cloud_level1):
                 df['tau1'][i] = 0
                 df['g01'][i]  = 0
@@ -249,8 +250,8 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
             if (df['tau2'][i] > 0):
                 df['g02'][i]  = 1
                 df['pi02'][i] = 1
-            if (df['tau2'][i] != 0):
-                max_cloud_level2   = max(layer_index - aerosol_layers, 0, max_cloud_level2)
+            if (df['tau2'][i] > 1e-10):
+                max_cloud_level2   = max(layer_index - aerosol_layers + 1, 0, max_cloud_level2)
             if (layer_index <= max_cloud_level2):
                 df['tau2'][i] = 0
                 df['g02'][i]  = 0
@@ -264,8 +265,8 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
             if (df['tau3'][i] > 0):
                 df['g03'][i]  = 1
                 df['pi03'][i] = 1
-            if (df['tau3'][i] != 0):
-                max_cloud_level3   = max(layer_index - aerosol_layers, 0, max_cloud_level3)
+            if (df['tau3'][i] > 1e-10):
+                max_cloud_level3   = max(layer_index - aerosol_layers + 1, 0, max_cloud_level3)
             if (layer_index <= max_cloud_level3):
                 df['tau3'][i] = 0
                 df['g03'][i]  = 0
@@ -279,8 +280,8 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
             if (df['tau4'][i] > 0):
                 df['g04'][i]  = 1
                 df['pi04'][i] = 1
-            if (df['tau4'][i] != 0):
-                max_cloud_level4   = max(layer_index - aerosol_layers, 0, max_cloud_level4)
+            if (df['tau4'][i] > 1e-10):
+                max_cloud_level4   = max(layer_index - aerosol_layers + 1, 0, max_cloud_level4)
             if (layer_index <= max_cloud_level4):
                 df['tau4'][i] = 0
                 df['g04'][i]  = 0
@@ -294,8 +295,8 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
             if (df['tau5'][i] > 0):
                 df['g05'][i]  = 1
                 df['pi05'][i] = 1
-            if (df['tau5'][i] != 0):
-                max_cloud_level5   = max(layer_index - aerosol_layers, 0, max_cloud_level5)
+            if (df['tau5'][i] > 1e-10):
+                max_cloud_level5   = max(layer_index - aerosol_layers + 1, 0, max_cloud_level5)
             if (layer_index <= max_cloud_level5):
                 df['tau5'][i] = 0
                 df['g05'][i]  = 0
@@ -310,8 +311,8 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
             if (df['tau6'][i] > 0):
                 df['g06'][i]  = 1
                 df['pi06'][i] = 1
-            if (df['tau6'][i] != 0):
-                max_cloud_level6   = max(layer_index - aerosol_layers, 0, max_cloud_level6)
+            if (df['tau6'][i] > 1e-10):
+                max_cloud_level6   = max(layer_index - aerosol_layers + 1, 0, max_cloud_level6)
             if (layer_index <= max_cloud_level6):
                 df['tau6'][i] = 0
                 df['g06'][i]  = 0
@@ -326,7 +327,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
                 df['g07'][i]  = 1
                 df['pi07'][i] = 1
             if (df['tau7'][i] > 1e-10):
-                max_cloud_level7 = max(layer_index - aerosol_layers, 0.0, max_cloud_level7)
+                max_cloud_level7 = max(layer_index - aerosol_layers + 1, 0.0, max_cloud_level7)
             if (layer_index <= max_cloud_level7):
                 df['tau7'][i] = 0
                 df['g07'][i]  = 0
@@ -341,8 +342,8 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
             if (df['tau8'][i] > 0):
                 df['g08'][i]  = 1
                 df['pi08'][i] = 1
-            if (df['tau8'][i] != 0):
-                max_cloud_level8 = max(layer_index - aerosol_layers, 0, max_cloud_level8)
+            if (df['tau8'][i] > 1e-10):
+                max_cloud_level8 = max(layer_index - aerosol_layers + 1, 0, max_cloud_level8)
             if (layer_index <= max_cloud_level8):
                 df['tau8'][i] = 0
                 df['g08'][i]  = 0
@@ -356,8 +357,8 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
             if (df['tau9'][i] > 0):
                 df['g09'][i]  = 1
                 df['pi09'][i] = 1
-            if (df['tau9'][i] != 0):
-                max_cloud_level9   = max(layer_index - aerosol_layers, 0, max_cloud_level9)
+            if (df['tau9'][i] > 1e-10):
+                max_cloud_level9   = max(layer_index - aerosol_layers + 1, 0, max_cloud_level9)
             if (layer_index <= max_cloud_level9):
                 df['tau9'][i] = 0
                 df['g09'][i]  = 0
@@ -372,7 +373,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
                 df['g010'][i]  = 1
                 df['pi010'][i] = 1
             if (df['tau10'][i] != 0):
-                max_cloud_level10   = max(layer_index - aerosol_layers, 0, max_cloud_level10)
+                max_cloud_level10   = max(layer_index - aerosol_layers + 1, 0, max_cloud_level10)
             if (layer_index <= max_cloud_level10):
                 df['tau10'][i] = 0
                 df['g010'][i]  = 0
@@ -386,8 +387,8 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
             if (df['tau11'][i] > 0):
                 df['g011'][i]  = 1
                 df['pi011'][i] = 1
-            if (df['tau11'][i] != 0):
-                max_cloud_level11   = max(layer_index - aerosol_layers, 0, max_cloud_level11)
+            if (df['tau11'][i] > 1e-10):
+                max_cloud_level11   = max(layer_index - aerosol_layers + 1, 0, max_cloud_level11)
             if (layer_index <= max_cloud_level11):
                 df['tau11'][i] = 0
                 df['g011'][i]  = 0
@@ -401,8 +402,8 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
             if (df['tau12'][i] > 0):
                 df['g012'][i]  = 1
                 df['pi012'][i] = 1
-            if (df['tau12'][i] != 0):
-                max_cloud_level12   = max(layer_index - aerosol_layers, 0, max_cloud_level12)
+            if (df['tau12'][i] > 1e-10):
+                max_cloud_level12   = max(layer_index - aerosol_layers + 1, 0, max_cloud_level12)
             if (layer_index <= max_cloud_level12):
                 df['tau12'][i] = 0
                 df['g012'][i]  = 0
@@ -416,14 +417,16 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
             if (df['tau13'][i] > 0):
                 df['g013'][i]  = 1
                 df['pi013'][i] = 1
-            if (df['tau13'][i] != 0):
-                max_cloud_level13   = max(layer_index - aerosol_layers, 0, max_cloud_level13)
+            if (df['tau13'][i] > 1e-10):
+                max_cloud_level13   = max(layer_index - aerosol_layers + 1, 0, max_cloud_level13)
             if (layer_index <= max_cloud_level13):
                 df['tau13'][i] = 0
                 df['g013'][i]  = 0
                 df['pi013'][i] = 0
             if (layer_index == INITIAL_NTAU-1):
                 max_cloud_level13 = 0
+
+
     else:
         pass
 
@@ -452,7 +455,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
         max_cloud_level12 = 0
         max_cloud_level13 = 0
 
-        for z in tqdm(range(len(df_copy))):
+        for z in range(len(df_copy)):
             i = len(df_copy) - z - 1
             layer_index   = np.abs(input_pressure_array_cgs - df_copy['pressure(bars)'][i]*1e6).argmin()
             particle_size = particle_size_vs_layer_array_in_meters[layer_index]
@@ -477,7 +480,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
                 df_copy['g01'][i]  = G0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
                 df_copy['pi01'][i] = PI0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
             if (df_copy['tau1'][i] != 0):
-                max_cloud_level1   = max(layer_index - aerosol_layers, 0, max_cloud_level1)
+                max_cloud_level1   = max(layer_index - aerosol_layers + 1, 0, max_cloud_level1)
             if (layer_index <= max_cloud_level1):
                 df_copy['tau1'][i] = 0
                 df_copy['g01'][i]  = 0
@@ -493,7 +496,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
                 df_copy['g02'][i]  = G0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
                 df_copy['pi02'][i] = PI0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
             if (df_copy['tau2'][i] != 0):
-                max_cloud_level2   = max(layer_index - aerosol_layers, 0, max_cloud_level2)
+                max_cloud_level2   = max(layer_index - aerosol_layers + 1, 0, max_cloud_level2)
             if (layer_index <= max_cloud_level2):
                 df_copy['tau2'][i] = 0
                 df_copy['g02'][i]  = 0
@@ -508,7 +511,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
                 df_copy['g03'][i]  = G0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
                 df_copy['pi03'][i] = PI0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
             if (df_copy['tau3'][i] != 0):
-                max_cloud_level3   = max(layer_index - aerosol_layers, 0, max_cloud_level3)
+                max_cloud_level3   = max(layer_index - aerosol_layers + 1, 0, max_cloud_level3)
             if (layer_index <= max_cloud_level3):
                 df_copy['tau3'][i] = 0
                 df_copy['g03'][i]  = 0
@@ -523,7 +526,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
                 df_copy['g04'][i]  = G0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
                 df_copy['pi04'][i] = PI0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
             if (df_copy['tau4'][i] != 0):
-                max_cloud_level4   = max(layer_index - aerosol_layers, 0, max_cloud_level4)
+                max_cloud_level4   = max(layer_index - aerosol_layers + 1, 0, max_cloud_level4)
             if (layer_index <= max_cloud_level4):
                 df_copy['tau4'][i] = 0
                 df_copy['g04'][i]  = 0
@@ -538,7 +541,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
                 df_copy['g05'][i]  = G0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
                 df_copy['pi05'][i] = PI0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
             if (df_copy['tau5'][i] != 0):
-                max_cloud_level5   = max(layer_index - aerosol_layers, 0, max_cloud_level5)
+                max_cloud_level5   = max(layer_index - aerosol_layers + 1, 0, max_cloud_level5)
             if (layer_index <= max_cloud_level5):
                 df_copy['tau5'][i] = 0
                 df_copy['g05'][i]  = 0
@@ -554,7 +557,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
                 df_copy['g06'][i]  = G0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
                 df_copy['pi06'][i] = PI0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
             if (df_copy['tau6'][i] != 0):
-                max_cloud_level6   = max(layer_index - aerosol_layers, 0, max_cloud_level6)
+                max_cloud_level6   = max(layer_index - aerosol_layers + 1, 0, max_cloud_level6)
             if (layer_index <= max_cloud_level6):
                 df_copy['tau6'][i] = 0
                 df_copy['g06'][i]  = 0
@@ -569,7 +572,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
                 df_copy['g07'][i]  = G0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
                 df_copy['pi07'][i] = PI0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
             if (df_copy['tau7'][i] > 1e-10):
-                max_cloud_level7 = max(layer_index - aerosol_layers, 0.0, max_cloud_level7)
+                max_cloud_level7 = max(layer_index - aerosol_layers + 1, 0.0, max_cloud_level7)
             if (layer_index <= max_cloud_level7):
                 df_copy['tau7'][i] = 0
                 df_copy['g07'][i]  = 0
@@ -585,7 +588,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
                 df_copy['g08'][i]  = G0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
                 df_copy['pi08'][i] = PI0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
             if (df_copy['tau8'][i] != 0):
-                max_cloud_level8 = max(layer_index - aerosol_layers, 0, max_cloud_level8)
+                max_cloud_level8 = max(layer_index - aerosol_layers + 1, 0, max_cloud_level8)
             if (layer_index <= max_cloud_level8):
                 df_copy['tau8'][i] = 0
                 df_copy['g08'][i]  = 0
@@ -600,7 +603,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
                 df_copy['g09'][i]  = G0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
                 df_copy['pi09'][i] = PI0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
             if (df_copy['tau9'][i] != 0):
-                max_cloud_level9   = max(layer_index - aerosol_layers, 0, max_cloud_level9)
+                max_cloud_level9   = max(layer_index - aerosol_layers + 1, 0, max_cloud_level9)
             if (layer_index <= max_cloud_level9):
                 df_copy['tau9'][i] = 0
                 df_copy['g09'][i]  = 0
@@ -615,7 +618,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
                 df_copy['g010'][i]  = G0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
                 df_copy['pi010'][i] = PI0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
             if (df_copy['tau10'][i] != 0):
-                max_cloud_level10   = max(layer_index - aerosol_layers, 0, max_cloud_level10)
+                max_cloud_level10   = max(layer_index - aerosol_layers + 1, 0, max_cloud_level10)
             if (layer_index <= max_cloud_level10):
                 df_copy['tau10'][i] = 0
                 df_copy['g010'][i]  = 0
@@ -630,7 +633,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
                 df_copy['g011'][i]  = G0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
                 df_copy['pi011'][i] = PI0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
             if (df_copy['tau11'][i] != 0):
-                max_cloud_level11   = max(layer_index - aerosol_layers, 0, max_cloud_level11)
+                max_cloud_level11   = max(layer_index - aerosol_layers + 1, 0, max_cloud_level11)
             if (layer_index <= max_cloud_level11):
                 df_copy['tau11'][i] = 0
                 df_copy['g011'][i]  = 0
@@ -645,7 +648,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
                 df_copy['g012'][i]  = G0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
                 df_copy['pi012'][i] = PI0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
             if (df_copy['tau12'][i] != 0):
-                max_cloud_level12   = max(layer_index - aerosol_layers, 0, max_cloud_level12)
+                max_cloud_level12   = max(layer_index - aerosol_layers + 1, 0, max_cloud_level12)
             if (layer_index <= max_cloud_level12):
                 df_copy['tau12'][i] = 0
                 df_copy['g012'][i]  = 0
@@ -660,7 +663,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
                 df_copy['g013'][i]  = G0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
                 df_copy['pi013'][i] = PI0_OPPR[CLOUD_INDEX][size_loc][wav_loc]
             if (df_copy['tau13'][i] != 0):
-                max_cloud_level13   = max(layer_index - aerosol_layers, 0, max_cloud_level13)
+                max_cloud_level13   = max(layer_index - aerosol_layers + 1, 0, max_cloud_level13)
             if (layer_index <= max_cloud_level13):
                 df_copy['tau13'][i] = 0
                 df_copy['g013'][i]  = 0
@@ -671,7 +674,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
         pass
 
     if HAZES == True:
-        for z in tqdm(range(len(df))):
+        for z in range(len(df)):
             i = len(df) - z - 1
             layer_index   = np.abs(input_pressure_array_cgs - df['pressure(bars)'][i]*1e6).argmin()
 

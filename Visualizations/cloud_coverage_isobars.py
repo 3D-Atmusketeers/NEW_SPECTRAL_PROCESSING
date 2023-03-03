@@ -182,7 +182,7 @@ def plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, cloud_
                                       np.concatenate([taus,taus], axis=1),
                                       cmap=cloud_colors, levels=100)
 
-            axes.set_xticks(axes.get_xticks()[::2])
+            axes.set_xticks(axes.get_xticks()[::4])
 
 
             # format axes

@@ -16,13 +16,13 @@ import setup_opac_versions
 
 # Phases in degrees, inclination in radians (sorry)
 # An inclination of 0 corresponds to edge on
-phases = [0.0]
+phases = [345.0]
 inclinations = [0.0]
 system_obliquity = 0
 
 # I recommend leaving these as is
 # The NLAT and NLON can be changed, but these values work well
-NTAU = 250
+NTAU = 500
 
 # Please don't touch these
 NLAT = 48
@@ -47,7 +47,7 @@ USE_FORT_FILES = True
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["HD209-PICKET", "HD209-PICKET-NUC-CLOUDS"]
+planet_names = ["Taub"]
 
 opacity_files = 'SET_1'
 
@@ -171,7 +171,6 @@ for q in range(len(planet_names)):
 
     # get all the stellar parameters needed from the excel doc of stellar params
     # that doc should be in the spectra folder, make sure to update it every once in a while
-
     star_name    = grab_input_data.read_planet_and_star_params(planet_name, "Name")
     ORB_SEP      = float(grab_input_data.read_planet_and_star_params(planet_name, "a (au)")) * 1.496e11
     STELLAR_TEMP = float(grab_input_data.read_planet_and_star_params(planet_name, "T* (K)"))
@@ -322,13 +321,14 @@ for q in range(len(planet_names)):
     inclination_strs = []
     phase_strs = []
 
+
     # Convert the fort files to the correct format
     if USE_FORT_FILES == True:
         convert_fort_files.convert_to_correct_format(path, runname, planet_name, INITIAL_NTAU, surfp, oom, tgr, grav, gasconst)
         print ("Converted the fort files to the new format")
     else:
         pass
-
+    
     add_clouds.add_clouds_to_gcm_output(path, runname, planet_name,
                                         grav, MTLX, CLOUDS, MOLEF,
                                         aerosol_layers, INITIAL_NTAU,
@@ -340,7 +340,7 @@ for q in range(len(planet_names)):
     
     # If you already have the Final planet file creates you can commend out run_grid and double planet file
     run_grid.run_all_grid(planet_name, phases, inclinations, system_obliquity, NTAU, NLAT, NLON, grid_lat_min, grid_lat_max, grid_lon_min, grid_lon_max, ONLY_PHASE)
-    """
+
     # Get all the files that you want to run
     input_paths, inclination_strs, phase_strs = get_run_lists(phases, inclinations)
     
@@ -353,7 +353,7 @@ for q in range(len(planet_names)):
         for W0_VAL in W0_VALS:
             for doppler_val in dopplers:
                 run_exo(input_paths, inclination_strs, phase_strs, doppler_val)
-    """
+
 
 """
 print("Moving the files out of the clean directory")
