@@ -16,13 +16,13 @@ import setup_opac_versions
 
 # Phases in degrees, inclination in radians (sorry)
 # An inclination of 0 corresponds to edge on
-phases = [345.0]
+phases = [0.0]
 inclinations = [0.0]
 system_obliquity = 0
 
 # I recommend leaving these as is
 # The NLAT and NLON can be changed, but these values work well
-NTAU = 500
+NTAU = 250
 
 # Please don't touch these
 NLAT = 48
@@ -47,7 +47,7 @@ USE_FORT_FILES = True
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["Taub"]
+planet_names = ["GJ1214b_None_0Clouds_0XMet", "GJ1214b_Tholin_0Clouds_0XMet"]
 
 opacity_files = 'SET_1'
 
@@ -101,8 +101,10 @@ for q in range(len(planet_names)):
     #MET_X_SOLAR = 1.0
     #HAZES       = False
 
+
+    # This assumes that 10x solar uses the 1x met chem tables, maybe a bad thing
     if (opacity_files == "SET_1"):
-        if (0.9 * MET_X_SOLAR <= 1.0 <= 1.1 * MET_X_SOLAR):
+        if (0.1 * MET_X_SOLAR <= 1.0 <= 11.0 * MET_X_SOLAR):
             chemistry_file_path = "DATA/SET_1/ordered_1x_solar_metallicity_chem.dat"
         elif (0.9 * MET_X_SOLAR <= 100.0 <= 1.1 * MET_X_SOLAR):
             chemistry_file_path = "DATA/SET_1/ordered_100x_solar_metallicity_chem.dat"
@@ -343,7 +345,7 @@ for q in range(len(planet_names)):
 
     # Get all the files that you want to run
     input_paths, inclination_strs, phase_strs = get_run_lists(phases, inclinations)
-    
+    """
     # If you want to manually set these values you can leave them here
     # Normally they will not affect it, unless you manually set them in two_stream.h
     W0_VALS = [0.0]
@@ -355,7 +357,7 @@ for q in range(len(planet_names)):
                 run_exo(input_paths, inclination_strs, phase_strs, doppler_val)
 
 
-"""
+
 print("Moving the files out of the clean directory")
 for filename in os.listdir('DATA'):
     if re.match(r'init_*', filename):

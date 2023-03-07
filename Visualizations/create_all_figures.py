@@ -26,7 +26,7 @@ plt.style.use('science.mplstyle')
 
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
-planet_names = ['Taub']
+planet_names = ["GJ1214b_None_0Clouds_0XMet", "GJ1214b_Tholin_0Clouds_0XMet"]
 
 # There are the different sets of opacity and EOS files
 # There are somethings that need to be changed in the template inputs file to make this happen
@@ -88,13 +88,13 @@ if isinstance(planet_names, list):
 else:
     planet_names = [planet_names]
 
-"""
+
 # Plot the broadband phase curves
 print ("Plotting the broadband phase curves...")
 print ()
 print ()
+broadband_phase_curves.plot_reflected_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len, two_sets_of_planets=True)
 broadband_phase_curves.plot_thermal_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len, two_sets_of_planets=False)
-broadband_phase_curves.plot_reflected_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len, two_sets_of_planets=False)
 broadband_phase_curves.plot_reflected_starlight_maps(planet_names, nlat, nlon, nlev, num_gcms, two_sets_of_planets=False)
 
 # Plot the isobaric cloud maps
@@ -123,13 +123,12 @@ wind_maps.plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude
 # Plotting the emission maps
 #emission_maps.plot_emission_maps(planet_names, nlat, nlon, nlev)
 """
-
 # Plot the spectra
 print ("Plotting the spectra...")
 print ()
 print ()
 spectra.plot_planet_spectra_blackbody_comparison(planet_names,
-                                                 black_body_temperatures=np.linspace(500, 2000, 4),
+                                                 black_body_temperatures=np.linspace(1000, 2000, 3),
                                                  num_phases=4)
 spectra.plot_star_spectra_test(planet_names)
 spectra.plot_filters(planet_names)
@@ -163,5 +162,4 @@ spectra.plot_fp_fs_phase_curves(planet_names,
                           num_phases=24,
                           transmission_filter_name='None',
                           wav_subset=[2e-6,3e-6])
-
-
+"""

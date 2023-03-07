@@ -336,7 +336,7 @@ def plot_planet_spectra_blackbody_comparison(planet_names, black_body_temperatur
         ax.set_xlim(min(planet_spectra.wavelength * 1e6), max(planet_spectra.wavelength * 1e6))
         ax.legend(fontsize=12, loc=(0, 1.05), ncol=2, mode='expand', title_fontsize=16)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
-        ax.set_ylabel(r'Flux (W/m$^2 Hz$)')  # (W m$^{-2}$)
+        ax.set_ylabel(r'Flux (W/m$^2$Hz)')  # (W m$^{-2}$)
         plt.savefig('../Figures/planet_spectra_blackbody_comparison_{}.jpg'.format(planet_name), dpi=200, bbox_inches='tight')
         plt.clf()
     return None
@@ -359,7 +359,7 @@ def plot_star_spectra_test(planet_names):
             linewidth=1.5)
 
         # blackbody comparison
-        Teffs = [3000, 4000, 5000, 6000]
+        Teffs = [5000, 5500, 6000, 6500]
         for Teff in Teffs:
             bb = BlackBody(temperature=Teff * u.K)
             wav = np.linspace(0.1, 20.0, 1000) * u.um
@@ -379,7 +379,7 @@ def plot_star_spectra_test(planet_names):
                 alpha=1.0,
                 linewidth=1.5)
 
-        plt.ylim(1e4, np.max(star_spectra.flux) * 3)
+        plt.ylim(1e4, 1e9)
         plt.xlim(0.1, np.max(star_spectra.wavelength * 1e6))
         plt.yscale('log')
         plt.xlabel('Wavelengths (microns)')
@@ -546,7 +546,7 @@ def plot_fp_fs_phase_curves(planet_names, planet_name_char_len, planet_radii, nu
     ax.legend(fontsize=12, loc=(0, 1.03), ncol=2, mode='expand')
     ax.set_xlabel('Orbital Phase')
     ax.set_ylabel(r'F$_p$/F$_s$ (ppm)')
-    plt.savefig('../Figures/Fp_Fs_{}_Phase_Curves.jpg'.format(planet_names[0][:planet_name_char_len]), dpi=200, bbox_inches='tight')
+    plt.savefig('../Figures/Fp_Fs_Phase_Curves.jpg', dpi=200, bbox_inches='tight')
     plt.clf()
     return None
 
@@ -616,7 +616,7 @@ def plot_fp_phase_curves(planet_names, planet_name_char_len, num_phases,
     ax.legend(fontsize=12, loc=(0, 1.03), ncol=2, mode='expand')
     ax.set_xlabel('Orbital Phase')
     ax.set_ylabel(r'Planet Flux (W/m$^2$/micron)')
-    plt.savefig('../Figures/Fp_{}_Phase_Curves.jpg'.format(planet_names[0][:planet_name_char_len]), dpi=200, bbox_inches='tight')
+    plt.savefig('../Figures/Fp_Phase_Curves.jpg', dpi=200, bbox_inches='tight')
     plt.clf()
     return None
 
@@ -727,7 +727,7 @@ def plot_fp_spectra(planet_names, planet_radii, num_phases, transmission_filter_
         ax.set_xlim(min(planet_spectra.wavelength * 1e6), max(planet_spectra.wavelength * 1e6))
         ax.legend(fontsize=12, loc=(0, 1.03), ncol=5, mode='expand', title='Orbital Phase', title_fontsize=18)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
-        ax.set_ylabel(r'F$_p$ (W/m$^2/micron$)')  # (W m$^{-2}$)
+        ax.set_ylabel(r'F$_p$ (W/m$^2$/micron)')  # (W m$^{-2}$)
         plt.savefig('../Figures/Fp_Spectra_{}.jpg'.format(planet_name), dpi=200, bbox_inches='tight')
 
     return None
