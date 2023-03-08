@@ -6,12 +6,19 @@ import grab_input_data
 ### ----- IMPORT LIBRARIES ----- ###
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
 
+def plot_aerosol_coverage_isobars(
+        planet_names,
+        nlat,
+        nlon,
+        nlev,
+        cloud_wavelength,
+        plot_hazes,
+        extra_pressure_level_bar):
 
-def plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, cloud_wavelength, extra_pressure_level_bar):
     # temp colormap
     cm_name = 'lajolla'
     cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
@@ -19,12 +26,12 @@ def plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, cloud_
     temperature_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
 
     # cloud colormap
-    cm_name = 'devon' 
+    cm_name = 'devon'
     cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
     cloud_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file[0:240])
 
     column_names = ['lat', 'lon', 'level',
-                'alt', 'pres', 'temp', 
+                    'alt', 'pres', 'temp',
                     'u', 'v', 'w',
                     'aero_tau_pre_qext_1', 'sw_asym_1', 'sw_pi0_1',
                     'aero_tau_pre_qext_2', 'sw_asym_2', 'sw_pi0_2',
@@ -41,33 +48,47 @@ def plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, cloud_
                     'aero_tau_pre_qext_13', 'sw_asym_13', 'sw_pi0_13',
                     'haze_tau_optical_depth_per_bar', 'haze_asym', 'haze_pi0']
     nlevel = nlev
-    nparams = len(column_names)  
-
+    nparams = len(column_names)
 
     for ind, planet_name in enumerate(planet_names):
-        gravity = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name, 'fort.7' ,'GA')
-        ir_absorbtion_coefficient = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name,'fort.7' ,'ABSLW')
+        molef = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name, 'fort.7', 'MOLEF')
+        hazes_str = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name, 'fort.7', 'HAZES')[0]
 
-        ir_photosphere_pressure_bars = (2./3.) * (gravity/ir_absorbtion_coefficient) / 10000
+        if hazes_str == 'T':
+            hazes = True
+        else:
+            hazes = False
+
+        gravity = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name, 'fort.7', 'GA')
+        ir_absorbtion_coefficient = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/',
+                                                                   planet_name, 'fort.7', 'ABSLW')
+
+        ir_photosphere_pressure_bars = (2. / 3.) * (gravity / ir_absorbtion_coefficient) / 10000
         ir_photosphere_pressure_bars = np.round(ir_photosphere_pressure_bars, 3)
-        
+
         if (extra_pressure_level_bar == 0):
             pressure_lev_bar = ir_photosphere_pressure_bars
         else:
             pressure_lev_bar = extra_pressure_level_bar
 
-        P_phots = [pressure_lev_bar] * len(planet_names) # Photospheric pressure in bars
+        # Photospheric pressure in bars
+        P_phots = [pressure_lev_bar] * len(planet_names)
 
         plt.clf()
-        fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(12,9))
+        fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(12, 9))
         plt.subplots_adjust(wspace=0.01, hspace=0.015)
 
         P_phot = P_phots[ind]
 
-        df = pd.read_csv('../Spectral-Processing/PLANET_MODELS/' + planet_name + '_with_clouds_and_wavelength_dependence.txt', delim_whitespace=True, names=column_names)
+        df = pd.read_csv(
+            '../Spectral-Processing/PLANET_MODELS/' +
+            planet_name +
+            '_with_clouds_and_wavelength_dependence.txt',
+            delim_whitespace=True,
+            names=column_names)
         data = df.to_numpy()
         data = data.reshape((nlat, nlon, nlevel, nparams))
-        
+
         # need to get indices for given pressure level
         pressure_ind = np.zeros((nlat, nlon))
 
@@ -78,10 +99,9 @@ def plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, cloud_
                 while data[i][j][k][4] > P_phot:
                     k -= 1
                 pressure_ind[i][j] = k
-                
+
             lons = np.arange(-360, 360, 3.75)
-        lats = data[:,:,0,0][:,0]
-        
+        lats = data[:, :, 0, 0][:, 0]
 
         ### ----- GET LOCAL TEMP, AEROSOL TAU, etc... ----- ###
 
@@ -94,7 +114,6 @@ def plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, cloud_
         vert_vels = np.zeros((nlat, nlon))
         pressures = np.zeros((nlat, nlon))
         z = np.zeros((nlat, nlon))
-
 
         # empty array to store values
         taus = np.zeros((nlat, nlon))
@@ -109,35 +128,34 @@ def plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, cloud_
                 NS_vels[i][j] = data[i][j][int(pressure_ind[i][j])][7]
                 vert_vels[i][j] = data[i][j][int(pressure_ind[i][j])][8]
 
-
                 # integrate aerosol optical depth above pressure level
                 k = 0
 
-                while k <= int(pressure_ind[i][j]):                
-                    taus[i][j] += data[i][j][k][9] + data[i][j][k][12] + data[i][j][k][15] + data[i][j][k][18] + data[i][j][k][21] + data[i][j][k][24] + data[i][j][k][27] + data[i][j][k][30]                            + data[i][j][k][33] + data[i][j][k][36] + data[i][j][k][39] + data[i][j][k][42] + data[i][j][k][45]
-                    
+                while k <= int(pressure_ind[i][j]):
+                    taus[i][j] += data[i][j][k][9] + data[i][j][k][12] + data[i][j][k][15] + data[i][j][k][18] + \
+                                  data[i][j][k][21] + data[i][j][k][24] + data[i][j][k][27] + data[i][j][k][30] + \
+                                  data[i][j][k][33] + data[i][j][k][36] + data[i][j][k][39] + data[i][j][k][42] + \
+                                  data[i][j][k][45]
+
+
                     # The hazes are optical depth per bar
-                    #taus[i][j] += data[i][j][k][48] * (data[i][j][k+1][4] - data[i][j][k][4])            
-                    
-                    # The clouds have extremely high optical depths
+                    if plot_hazes:
+                        taus[i][j] += data[i][j][k][48] * (data[i][j][k+1][4] - data[i][j][k][4])
                     k += 1
-                    
 
         # stream plot
         test_x = np.linspace(min(lons), max(lons), len(lons))
         test_y = np.linspace(min(lats), max(lats), len(lats))
 
         temp_map = axes.contourf(lons,
-                                lats, np.concatenate([temps,temps], axis=1),
-                                cmap=temperature_colors, levels=100)  
-        flow = axes.streamplot(test_x, test_y, 
-                               np.concatenate([EW_vels,EW_vels], axis=1),
-                               np.concatenate([NS_vels,NS_vels], axis=1),
-                               linewidth=1.2,density=([1,1.5]),color='#d8dcd6', zorder=1)
-        
-        
+                                 lats, np.concatenate([temps, temps], axis=1),
+                                 cmap=temperature_colors, levels=100)
+        axes.streamplot(test_x, test_y,
+                               np.concatenate([EW_vels, EW_vels], axis=1),
+                               np.concatenate([NS_vels, NS_vels], axis=1),
+                               linewidth=1.2, density=([1, 1.5]), color='#d8dcd6', zorder=1)
+
         # format axes
-        #for ax in axes:#.flatten():
         axes.set_xlim([-180, 180])
         axes.set_ylim([-87, 87])
         axes.spines['left'].set_position('zero')
@@ -156,37 +174,39 @@ def plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, cloud_
             labelcolor='w',
             labelsize=25,
             pad=-12)
-        #axes.yaxis.get_major_ticks()[2].label1.set_visible(False)
+
+        # axes.yaxis.get_major_ticks()[2].label1.set_visible(False)
         axes.set_yticks([-75, -50, -25, 25, 50, 75])
         axes.grid(color='w', alpha=0.5, ls=':')
 
-
-        axes.patch.set_edgecolor('black')  
-        axes.patch.set_linewidth('2')  
+        axes.patch.set_edgecolor('black')
+        axes.patch.set_linewidth('2')
         axes.grid(color='w', alpha=0.5, ls=':')
 
-        temp_cbar = fig.colorbar(temp_map, aspect=30, pad=0.015, orientation = 'horizontal') #ax=axes.ravel().tolist(),
+        temp_cbar = fig.colorbar(
+            temp_map,
+            aspect=30,
+            pad=0.015,
+            orientation='horizontal')  # ax=axes.ravel().tolist(),
 
         temp_cbar.set_label('Temperature (K)', fontsize=26)
 
+        plt.savefig('../Figures/Temperature_Isobars_{}_bar_{}.png'.format(
+            P_phots[0], planet_name), bbox_inches='tight', dpi=250)
 
-        plt.savefig('../Figures/Temperature_Isobars_{}_bar_{}.png'.format(P_phots[0], planet_name), bbox_inches='tight', dpi=250)
-        
-        
-        if 'CLOUDS' in planet_name:
+        if (any(i > 1e-20 for i in molef) or hazes):
             plt.clf()
-            fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(12,9))
+            fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(12, 9))
             plt.subplots_adjust(wspace=0.01, hspace=0.015)
 
             cloud_map = axes.contourf(lons, lats,
-                                      np.concatenate([taus,taus], axis=1),
+                                      np.concatenate([taus, taus], axis=1),
                                       cmap=cloud_colors, levels=100)
 
             axes.set_xticks(axes.get_xticks()[::4])
 
-
             # format axes
-            #for ax in axes:#.flatten():
+            # for ax in axes:#.flatten():
             axes.set_xlim([-180, 180])
             axes.set_ylim([-87, 87])
             axes.spines['left'].set_position('zero')
@@ -205,22 +225,23 @@ def plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, cloud_
                 labelcolor='w',
                 labelsize=25,
                 pad=-12)
-            #axes.yaxis.get_major_ticks()[2].label1.set_visible(False)
+            # axes.yaxis.get_major_ticks()[2].label1.set_visible(False)
             axes.set_yticks([-75, -50, -25, 25, 50, 75])
             axes.grid(color='w', alpha=0.5, ls=':')
 
-
             axes.set_yticks([-75, -50, -25, 25, 50, 75])
             axes.grid(color='w', alpha=0.5, ls=':')
 
-
-            axes.patch.set_edgecolor('black')  
-            axes.patch.set_linewidth('2')  
+            axes.patch.set_edgecolor('black')
+            axes.patch.set_linewidth('2')
             axes.grid(color='w', alpha=0.5, ls=':')
 
+            cloud_cbar = fig.colorbar(cloud_map, aspect=30, pad=0.015, orientation='horizontal')
 
-            cloud_cbar = fig.colorbar(cloud_map, aspect=30, pad=0.015, orientation = 'horizontal')
-            cloud_cbar.set_label('Cloud Optical Depth, ' + str(cloud_wavelength) + ' $\\mu$m', fontsize=26)
+            if plot_hazes:
+                cloud_cbar.set_label('Cloud and Haze Optical Depth, ' + str(cloud_wavelength) + ' $\\mu$m',fontsize=26)
+            else:
+                cloud_cbar.set_label('Cloud Optical Depth, ' + str(cloud_wavelength) + ' $\\mu$m', fontsize=26)
 
-            plt.savefig('../Figures/Cloud_Coverage_Isobars_{}_bar_{}.png'.format(P_phots[0], planet_name), bbox_inches='tight', dpi=250)
-        
+            plt.savefig('../Figures/Cloud_Coverage_Isobars_{}_bar_{}.png'.format(
+                P_phots[0], planet_name), bbox_inches='tight', dpi=250)

@@ -9,7 +9,7 @@ import re
 # If they're broken, venmo isaac-malsky
 # I wont' fix them, but I'll appreciate the money
 import broadband_phase_curves
-import cloud_coverage_isobars
+import aerosol_coverage_isobars
 import pressure_temperature_condensation_curves
 import spectra
 
@@ -26,7 +26,7 @@ plt.style.use('science.mplstyle')
 
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
-planet_names = ["GJ1214b_None_0Clouds_0XMet", "GJ1214b_Tholin_0Clouds_0XMet"]
+planet_names = ["GJ1214b_Tholin_0Clouds_0XMet"]
 
 # There are the different sets of opacity and EOS files
 # There are somethings that need to be changed in the template inputs file to make this happen
@@ -93,9 +93,9 @@ else:
 print ("Plotting the broadband phase curves...")
 print ()
 print ()
-broadband_phase_curves.plot_reflected_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len, two_sets_of_planets=True)
-broadband_phase_curves.plot_thermal_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len, two_sets_of_planets=False)
-broadband_phase_curves.plot_reflected_starlight_maps(planet_names, nlat, nlon, nlev, num_gcms, two_sets_of_planets=False)
+#broadband_phase_curves.plot_reflected_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len, two_sets_of_planets=True)
+##broadband_phase_curves.plot_thermal_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len, two_sets_of_planets=False)
+#broadband_phase_curves.plot_reflected_starlight_maps(planet_names, nlat, nlon, nlev, num_gcms, two_sets_of_planets=False)
 
 # Plot the isobaric cloud maps
 # If the extra_pressure level is greater than 0, its plots it also
@@ -103,8 +103,11 @@ broadband_phase_curves.plot_reflected_starlight_maps(planet_names, nlat, nlon, n
 print ("Plotting the isobaric projections...")
 print ()
 print ()
-cloud_coverage_isobars.plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, cloud_wavelength,extra_pressure_level_bar=0)
-cloud_coverage_isobars.plot_cloud_coverage_isobars(planet_names, nlat, nlon, nlev, num_gcms, cloud_wavelength,extra_pressure_level_bar=0.001)
+#aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength,
+#                                                       plot_hazes=False, extra_pressure_level_bar=0)
+#aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength,
+#                                                       plot_hazes = False, extra_pressure_level_bar = 0.001)
+
 
 
 
@@ -112,13 +115,13 @@ cloud_coverage_isobars.plot_cloud_coverage_isobars(planet_names, nlat, nlon, nle
 print ("Plotting the pressure temperature condensation curves...")
 print ()
 print ()
-pressure_temperature_condensation_curves.plot_PTC_curves(planet_names, nlat, nlon, nlev, num_gcms, num_orders_of_magnitude)
+pressure_temperature_condensation_curves.plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
 
 
 # Plot other planet characteristics
-aerosol_maps.plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, cloud_wavelength)
-aerosol_profiles.plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
-wind_maps.plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
+#aerosol_maps.plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, cloud_wavelength)
+#aerosol_profiles.plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
+#wind_maps.plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
 
 # Plotting the emission maps
 #emission_maps.plot_emission_maps(planet_names, nlat, nlon, nlev)
