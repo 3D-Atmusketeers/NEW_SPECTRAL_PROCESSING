@@ -26,7 +26,6 @@ plt.style.use('science.mplstyle')
 
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
-planet_names = ["GJ1214b_Tholin_0Clouds_0XMet"]
 
 # There are the different sets of opacity and EOS files
 # There are somethings that need to be changed in the template inputs file to make this happen
@@ -52,15 +51,26 @@ else:
     exit(0)
 
 
+
+from tqdm import tqdm
+import time
+
+print("WARNING! Downloading Viruses Now...")
+print("Virus Download Progress:")
+for i in tqdm(np.linspace(0,1,30)):
+    time.sleep(0.1)
+
 # Get the number of GCMS
 num_gcms = len(planet_names)
 
 # Get the number of orders of magnitude
-num_orders_of_magnitude = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_names[0], "fort.7", "OOM_IN")
+num_orders_of_magnitude = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/',
+                                                         planet_names[0], "fort.7", "OOM_IN")
 
 planet_radii = []
 for planet_name in planet_names:
-    planet_radii.append(float(grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name, "fort.7","RADEA")))
+    planet_radii.append(float(grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/',
+                                                             planet_name, "fort.7","RADEA")))
 
 # Get the planet name from the input string
 planet_name_base = re.split(r"[_|-]", planet_names[0])[0]
@@ -70,7 +80,8 @@ planet_name_char_len = len(planet_name_base) + 1
 # If the file doesn't exist, take a guess and print a warning
 column_names = ['lat', 'lon', 'level','alt', 'pres', 'temp', 'u', 'v', 'w']
 if os.path.isfile('../Spectral-Processing/PLANET_MODELS/' + planet_names[0] + '.txt'):
-    df = pd.read_csv('../Spectral-Processing/PLANET_MODELS/' + planet_names[0] + '.txt', delim_whitespace=True, names=column_names)
+    df = pd.read_csv('../Spectral-Processing/PLANET_MODELS/' + planet_names[0] + '.txt',
+                     delim_whitespace=True, names=column_names)
     nlat = len(set(df.lat))
     nlon = len(set(df.lon))
     nlev = len(set(df.level))
@@ -93,9 +104,9 @@ else:
 print ("Plotting the broadband phase curves...")
 print ()
 print ()
-#broadband_phase_curves.plot_reflected_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len, two_sets_of_planets=True)
-##broadband_phase_curves.plot_thermal_phasecurves(planet_names, nlat, nlon, nlev, num_gcms,planet_name_char_len, two_sets_of_planets=False)
-#broadband_phase_curves.plot_reflected_starlight_maps(planet_names, nlat, nlon, nlev, num_gcms, two_sets_of_planets=False)
+broadband_phase_curves.plot_reflected_phasecurves(planet_names, nlon, two_sets_of_planets=True)
+broadband_phase_curves.plot_thermal_phasecurves(planet_names, nlon, two_sets_of_planets=True)
+#broadband_phase_curves.plot_reflected_starlight_maps(planet_names)
 
 # Plot the isobaric cloud maps
 # If the extra_pressure level is greater than 0, its plots it also
@@ -115,7 +126,7 @@ print ()
 print ("Plotting the pressure temperature condensation curves...")
 print ()
 print ()
-pressure_temperature_condensation_curves.plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
+#pressure_temperature_condensation_curves.plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
 
 
 # Plot other planet characteristics

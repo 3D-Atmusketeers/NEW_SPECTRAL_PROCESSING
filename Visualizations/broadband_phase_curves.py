@@ -5,10 +5,35 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from scipy import interpolate
-import matplotlib.pylab as pl
+import matplotlib as pl
 import re
+from scipy import interpolate
 
+def record_phase_peak(phases, sw_fluxes, lw_fluxes, planet_name):
+    """
+    phases: list of phases or something
+    fluxes: list of fluxes or something
+    """
+
+    num_points = 10000
+    phases_new = np.linspace(0, 1, num_points)
+
+    f_sw_fluxes = interpolate.interp1d(phases, sw_fluxes)
+    f_lw_fluxes = interpolate.interp1d(phases, lw_fluxes)
+
+    new_sw_fluxes = f_sw_fluxes(phases_new)
+    new_lw_fluxes = f_lw_fluxes(phases_new)
+
+    sw_peak = np.argmax(new_sw_fluxes) / num_points
+    lw_peak = np.argmax(new_lw_fluxes) / num_points
+
+    with open('OUTPUT_DATA/Phase_Curve_Peak_' + planet_name + '.txt', 'w') as f:
+        f.write(planet_name + '\n')
+        f.write("SW Peak: " + str(sw_peak) + "\n")
+        f.write("LW PEAK: " + str(lw_peak) + "\n")
+        f.write('\n\n')
+
+    return None
 
 def get_planet_df(planet_name, nlat, nlon, nlev, base):
     with open(base + planet_name + '/Planet_Run/fort.7', 'r') as fp:
@@ -98,8 +123,6 @@ def get_planet_df(planet_name, nlat, nlon, nlev, base):
                        'swin': swin,
                        'lwout': lwout})
 
-
-
     df['lwin'] = FBASEFLUX
 
     df.lon = df.lon.mask(df.lon >= 180.0, df.lon - 360.0)
@@ -107,7 +130,7 @@ def get_planet_df(planet_name, nlat, nlon, nlev, base):
     return df
 
 
-def get_phase_curve(df, nlat=48, nlon=96, nlev=50):
+def get_phase_curve(df):
     df['swout_temp'] = df['swout'] * np.cos((df['lat'] * (np.pi / 180.0))) ** 2.0
     df['lwout_temp'] = df['lwout'] * np.cos((df['lat'] * (np.pi / 180.0))) ** 2.0
     df['swin_temp'] = df['swin'] * np.cos((df['lat'] * (np.pi / 180.0))) ** 2.0
@@ -139,9 +162,7 @@ def get_phase_curve(df, nlat=48, nlon=96, nlev=50):
         # Sum all the visible points
         lw_phase_curve.append(sum(filter(lambda x: x >= 0, list(lon_df.lw_final))))
         sw_phase_curve.append(sum(filter(lambda x: x >= 0, list(lon_df.sw_final))))
-
         sw_in_phase_curve.append(sum(filter(lambda x: x >= 0, list(lon_df.swin_final))))
-
         vis_phase_curve.append(sum(filter(lambda x: x >= 0, list(lon_df.vis_final))))
 
     # Divide by the visible area thing
@@ -191,9 +212,9 @@ def print_energy_balances(df, planet_name, sw_phase_curve, lw_phase_curve, nlon)
     return None
 
 
-def plot_thermal_phasecurves(planet_names, nlat, nlon, nlev, num_gcms, planet_name_char_len, two_sets_of_planets):
+def plot_thermal_phasecurves(planet_names, nlon, two_sets_of_planets):
     n = len(planet_names)
-    #colors = pl.cm.gnuplot(np.linspace(0, 1, int(n / 2) + 1))
+    colors = pl.cm.gnuplot(np.linspace(0, 1, int(n / 2) + 1))
 
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 6), sharex=True, sharey=False)
     plt.subplots_adjust(wspace=0.275, hspace=0.1)
@@ -203,15 +224,16 @@ def plot_thermal_phasecurves(planet_names, nlat, nlon, nlev, num_gcms, planet_na
         df = get_planet_df(planet_names[j], nlat=48, nlon=96, nlev=50, base='../Spectral-Processing/GCM-OUTPUT/')
         lw_phase_curve, sw_phase_curve, swin_phase_curve, lon_df = get_phase_curve(df)
 
-        #linestyle_str = 'solid'
-        #if two_sets_of_planets:
-        #    if z >= int(n / 2):
-        #        z = j - int(n / 2)
-        #        linestyle_str = 'dashed'
+        linestyle_str = 'solid'
+        if two_sets_of_planets:
+            if z >= int(n / 2):
+                z = j - int(n / 2)
+                linestyle_str = 'dashed'
 
         # Plot each phase curve
         temp_name = planet_names[j].replace("_", "-")
-        ax.plot(np.linspace(0, 1, nlon), lw_phase_curve, linewidth=2, label=temp_name)
+        phases = np.linspace(0, 1, nlon, endpoint=True)
+        ax.plot(phases, lw_phase_curve, linewidth=2, label=temp_name, linestyle=linestyle_str, color=colors[z])
 
     ax.legend(fontsize=10, loc=(0, 1.05), ncol=2, mode='expand')
 
@@ -225,26 +247,29 @@ def plot_thermal_phasecurves(planet_names, nlat, nlon, nlev, num_gcms, planet_na
     return None
 
 
-def plot_reflected_phasecurves(planet_names, nlat, nlon, nlev, num_gcms, planet_name_char_len, two_sets_of_planets):
+def plot_reflected_phasecurves(planet_names, nlon, two_sets_of_planets):
     n = len(planet_names)
-    #colors = pl.cm.gnuplot(np.linspace(0, 1, int(n / 2) + 1))
+    colors = pl.cm.gnuplot(np.linspace(0, 1, int(n / 2) + 1))
 
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 6), sharex=True, sharey=False)
     plt.subplots_adjust(wspace=0.275, hspace=0.1)
 
     for j, planet_name in enumerate(planet_names):
-        #z = j
+        z = j
         df = get_planet_df(planet_names[j], nlat=48, nlon=96, nlev=50, base='../Spectral-Processing/GCM-OUTPUT/')
         lw_phase_curve, sw_phase_curve, swin_phase_curve, lon_df = get_phase_curve(df)
 
-        #linestyle_str = 'solid'
-        #if two_sets_of_planets:
-        #    if z >= int(n / 2):
-        #        z = j - int(n / 2)
-        #        linestyle_str = 'dashed'
+        linestyle_str = 'solid'
+        if two_sets_of_planets:
+            if z >= int(n / 2):
+                z = j - int(n / 2)
+                linestyle_str = 'dashed'
 
         temp_name = planet_names[j].replace("_", "-")
-        ax.plot(np.linspace(0, 1, nlon), sw_phase_curve, linewidth=2, label=temp_name)
+        phases = np.linspace(0, 1, nlon, endpoint=True)
+        ax.plot(phases, sw_phase_curve, linewidth=2, label=temp_name, linestyle=linestyle_str, color=colors[z])
+
+        record_phase_peak(phases, sw_phase_curve, lw_phase_curve, planet_name)
         print_energy_balances(df, planet_names[j], sw_phase_curve, lw_phase_curve, nlon)
 
     ax.legend(fontsize=10, loc=(0, 1.05), ncol=2, mode='expand')
@@ -260,7 +285,7 @@ def plot_reflected_phasecurves(planet_names, nlat, nlon, nlev, num_gcms, planet_
     return None
 
 
-def plot_reflected_starlight_maps(planet_names, nlat, nlon, nlev, num_gcms, two_sets_of_planets):
+def plot_reflected_starlight_maps(planet_names):
     for j, planet_name in enumerate(planet_names):
         df = get_planet_df(planet_names[j], nlat=48, nlon=96, nlev=50, base='../Spectral-Processing/GCM-OUTPUT/')
 

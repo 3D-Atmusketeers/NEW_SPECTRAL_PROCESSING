@@ -47,7 +47,7 @@ USE_FORT_FILES = True
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b_None_0Clouds_0XMet", "GJ1214b_Tholin_0Clouds_0XMet"]
+planet_names = ["HD189-PICKET-10X-New"]
 
 opacity_files = 'SET_1'
 
@@ -97,9 +97,6 @@ for q in range(len(planet_names)):
     MET_X_SOLAR    = 10.0 ** grab_input_data.get_input_data(path, runname, "fort.7","METALLICITY")
     HAZES          = grab_input_data.get_input_data(path, runname, "fort.7","HAZES")
     MOLEF          = grab_input_data.get_input_data(path, runname, "fort.7", "MOLEF")
-
-    #MET_X_SOLAR = 1.0
-    #HAZES       = False
 
 
     # This assumes that 10x solar uses the 1x met chem tables, maybe a bad thing

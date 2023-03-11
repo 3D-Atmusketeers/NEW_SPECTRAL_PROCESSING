@@ -160,7 +160,7 @@ def plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude
             fig.text(0.21, 0.84, r"Substellar Profile", size=20, ha='center')
             fig.text(0.64, 0.84, r"Antistellar Profile", size=20, ha='center')
 
-            fig.text(0.5, 0.06, r"Pressure (bar)", size=28, ha='center')
+            fig.text(0.5, 0.04, r"Pressure (bar)", size=26, ha='center')
 
             plt.savefig('../Figures/Aerosol_Profiles_{}.png'.format(planet_name), bbox_inches='tight', dpi=100)
             i = i + 1

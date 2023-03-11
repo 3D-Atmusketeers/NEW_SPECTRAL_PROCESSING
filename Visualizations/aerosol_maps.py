@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+import grab_input_data
 
 def plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, cloud_wavelength):
     # cloud colormap
@@ -9,7 +10,7 @@ def plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, c
     cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
     my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file[0:240])
 
-    def get_optical_depth(file, nlat, nlon, nlev):
+    def get_optical_depth(file, nlat, nlev):
         df = pd.read_csv(file,
                         delim_whitespace=True, skiprows=0,
                         names=('lat', 'lon', 'level',
@@ -62,31 +63,44 @@ def plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, c
 
 
 
-    for i in range(len(planet_names)): 
-        plt.clf()
+    for i in range(len(planet_names)):
 
-        planet_name = planet_names[i]
-        file1 = '../Spectral-Processing/PLANET_MODELS/' + planet_name + '_with_clouds_and_wavelength_dependence.txt'
+        molef = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name, 'fort.7', 'MOLEF')
+        hazes_str = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name, 'fort.7', 'HAZES')[0]
 
-        fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(9,8), sharex=True, sharey=True)
-        plt.subplots_adjust(wspace=0.02, hspace=0.1)
+        if hazes_str == 'T':
+            hazes = True
+        else:
+            hazes = False
 
-        lats = np.linspace(-90, 90, nlat)
-        pressures = np.logspace(2 - num_orders_of_magnitude, 2, nlev - 1)
+        if any(i > 1e-20 for i in molef) or hazes:
+            plt.clf()
 
-        optical_depths1 = get_optical_depth(file1, nlat, nlon, nlev)
-        mp1 = axes.contourf(lats, pressures, np.log10(optical_depths1.T), cmap=my_colors, levels=np.linspace(-2,2,100), extend='both')
+            planet_name = planet_names[i]
+            file1 = '../Spectral-Processing/PLANET_MODELS/' + planet_name + '_with_clouds_and_wavelength_dependence.txt'
 
-        axes.set_yscale("log")
-        axes.set_ylim(1e2, 10 ** (2 - num_orders_of_magnitude))
+            fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(9,8), sharex=True, sharey=True)
+            plt.subplots_adjust(wspace=0.02, hspace=0.1)
 
-        #cbar = fig.colorbar(mp1, ax=axes.ravel().tolist(), location='top', aspect=50, pad=0.02)
-        cbar = fig.colorbar(mp1, aspect=20, pad=0.02)
-        cbar.set_label(r'log$_{10}$ Aerosol Optical Depth per bar at ' + str(cloud_wavelength) + ' $\mu$m',
-                                                                                             size=20, labelpad=10)
-        cbar.ax.tick_params(labelsize=22)  # set your label size here
+            lats = np.linspace(-90, 90, nlat)
+            pressures = np.logspace(2 - num_orders_of_magnitude, 2, nlev - 1)
 
-        fig.text(0.5, 0.04, r"Latitude (degrees)", size=28, ha='center')
-        fig.text(0.0, 0.45, r"Pressure (bar)", size=28, va='center', rotation='vertical')
+            optical_depths1 = get_optical_depth(file1, nlat, nlev)
+            mp1 = axes.contourf(lats, pressures, np.log10(optical_depths1.T), cmap=my_colors, levels=np.linspace(-2,2,100), extend='both')
 
-        plt.savefig('../Figures/Aerosol_Maps_{}.png'.format(planet_name), bbox_inches='tight', dpi=100)
+            axes.set_yscale("log")
+            axes.set_ylim(1e2, 10 ** (2 - num_orders_of_magnitude))
+
+            #cbar = fig.colorbar(mp1, ax=axes.ravel().tolist(), location='top', aspect=50, pad=0.02)
+            cbar = fig.colorbar(mp1, aspect=20, pad=0.02)
+            cbar.set_label(r'log$_{10}$ Aerosol Optical Depth per bar at ' + str(cloud_wavelength) + ' $\mu$m',
+                                                                                                 size=20, labelpad=10)
+            cbar.ax.tick_params(labelsize=22)  # set your label size here
+
+            fig.text(0.5, 0.04, r"Latitude (degrees)", size=28, ha='center')
+            fig.text(0.0, 0.45, r"Pressure (bar)", size=28, va='center', rotation='vertical')
+
+            plt.savefig('../Figures/Aerosol_Maps_{}.png'.format(planet_name), bbox_inches='tight', dpi=100)
+        else:
+            pass
+    return None
