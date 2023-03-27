@@ -47,7 +47,7 @@ USE_FORT_FILES = True
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["HD189-PICKET-10X-New"]
+planet_names = ["GJ1214b-tholin-50clouds-30met"]
 
 opacity_files = 'SET_1'
 
@@ -98,19 +98,20 @@ for q in range(len(planet_names)):
     HAZES          = grab_input_data.get_input_data(path, runname, "fort.7","HAZES")
     MOLEF          = grab_input_data.get_input_data(path, runname, "fort.7", "MOLEF")
 
-
+    # This is the path to the chemistry file
     # This assumes that 10x solar uses the 1x met chem tables, maybe a bad thing
     if (opacity_files == "SET_1"):
-        if (0.1 * MET_X_SOLAR <= 1.0 <= 11.0 * MET_X_SOLAR):
+        if (0.1  <= MET_X_SOLAR < 99.0):
             chemistry_file_path = "DATA/SET_1/ordered_1x_solar_metallicity_chem.dat"
-        elif (0.9 * MET_X_SOLAR <= 100.0 <= 1.1 * MET_X_SOLAR):
+        elif (99.0 <= MET_X_SOLAR < 150.0):
             chemistry_file_path = "DATA/SET_1/ordered_100x_solar_metallicity_chem.dat"
-        elif (0.9 * MET_X_SOLAR <= 300.0 <= 1.1 * MET_X_SOLAR):
+        elif (150.0  <= MET_X_SOLAR < 2000.0):
             chemistry_file_path = "DATA/SET_1/ordered_300x_solar_metallicity_chem.dat"
-        elif (0.9 * MET_X_SOLAR <= 3000.0 <= 1.1 * MET_X_SOLAR):
+        elif (2000.0  <= MET_X_SOLAR < 4000.0):
             chemistry_file_path = "DATA/SET_1/ordered_3000x_solar_metallicity_chem.dat"
         else:
             print("Error in choosing which metallicy the chemistry file should be")
+
     elif (opacity_files == "SET_2"):
         chemistry_file_path = "DATA/SET_2/eos_solar_doppler.dat"
     elif (opacity_files == "SET_3"):
@@ -192,7 +193,8 @@ for q in range(len(planet_names)):
     print("Mean Molecular Weight", MEAN_MOLECULAR_WEIGHT)
     print("")
     print("Be careful to make sure that your chemistry file is correct!")
-    print("METALLICITY = ", MET_X_SOLAR, chemistry_file_path)
+    print("METALLICITY = ", MET_X_SOLAR)
+    print("chemistry file path = ", chemistry_file_path)
     print("USING opacity set: ", opacity_files)
 
     print("")
@@ -319,7 +321,6 @@ for q in range(len(planet_names)):
     output_paths = []
     inclination_strs = []
     phase_strs = []
-
 
     # Convert the fort files to the correct format
     if USE_FORT_FILES == True:

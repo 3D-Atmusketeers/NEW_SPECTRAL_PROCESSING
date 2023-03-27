@@ -26,6 +26,9 @@ plt.style.use('science.mplstyle')
 
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
+planet_names = ["GJ1214b-none-0clouds-1met",
+                "GJ1214b-tholin-50clouds-30met"]
+
 
 # There are the different sets of opacity and EOS files
 # There are somethings that need to be changed in the template inputs file to make this happen
@@ -52,13 +55,12 @@ else:
 
 
 
-from tqdm import tqdm
-import time
-
-print("WARNING! Downloading Viruses Now...")
-print("Virus Download Progress:")
-for i in tqdm(np.linspace(0,1,30)):
-    time.sleep(0.1)
+#from tqdm import tqdm
+#import time
+#print("WARNING! Downloading Viruses Now...")
+#print("Virus Download Progress:")
+#for i in tqdm(np.linspace(0,1,30)):
+#    time.sleep(0.1)
 
 # Get the number of GCMS
 num_gcms = len(planet_names)
@@ -100,12 +102,18 @@ else:
     planet_names = [planet_names]
 
 
+
+
+
+
+
+
 # Plot the broadband phase curves
 print ("Plotting the broadband phase curves...")
 print ()
 print ()
-broadband_phase_curves.plot_reflected_phasecurves(planet_names, nlon, two_sets_of_planets=True)
-broadband_phase_curves.plot_thermal_phasecurves(planet_names, nlon, two_sets_of_planets=True)
+#broadband_phase_curves.plot_reflected_phasecurves(planet_names, nlon, two_sets_of_planets=False)
+#broadband_phase_curves.plot_thermal_phasecurves(planet_names, nlon, two_sets_of_planets=False)
 #broadband_phase_curves.plot_reflected_starlight_maps(planet_names)
 
 # Plot the isobaric cloud maps
@@ -114,11 +122,8 @@ broadband_phase_curves.plot_thermal_phasecurves(planet_names, nlon, two_sets_of_
 print ("Plotting the isobaric projections...")
 print ()
 print ()
-#aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength,
-#                                                       plot_hazes=False, extra_pressure_level_bar=0)
-#aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength,
-#                                                       plot_hazes = False, extra_pressure_level_bar = 0.001)
-
+aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes=False, extra_pressure_level_bar=0)
+aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes = False, extra_pressure_level_bar = 0.001)
 
 
 

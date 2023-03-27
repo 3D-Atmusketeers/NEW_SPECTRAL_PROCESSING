@@ -119,7 +119,7 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
 
             axes.legend(fontsize=14, ncol=2, labelspacing=0.0, loc='lower left')
 
-        axes.set_ylim(0.99e2, 10 ** (2 - num_orders_of_magnitude))
+        axes.set_ylim(0.99e2, 9.99999 ** (2 - num_orders_of_magnitude))
         axes.set_xlim([max(0, min_temp - 50), max_temp + 50])
 
         axes.xaxis.set_ticks_position('bottom')

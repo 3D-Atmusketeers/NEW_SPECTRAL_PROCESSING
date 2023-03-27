@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+from matplotlib import ticker
 
 
 def plot_aerosol_coverage_isobars(
@@ -191,6 +192,10 @@ def plot_aerosol_coverage_isobars(
 
         temp_cbar.set_label('Temperature (K)', fontsize=26)
 
+        temp_tick_locator = ticker.MaxNLocator(nbins=6)
+        temp_cbar.locator = temp_tick_locator
+        temp_cbar.update_ticks()
+
         plt.savefig('../Figures/Temperature_Isobars_{}_bar_{}.png'.format(
             P_phots[0], planet_name), bbox_inches='tight', dpi=250)
 
@@ -202,8 +207,6 @@ def plot_aerosol_coverage_isobars(
             cloud_map = axes.contourf(lons, lats,
                                       np.concatenate([taus, taus], axis=1),
                                       cmap=cloud_colors, levels=100)
-
-            axes.set_xticks(axes.get_xticks()[::4])
 
             # format axes
             # for ax in axes:#.flatten():
@@ -227,7 +230,6 @@ def plot_aerosol_coverage_isobars(
                 pad=-12)
 
             axes.yaxis.set_major_locator(plt.MaxNLocator(5))
-            # axes.yaxis.get_major_ticks()[2].label1.set_visible(False)
             axes.set_yticks([-75, -50, -25, 25, 50, 75])
             axes.grid(color='w', alpha=0.5, ls=':')
 
@@ -239,6 +241,11 @@ def plot_aerosol_coverage_isobars(
             axes.grid(color='w', alpha=0.5, ls=':')
 
             cloud_cbar = fig.colorbar(cloud_map, aspect=30, pad=0.015, orientation='horizontal')
+
+            tick_locator = ticker.MaxNLocator(nbins=6)
+            cloud_cbar.locator = tick_locator
+            cloud_cbar.update_ticks()
+
 
             if plot_hazes:
                 cloud_cbar.set_label('Cloud and Haze Optical Depth, ' + str(cloud_wavelength) + ' $\\mu$m',fontsize=26)

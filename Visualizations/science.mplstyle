@@ -26,6 +26,9 @@ xtick.minor.pad : 6
 ytick.major.pad : 6
 ytick.minor.pad : 6
 
+axes.labelpad: 6
+
+
 xtick.labelsize : 20
 ytick.labelsize : 20
 legend.fontsize : 17
@@ -41,8 +44,6 @@ savefig.dpi : 100
 # Not good for colorblind people
 axes.prop_cycle: cycler('color', ['black', '7e1e9c', '15b01a', '448ee4', 'ff7fa7', '029386',   'ed872d',   'ae1717',   'gray'])
 
-font.family : serif
-font.serif : Palatino
-text.usetex : True
-
-#ax.tick_params(axis='x', which='major', pad=6)
+#font.family : serif
+#text.usetex : True
+#font.serif : Palatino

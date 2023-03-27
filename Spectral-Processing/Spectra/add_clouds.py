@@ -181,18 +181,22 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
         g0_haze  = np.loadtxt('SCATTERING_DATA/haze_'  + HAZE_TYPE  + '_wav_gg.txt')
         pi0_haze = np.loadtxt('SCATTERING_DATA/haze_'  + HAZE_TYPE  + '_wav_pi0.txt')
     else:
-        tau_haze = 0
-        g0_haze  = 0
-        pi0_haze = 0
-
+        tau_haze = np.loadtxt('SCATTERING_DATA/haze_tholin_wav_tauperbar.txt')
+        g0_haze  = np.loadtxt('SCATTERING_DATA/haze_tholin_wav_gg.txt')
+        pi0_haze = np.loadtxt('SCATTERING_DATA/haze_tholin_wav_pi0.txt')
+    
+        tau_haze = tau_haze * 0
+        g0_haze  = g0_haze  * 0
+        pi0_haze = pi0_haze * 0
         print ('No hazes')
         pass
 
 
-    QE_OPPR  = np.array([qe0, qe1,qe2,qe3,qe4,qe5,qe6,qe7,qe8,qe9,qe10,qe11,qe12,tau_haze])
-    PI0_OPPR = np.array([pi00, pi01,pi02,pi03,pi04,pi05,pi06,pi07,pi08,pi09,pi010,pi011,pi012,pi0_haze])
-    G0_OPPR  = np.array([g00, g01,g02,g03,g04,g05,g06,g07,g08,g09,g010,g011,g012,g0_haze])
-    Tconds = np.array([TconKCl,TconZnS,TconNa2S,TCONMnS,TconCr,TCONSiO2,TCONMg2SiO4,TconVO,TconNi,TCONFe,TconCa2SiO4,TconCaTiO3,TCONAl2O3])
+    QE_OPPR  = np.array([qe0, qe1,qe2,qe3,qe4,qe5,qe6,qe7,qe8,qe9,qe10,qe11,qe12,tau_haze], dtype=object)
+    PI0_OPPR = np.array([pi00, pi01,pi02,pi03,pi04,pi05,pi06,pi07,pi08,pi09,pi010,pi011,pi012,pi0_haze], dtype=object)
+    G0_OPPR  = np.array([g00, g01,g02,g03,g04,g05,g06,g07,g08,g09,g010,g011,g012,g0_haze], dtype=object)
+    Tconds   = np.array([TconKCl,TconZnS,TconNa2S,TCONMnS,TconCr,TCONSiO2,TCONMg2SiO4,
+                         TconVO,TconNi,TCONFe,TconCa2SiO4,TconCaTiO3,TCONAl2O3], dtype=object)
 
     G = grav
 

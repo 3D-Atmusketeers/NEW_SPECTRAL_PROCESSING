@@ -2,11 +2,14 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import grab_input_data
+import matplotlib.pylab as pl
 
 def plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
 
     colors=['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#fabed4', '#469990', '#dcbeff', '#9A6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#a9a9a9', '#ffffff']
-
+    colors = pl.cm.nipy_spectral(np.linspace(0, 1, 13))
+    
+    
     for planet_name in planet_names:
         gravity = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name,'fort.7' ,'GA')
         ir_absorbtion_coefficient = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name,'fort.7' ,'ABSLW')
@@ -60,9 +63,10 @@ def plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude
         df1 = df1[(df1['lat'] == 1.8556)  & (df1['lon'] == 0.0)].reset_index(drop=True)
         df2 = df2[(df2['lat'] == 1.8556)  & (df2['lon'] == 180.0)].reset_index(drop=True)
         
-
+        plt.clf()
+        
         fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(14,11))
-        plt.subplots_adjust(wspace=0.25, hspace=0.15)
+        plt.subplots_adjust(wspace=0.35, hspace=0.15)
 
         optical_depths_1 = df1.aero_tau_1 + df1.aero_tau_2 + df1.aero_tau_3 + df1.aero_tau_4 + \
                         df1.aero_tau_5 + df1.aero_tau_6 + df1.aero_tau_7 + df1.aero_tau_8 + \
@@ -112,8 +116,6 @@ def plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude
             ax[0,1].plot(df2.pres, np.cumsum(list(df2.aero_tau_12)), color=colors[6], linewidth=3)
             ax[0,1].plot(df2.pres, np.cumsum(list(df2.aero_tau_13)), color=colors[7], linewidth=3,)
 
-
-
             ax[1,0].plot(df1.pres, cum_optical_depths_1, color='black', linewidth=3, label='Substellar Point')
             ax[1,0].plot(df2.pres, cum_optical_depths_2, color='red', linewidth=3, label='Antistellar Point')
 
@@ -131,19 +133,19 @@ def plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude
             ax[1,0].set_yscale('log')
             ax[1,1].set_yscale('linear')
 
-            ax[0,0].set_ylim([1e-3, 5e2])
-            ax[0,1].set_ylim([1e-3, 5e2])
-            ax[1,0].set_ylim([1e-3, 5e2])
+            ax[0,0].set_ylim([1.01e-3, 2.0 * np.amax([cum_optical_depths_1, cum_optical_depths_2])])
+            ax[0,1].set_ylim([1.01e-3, 2.0 * np.amax([cum_optical_depths_1, cum_optical_depths_2])])
+            ax[1,0].set_ylim([1.01e-3, 2.0 * np.amax([cum_optical_depths_1, cum_optical_depths_2])])
 
-            ax[0,0].set_xlim([1e-5, 1e2])
-            ax[0,1].set_xlim([1e-5, 1e2])
-            ax[1,0].set_xlim([1e-5, 1e2])
-            ax[1,1].set_xlim([1e-5, 1e2])
+            ax[0,0].set_xlim([1.01e-5, 0.99e2])
+            ax[0,1].set_xlim([1.01e-5, 0.99e2])
+            ax[1,0].set_xlim([1.01e-5, 0.99e2])
+            ax[1,1].set_xlim([1.01e-5, 0.99e2])
 
-            ax[0,0].set_ylabel(r'Cumulative Cloud $\tau$')
-            ax[0,1].set_ylabel(r'Cumulative Cloud $\tau$')
-            ax[1,0].set_ylabel(r'All Clouds Cumulative $\tau$')
-            ax[1,1].set_ylabel('Temperature (K)')
+            ax[0,0].set_ylabel(r'Cumulative Cloud $\tau$', fontsize=24)
+            ax[0,1].set_ylabel(r'Cumulative Cloud $\tau$', fontsize=24)
+            ax[1,0].set_ylabel(r'All Clouds Cumulative $\tau$', fontsize=24)
+            ax[1,1].set_ylabel('Temperature (K)', fontsize=24)
 
             ax[0,0].axvline(x=ir_photosphere_pressure_bars,color='gray', linestyle='dashed', linewidth=3)
             ax[0,1].axvline(x=ir_photosphere_pressure_bars, color='gray', linestyle='dashed', linewidth=3)
@@ -151,18 +153,23 @@ def plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude
             ax[1,1].axvline(x=ir_photosphere_pressure_bars, color='gray', linestyle='dashed', label='Photosphere Pressure Level', linewidth=3)
 
             plt.rcParams['legend.title_fontsize'] = 'small'
-            ax[0,0].legend(fontsize=14, ncol=6, handleheight=1, labelspacing=0.0,
-                        title="Cloud Species", bbox_to_anchor=(2.0, 1.35))
+            ax[0,0].legend(fontsize=13.2, ncol=8, labelspacing=0.0,
+                        title="Cloud Species", bbox_to_anchor=(0., 1.02, 2.2, .102),)
+                        
+            #ax.legend(fontsize=12, loc=(0, 1.05), ncol=2, mode='expand', title_fontsize=16)
+            
+                        
+            #plt.figlegend(loc=(0, 1.05), ncol=7, labelspacing=0., title="Cloud Species", fontsize=14)
+
+                        
+            #ax[0,0].legend(fontsize=12, loc=(0, 1.05), ncol=6, mode='expand', title="Cloud Species", title_fontsize=16)            
             ax[1,0].legend()
             #ax[1,1].legend()
 
+            fig.text(0.23, 0.84, r"Substellar Profile", size=20, ha='center')
+            fig.text(0.66, 0.84, r"Antistellar Profile", size=20, ha='center')
 
-            fig.text(0.21, 0.84, r"Substellar Profile", size=20, ha='center')
-            fig.text(0.64, 0.84, r"Antistellar Profile", size=20, ha='center')
-
-            fig.text(0.5, 0.04, r"Pressure (bar)", size=26, ha='center')
+            fig.text(0.5, 0.04, r"Pressure (bar)", size=24, ha='center')
 
             plt.savefig('../Figures/Aerosol_Profiles_{}.png'.format(planet_name), bbox_inches='tight', dpi=100)
             i = i + 1
-
-        

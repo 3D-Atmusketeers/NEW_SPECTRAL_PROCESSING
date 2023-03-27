@@ -214,7 +214,10 @@ def print_energy_balances(df, planet_name, sw_phase_curve, lw_phase_curve, nlon)
 
 def plot_thermal_phasecurves(planet_names, nlon, two_sets_of_planets):
     n = len(planet_names)
-    colors = pl.cm.gnuplot(np.linspace(0, 1, int(n / 2) + 1))
+    if two_sets_of_planets:
+        colors = pl.cm.gnuplot(np.linspace(0, 1, int(n / 2) + 1))
+    else:
+        colors = pl.cm.gnuplot(np.linspace(0, 1, n))
 
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 6), sharex=True, sharey=False)
     plt.subplots_adjust(wspace=0.275, hspace=0.1)
@@ -235,7 +238,7 @@ def plot_thermal_phasecurves(planet_names, nlon, two_sets_of_planets):
         phases = np.linspace(0, 1, nlon, endpoint=True)
         ax.plot(phases, lw_phase_curve, linewidth=2, label=temp_name, linestyle=linestyle_str, color=colors[z])
 
-    ax.legend(fontsize=10, loc=(0, 1.05), ncol=2, mode='expand')
+    ax.legend(fontsize=14, loc=(0, 1.05), ncol=2, mode='expand')
 
     ax.set_xlim(0.01, 0.99)
     ax.set_xlabel('Orbital Phase', fontsize=24)
@@ -249,7 +252,11 @@ def plot_thermal_phasecurves(planet_names, nlon, two_sets_of_planets):
 
 def plot_reflected_phasecurves(planet_names, nlon, two_sets_of_planets):
     n = len(planet_names)
-    colors = pl.cm.gnuplot(np.linspace(0, 1, int(n / 2) + 1))
+
+    if two_sets_of_planets:
+        colors = pl.cm.gnuplot(np.linspace(0, 1, int(n / 2) + 1))
+    else:
+        colors = pl.cm.gnuplot(np.linspace(0, 1, n))
 
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 6), sharex=True, sharey=False)
     plt.subplots_adjust(wspace=0.275, hspace=0.1)
@@ -272,7 +279,7 @@ def plot_reflected_phasecurves(planet_names, nlon, two_sets_of_planets):
         record_phase_peak(phases, sw_phase_curve, lw_phase_curve, planet_name)
         print_energy_balances(df, planet_names[j], sw_phase_curve, lw_phase_curve, nlon)
 
-    ax.legend(fontsize=10, loc=(0, 1.05), ncol=2, mode='expand')
+    ax.legend(fontsize=14, loc=(0, 1.05), ncol=2, mode='expand')
 
     ax.set_xlim(0.01, 0.99)
     ax.set_xlim(0.01, 0.99)

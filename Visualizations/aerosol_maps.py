@@ -64,6 +64,7 @@ def plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, c
 
 
     for i in range(len(planet_names)):
+        planet_name = planet_names[i]
 
         molef = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name, 'fort.7', 'MOLEF')
         hazes_str = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name, 'fort.7', 'HAZES')[0]
@@ -75,8 +76,7 @@ def plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, c
 
         if any(i > 1e-20 for i in molef) or hazes:
             plt.clf()
-
-            planet_name = planet_names[i]
+            
             file1 = '../Spectral-Processing/PLANET_MODELS/' + planet_name + '_with_clouds_and_wavelength_dependence.txt'
 
             fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(9,8), sharex=True, sharey=True)
@@ -97,7 +97,7 @@ def plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, c
                                                                                                  size=20, labelpad=10)
             cbar.ax.tick_params(labelsize=22)  # set your label size here
 
-            fig.text(0.5, 0.04, r"Latitude (degrees)", size=28, ha='center')
+            fig.text(0.5, 0.02, r"Latitude (degrees)", size=28, ha='center')
             fig.text(0.0, 0.45, r"Pressure (bar)", size=28, va='center', rotation='vertical')
 
             plt.savefig('../Figures/Aerosol_Maps_{}.png'.format(planet_name), bbox_inches='tight', dpi=100)
