@@ -36,7 +36,7 @@ def plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
 
     for planet_name in planet_names:
         plt.clf()
-        fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(9,8), sharex=True, sharey=True)
+        fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(10,8), sharex=True, sharey=True)
         plt.subplots_adjust(wspace=0.02, hspace=0.1)
 
         lats = np.linspace(-90, 90, nlat)
@@ -66,7 +66,7 @@ def plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
         temp_cbar = fig.colorbar(mp1, aspect=20, pad=0.02)
         temp_cbar.set_label('E-W Wind Speed (m/s)', size=26)
 
-        fig.text(0.5, 0.03, r"Latitude (degrees)", size=30,  ha='center')
-        fig.text(0.0, 0.5, r"Pressure (bar)", size=30,  va='center', rotation='vertical')
+        fig.text(0.5, 0.03, r"Latitude (degrees)", size=26,  ha='center')
+        fig.text(0.0, 0.5, r"Pressure (bar)", size=26,  va='center', rotation='vertical')
 
         plt.savefig('../Figures/wind_maps_{}.png'.format(planet_name), bbox_inches='tight', dpi=100)

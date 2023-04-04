@@ -22,7 +22,7 @@ system_obliquity = 0
 
 # I recommend leaving these as is
 # The NLAT and NLON can be changed, but these values work well
-NTAU = 250
+NTAU = 500
 
 # Please don't touch these
 NLAT = 48
@@ -47,7 +47,7 @@ USE_FORT_FILES = True
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-tholin-50clouds-30met"]
+planet_names = ["GJ1214b-none-0clouds-30met"]
 
 opacity_files = 'SET_1'
 
@@ -321,6 +321,7 @@ for q in range(len(planet_names)):
     output_paths = []
     inclination_strs = []
     phase_strs = []
+    
 
     # Convert the fort files to the correct format
     if USE_FORT_FILES == True:
@@ -343,7 +344,7 @@ for q in range(len(planet_names)):
 
     # Get all the files that you want to run
     input_paths, inclination_strs, phase_strs = get_run_lists(phases, inclinations)
-    """
+    
     # If you want to manually set these values you can leave them here
     # Normally they will not affect it, unless you manually set them in two_stream.h
     W0_VALS = [0.0]
@@ -356,12 +357,12 @@ for q in range(len(planet_names)):
 
 
 
-print("Moving the files out of the clean directory")
-for filename in os.listdir('DATA'):
-    if re.match(r'init_*', filename):
-        shutil.move(os.path.join('DATA', filename), os.path.join('../PLANET_MODELS', filename))
 
-for filename in os.listdir('OUT'):
-    if re.match(r'Spec_*', filename):
-        shutil.move(os.path.join('OUT', filename), os.path.join('../FINISHED_SPECTRA', filename))
-"""
+#print("Moving the files out of the clean directory")
+#for filename in os.listdir('DATA'):
+#    if re.match(r'init_*', filename):
+#        shutil.move(os.path.join('DATA', filename), os.path.join('../PLANET_MODELS', filename))
+
+#for filename in os.listdir('OUT'):
+#    if re.match(r'Spec_*', filename):
+#        shutil.move(os.path.join('OUT', filename), os.path.join('../FINISHED_SPECTRA', filename))

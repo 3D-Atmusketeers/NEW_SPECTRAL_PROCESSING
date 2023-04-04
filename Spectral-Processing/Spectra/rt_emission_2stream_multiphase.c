@@ -1176,6 +1176,7 @@ int RT_Emit_3D(double PHASE)
     }
     printf("solid %f\n", solid);
     for(i=0; i<NLAMBDA; i++)
+    //for(i=5000; i<5001; i++)
     {
         // Get the points on the wavelength grids
         wavelength_microns = atmos.lambda[i] * 1e6;
@@ -1535,7 +1536,9 @@ int RT_Emit_3D(double PHASE)
                     //{
                     //    for (j = kmin; j<NTAU; j++)
                     //    {
-                    //        printf("%d %.3e %.3e %.3e %.3e %.3e\n", j, dtau_em[l][m][j], tau_em[l][m][j], kappa_nu_array[l][m][j], intensity[l][m], atmos.lambda[i]);
+                    //        printf("%d %.3e %.3e %.3e %.3e %.3e %.3e %.3e\n", j, pi0_tot[l][m][j], \
+                    //           asym_tot[l][m][j], temperature_3d[l][m][j], tau_em[l][m][j], \
+                    //           atmos.incident_frac[l][m][NTAU-10], dtau_em[l][m][j], intensity[l][m]);
                     //    }
                     //}
 

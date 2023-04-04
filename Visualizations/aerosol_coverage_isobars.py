@@ -61,8 +61,7 @@ def plot_aerosol_coverage_isobars(
             hazes = False
 
         gravity = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name, 'fort.7', 'GA')
-        ir_absorbtion_coefficient = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/',
-                                                                   planet_name, 'fort.7', 'ABSLW')
+        ir_absorbtion_coefficient = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', bbplanet_name, 'fort.7', 'ABSLW')
 
         ir_photosphere_pressure_bars = (2. / 3.) * (gravity / ir_absorbtion_coefficient) / 10000
         ir_photosphere_pressure_bars = np.round(ir_photosphere_pressure_bars, 3)

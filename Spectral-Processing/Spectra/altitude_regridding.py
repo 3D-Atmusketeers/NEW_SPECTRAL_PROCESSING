@@ -14,46 +14,46 @@ def regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, NTAU, NLON
     NPARAMS = 51
 
     #########################################
-    #			END USER INPUTS				#
+    #            END USER INPUTS                #
     #########################################
 
     ### ----- FIND NEW ALTITUDE GRID ----- ###
     def altitudes(data):
 
-    	# data must be an array of dimensions [NLAT x NLON x NTAU x NPARAMS]
+        # data must be an array of dimensions [NLAT x NLON x NTAU x NPARAMS]
 
 
-    	# intial min and max altitudes
+        # intial min and max altitudes
 
-    	z_min = 0
+        z_min = 0
 
-    	z_max = 0
-
-
-    	# find highest and lowest altitude
-    	print ("Find the highest and lowest altitudes")
-
-    	for i in range(NLAT):
-
-    		for j in range(NLON):
-
-    			if data[i][j][0][3] > z_max:
-
-    				z_max = data[i][j][0][3]
-
-    			if data[i][j][NTAU - 1][3] > z_min:
-
-    				z_min = data[i][j][NTAU - 1][3]
+        z_max = 0
 
 
-    	# define new grid of altitudes
+        # find highest and lowest altitude
+        print ("Find the highest and lowest altitudes")
 
-    	z_grid = np.flip(np.linspace(z_min, z_max, NTAU_new), axis=0)
+        for i in range(NLAT):
+
+            for j in range(NLON):
+
+                if data[i][j][0][3] > z_max:
+
+                    z_max = data[i][j][0][3]
+
+                if data[i][j][NTAU - 1][3] > z_min:
+
+                    z_min = data[i][j][NTAU - 1][3]
 
 
-    	# return grid of new altitudes
+        # define new grid of altitudes
 
-    	return z_grid
+        z_grid = np.flip(np.linspace(z_min, z_max, NTAU_new), axis=0)
+
+
+        # return grid of new altitudes
+
+        return z_grid
 
 
 
@@ -67,64 +67,64 @@ def regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, NTAU, NLON
     def double_lons(data):
 
 
-    	data2 = np.copy(data)
+        data2 = np.copy(data)
 
-    	data3 = []
-
-
-    	# add 360 to copy of longitudes (does not duplicate 360)
-
-    	for row in data2:
-
-    	    row[1] += 360.
-
-    	    if row[1] == 360.:
-
-    	        last_row = np.copy(row)
-
-    	        last_row[1] += 360.
-
-    	        data3.append(last_row)
+        data3 = []
 
 
-    	# combine copies of data        
+        # add 360 to copy of longitudes (does not duplicate 360)
 
-    	double_data = np.concatenate((data, data2, data3))
+        for row in data2:
 
+            row[1] += 360.
 
-    	# sort double_data by latitude
+            if row[1] == 360.:
 
-    	double_data = double_data[double_data[:,0].argsort()]
+                last_row = np.copy(row)
 
+                last_row[1] += 360.
 
-    	# sort data to match original format (sorry, this is messy and probably not efficient)
-    	print("Regridding to new number of layers")
-    	for i in tqdm(range(NLAT)):
-
-    	    chunk = double_data[int(i * len(double_data) / NLAT) : int((i + 1) * len(double_data) / NLAT)]
-
-    	    chunk = chunk[chunk[:,1].argsort()]
-
-    	    for j in range(NLON_new):
-
-    	        sub_chunk = chunk[int(j * len(chunk) / NLON_new) : int((j +1 ) * len(chunk) / NLON_new)]
-
-    	        sub_chunk = sub_chunk[sub_chunk[:,2].argsort()]
-
-    	        chunk[int(j * len(chunk) / (NLON_new)) : int((j + 1) * len(chunk) / (NLON_new))] = sub_chunk
-
-    	    double_data[int(i * len(double_data) / NLAT) : int((i + 1) * len(double_data) / NLAT)] = chunk
+                data3.append(last_row)
 
 
-    	# convert bars to pascals
+        # combine copies of data        
 
-    	#for i, row in enumerate(double_data):
-    	#	double_data[i][4] *= 1e+5
+        double_data = np.concatenate((data, data2, data3))
+
+
+        # sort double_data by latitude
+
+        double_data = double_data[double_data[:,0].argsort()]
+
+
+        # sort data to match original format (sorry, this is messy and probably not efficient)
+        print("Regridding to new number of layers")
+        for i in tqdm(range(NLAT)):
+
+            chunk = double_data[int(i * len(double_data) / NLAT) : int((i + 1) * len(double_data) / NLAT)]
+
+            chunk = chunk[chunk[:,1].argsort()]
+
+            for j in range(NLON_new):
+
+                sub_chunk = chunk[int(j * len(chunk) / NLON_new) : int((j +1 ) * len(chunk) / NLON_new)]
+
+                sub_chunk = sub_chunk[sub_chunk[:,2].argsort()]
+
+                chunk[int(j * len(chunk) / (NLON_new)) : int((j + 1) * len(chunk) / (NLON_new))] = sub_chunk
+
+            double_data[int(i * len(double_data) / NLAT) : int((i + 1) * len(double_data) / NLAT)] = chunk
+
+
+        # convert bars to pascals
+
+        #for i, row in enumerate(double_data):
+        #    double_data[i][4] *= 1e+5
 
 
         # return doubled data grid
 
-    	return double_data
+        return double_data
 
 
     ### ----- LINEAR INTERPOLATION OVER ENTIRE GRID ----- ###
@@ -132,56 +132,56 @@ def regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, NTAU, NLON
 
     def LInterp_1d(data, data_new, z_new, param_col):
 
-    	# data must be an array of dimensions [NLAT x NLON x NTAU x NPARAMS]
-    	# z_grid is array of length NTAU containing new altitude grid points
-    	"""
-    	if param_col == 5:
-    		print ('here')
-    		print (data[0][0][:,param_col])
+        # data must be an array of dimensions [NLAT x NLON x NTAU x NPARAMS]
+        # z_grid is array of length NTAU containing new altitude grid points
+        """
+        if param_col == 5:
+            print ('here')
+            print (data[0][0][:,param_col])
 
-    		param_interp = interpolate.interp1d(data[0][0][:,3], data[0][0][:,param_col], kind="linear", bounds_error=False, fill_value=0)
+            param_interp = interpolate.interp1d(data[0][0][:,3], data[0][0][:,param_col], kind="linear", bounds_error=False, fill_value=0)
 
-    		param_new = param_interp(z_new)
+            param_new = param_interp(z_new)
 
-    		print (param_new)
-    	"""
-
-
-    	for i in range(NLAT):
-
-    		for j in range(NLON):
+            print (param_new)
+        """
 
 
-    			# old altitude grid at this lat, lon
+        for i in range(NLAT):
 
-    			z_old = data[i][j][:,3]
-
-    			# parameter values on old altitude grid
-
-    			param_old = data[i][j][:,param_col]
+            for j in range(NLON):
 
 
+                # old altitude grid at this lat, lon
 
-    			# linear interpolation function created from old altitudes and parameter values
+                z_old = data[i][j][:,3]
 
-    			param_interp = interpolate.interp1d(z_old, param_old, kind="linear", bounds_error=False, fill_value=0)
+                # parameter values on old altitude grid
+
+                param_old = data[i][j][:,param_col]
 
 
 
-    			# apply interpolation function (values not on new grid set to zero)
+                # linear interpolation function created from old altitudes and parameter values
 
-    			param_new = param_interp(z_new)
+                param_interp = interpolate.interp1d(z_old, param_old, kind="linear", bounds_error=False, fill_value=0)
 
 
 
-    			# change parameter values in data array to the new interpolated values
-    			for k in range(NTAU_new):
-    				if (param_col == 9 or param_col == 12 or param_col == 15 or param_col == 18):
-    					data_new[i][j][k][param_col] = param_new[k] #/ (NTAU_new / NTAU)# optical depth
-    				else:
-    					data_new[i][j][k][param_col] = param_new[k]
+                # apply interpolation function (values not on new grid set to zero)
 
-    	return data_new
+                param_new = param_interp(z_new)
+
+
+
+                # change parameter values in data array to the new interpolated values
+                for k in range(NTAU_new):
+                    if (param_col == 9 or param_col == 12 or param_col == 15 or param_col == 18):
+                        data_new[i][j][k][param_col] = param_new[k] #/ (NTAU_new / NTAU)# optical depth
+                    else:
+                        data_new[i][j][k][param_col] = param_new[k]
+
+        return data_new
 
 
 
@@ -195,177 +195,177 @@ def regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, NTAU, NLON
 
     def LogInterp_1d(data, data_new, z_new, param_col, integrate=False):
 
-    	# data must be an array of dimensions [NLAT x NLON x NTAU x NPARAMS]
-    	# z_grid is array of length NTAU containing new altitude grid points
+        # data must be an array of dimensions [NLAT x NLON x NTAU x NPARAMS]
+        # z_grid is array of length NTAU containing new altitude grid points
 
 
 
 
-    	if integrate == True:
+        if integrate == True:
 
 
-    		# integrate
+            # integrate
 
-    		for i in range(NLAT):
+            for i in range(NLAT):
 
-    			for j in range(NLON):
+                for j in range(NLON):
 
-    				for k in range(NTAU - 1):
+                    for k in range(NTAU - 1):
 
-    					data[i][j][k+1][param_col] = data[i][j][k+1][param_col] + data[i][j][k][param_col]
+                        data[i][j][k+1][param_col] = data[i][j][k+1][param_col] + data[i][j][k][param_col]
 
 
 
 
-    		# define new half-step grid to interpolate over
+            # define new half-step grid to interpolate over
 
-    		dz = (np.max(z_new) - np.min(z_new)) / (NTAU_new - 1)
+            dz = (np.max(z_new) - np.min(z_new)) / (NTAU_new - 1)
 
-    		half_grid = np.zeros(NTAU_new + 1)
+            half_grid = np.zeros(NTAU_new + 1)
 
-    		half_grid[0] = z_new[0] + (0.5 * dz)
+            half_grid[0] = z_new[0] + (0.5 * dz)
 
-    		for n in range(len(half_grid) - 1):
+            for n in range(len(half_grid) - 1):
 
-    			half_grid[n+1] = half_grid[n] - dz
+                half_grid[n+1] = half_grid[n] - dz
 
 
 
-    		# do log interpolation
+            # do log interpolation
 
 
-    		for i in range(NLAT):
+            for i in range(NLAT):
 
-    			for j in range(NLON):
+                for j in range(NLON):
 
 
-    				# old altitude grid at this lat, lon
+                    # old altitude grid at this lat, lon
 
-    				z_old = data[i][j][:,3]
+                    z_old = data[i][j][:,3]
 
 
 
-    				# parameter values on old altitude grid
+                    # parameter values on old altitude grid
 
-    				param_old = data[i][j][:,param_col]
+                    param_old = data[i][j][:,param_col]
 
 
 
-    				# make sure no values fall below some epsilon (zeros are bad!)
+                    # make sure no values fall below some epsilon (zeros are bad!)
 
-    				epsilon = 1e-10
+                    epsilon = 1e-10
 
-    				for n in range(len(param_old)):
+                    for n in range(len(param_old)):
 
-    					if param_old[n] < epsilon:
+                        if param_old[n] < epsilon:
 
-    						param_old[n] = epsilon
+                            param_old[n] = epsilon
 
 
 
-    				# log of old parameter
+                    # log of old parameter
 
-    				log_param_old = np.log(param_old)
+                    log_param_old = np.log(param_old)
 
 
 
-    				# linear interpolation function created from old altitudes and log parameter values
+                    # linear interpolation function created from old altitudes and log parameter values
 
-    				param_interp = interpolate.interp1d(z_old, log_param_old, kind="linear", fill_value="extrapolate")
+                    param_interp = interpolate.interp1d(z_old, log_param_old, kind="linear", fill_value="extrapolate")
 
 
 
-    				# apply interpolation function
+                    # apply interpolation function
 
-    				log_param_new = param_interp(half_grid)
+                    log_param_new = param_interp(half_grid)
 
 
 
-    				# exponentiate interpolated valued to get back to original format
+                    # exponentiate interpolated valued to get back to original format
 
-    				param_new = np.exp(log_param_new)
+                    param_new = np.exp(log_param_new)
 
-    				
+                    
 
-    				# discretize back to grid and change parameter values in data array to the new interpolated values
+                    # discretize back to grid and change parameter values in data array to the new interpolated values
 
-    				for k in range(NTAU_new):
+                    for k in range(NTAU_new):
 
-    					data_new[i][j][k][param_col] = param_new[k+1] - param_new[k]
+                        data_new[i][j][k][param_col] = param_new[k+1] - param_new[k]
 
 
 
 
 
-    	else:
+        else:
 
 
 
-    		for i in range(NLAT):
+            for i in range(NLAT):
 
-    			for j in range(NLON):
+                for j in range(NLON):
 
 
-    				# old altitude grid at this lat, lon
+                    # old altitude grid at this lat, lon
 
-    				z_old = data[i][j][:,3]
+                    z_old = data[i][j][:,3]
 
 
 
-    				# parameter values on old altitude grid
+                    # parameter values on old altitude grid
 
-    				param_old = data[i][j][:,param_col]
+                    param_old = data[i][j][:,param_col]
 
 
 
-    				# make sure no values fall below some epsilon (zeros are bad!)
+                    # make sure no values fall below some epsilon (zeros are bad!)
 
-    				epsilon = 1e-10
+                    epsilon = 1e-10
 
-    				for n in range(len(param_old)):
+                    for n in range(len(param_old)):
 
-    					if param_old[n] < epsilon:
+                        if param_old[n] < epsilon:
 
-    						param_old[n] = epsilon
+                            param_old[n] = epsilon
 
 
 
-    				# log of old parameter
+                    # log of old parameter
 
-    				log_param_old = np.log(param_old)
+                    log_param_old = np.log(param_old)
 
 
 
-    				# linear interpolation function created from old altitudes and log parameter values
+                    # linear interpolation function created from old altitudes and log parameter values
 
-    				param_interp = interpolate.interp1d(z_old, log_param_old, kind="linear", bounds_error=False, fill_value=-1e10)
+                    param_interp = interpolate.interp1d(z_old, log_param_old, kind="linear", bounds_error=False, fill_value=-1e10)
 
 
 
-    				# apply interpolation function (values not on new grid should go to zero)
+                    # apply interpolation function (values not on new grid should go to zero)
 
-    				log_param_new = param_interp(z_new)
+                    log_param_new = param_interp(z_new)
 
 
 
-    				# exponentiate interpolated valued to get back to original format
+                    # exponentiate interpolated valued to get back to original format
 
-    				param_new = np.exp(log_param_new)
+                    param_new = np.exp(log_param_new)
 
 
 
-    				# change parameter values in data array to the new interpolated values
+                    # change parameter values in data array to the new interpolated values
 
-    				for k in range(NTAU_new):
+                    for k in range(NTAU_new):
 
-    					data_new[i][j][k][param_col] = param_new[k]
+                        data_new[i][j][k][param_col] = param_new[k]
 
 
 
 
-    	return data_new
+        return data_new
 
-    	
+        
 
 
 
@@ -377,9 +377,9 @@ def regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, NTAU, NLON
 
 
     ############################################################
-    ###														 ###
-    ###	----- MAIN PART OF CODE -- CALL FUNCTIONS HERE ----- ###
-    ###														 ###
+    ###                                                         ###
+    ###    ----- MAIN PART OF CODE -- CALL FUNCTIONS HERE ----- ###
+    ###                                                         ###
     ############################################################
 
 
@@ -408,15 +408,15 @@ def regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, NTAU, NLON
 
     if smoothing == True:
 
-    	for i in range(NLAT):
+        for i in range(NLAT):
 
-    		for j in range(NLON):
+            for j in range(NLON):
 
-    			temps = data[i][j][:,5]
+                temps = data[i][j][:,5]
 
-    			temps = savgol_filter(temps, 7, 3)		# (data, window size, polynomial degree)
+                temps = savgol_filter(temps, 7, 3)        # (data, window size, polynomial degree)
 
-    			data[i][j][:,5] = temps
+                data[i][j][:,5] = temps
 
 
 
@@ -442,72 +442,72 @@ def regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, NTAU, NLON
         data_new = LInterp_1d(data, data_new, z_grid, 10)
         data_new = LInterp_1d(data, data_new, z_grid, 11)
     else:
-		# 1
+        # 1
         data_new = LInterp_1d(data, data_new, z_grid, 9) 
         data_new = LInterp_1d(data, data_new, z_grid, 10)
         data_new = LInterp_1d(data, data_new, z_grid, 11)
 
-		# 2
+        # 2
         data_new = LInterp_1d(data, data_new, z_grid, 12)
         data_new = LInterp_1d(data, data_new, z_grid, 13)
         data_new = LInterp_1d(data, data_new, z_grid, 14)
 
-		# 3
+        # 3
         data_new = LInterp_1d(data, data_new, z_grid, 15)
         data_new = LInterp_1d(data, data_new, z_grid, 16)
         data_new = LInterp_1d(data, data_new, z_grid, 17)
 
-		# 4
+        # 4
         data_new = LInterp_1d(data, data_new, z_grid, 18)
         data_new = LInterp_1d(data, data_new, z_grid, 19)
         data_new = LInterp_1d(data, data_new, z_grid, 20)
 
-		# 5
+        # 5
         data_new = LInterp_1d(data, data_new, z_grid, 21)
         data_new = LInterp_1d(data, data_new, z_grid, 22)
         data_new = LInterp_1d(data, data_new, z_grid, 23)
 
-		# 6
+        # 6
         data_new = LInterp_1d(data, data_new, z_grid, 24)
         data_new = LInterp_1d(data, data_new, z_grid, 25)
         data_new = LInterp_1d(data, data_new, z_grid, 26)
 
-		# 7
+        # 7
         data_new = LInterp_1d(data, data_new, z_grid, 27)
         data_new = LInterp_1d(data, data_new, z_grid, 28)
         data_new = LInterp_1d(data, data_new, z_grid, 29)
 
-		# 8
+        # 8
         data_new = LInterp_1d(data, data_new, z_grid, 30)
         data_new = LInterp_1d(data, data_new, z_grid, 31)
         data_new = LInterp_1d(data, data_new, z_grid, 32)
 
-		# 9
+        # 9
         data_new = LInterp_1d(data, data_new, z_grid, 33)
         data_new = LInterp_1d(data, data_new, z_grid, 34)
         data_new = LInterp_1d(data, data_new, z_grid, 35)
 
-		# 10
+        # 10
         data_new = LInterp_1d(data, data_new, z_grid, 36)
         data_new = LInterp_1d(data, data_new, z_grid, 37)
         data_new = LInterp_1d(data, data_new, z_grid, 38)
 
-		# 11
+        # 11
         data_new = LInterp_1d(data, data_new, z_grid, 39)
         data_new = LInterp_1d(data, data_new, z_grid, 40)
         data_new = LInterp_1d(data, data_new, z_grid, 41)
 
-		# 12
+        # 12
         data_new = LInterp_1d(data, data_new, z_grid, 42)
         data_new = LInterp_1d(data, data_new, z_grid, 43)
         data_new = LInterp_1d(data, data_new, z_grid, 44)
 
-		# 13
+        # 13
         data_new = LInterp_1d(data, data_new, z_grid, 45)
         data_new = LInterp_1d(data, data_new, z_grid, 46)
         data_new = LInterp_1d(data, data_new, z_grid, 47)
 
-	    # HAZES
+        # HAZES
         data_new = LInterp_1d(data, data_new, z_grid, 48)
         data_new = LInterp_1d(data, data_new, z_grid, 49)
         data_new = LInterp_1d(data, data_new, z_grid, 50)
@@ -517,13 +517,13 @@ def regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, NTAU, NLON
 
     for i in range(NLAT):
 
-    	for j in range(NLON):
+        for j in range(NLON):
 
-    		for k in range(NTAU_new):
-    			data_new[i][j][k][3] = z_grid[k]
-    			data_new[i][j][k][2] = k + 1
-    			data_new[i][j][k][1] = data[i][j][0][1]
-    			data_new[i][j][k][0] = data[i][j][0][0]
+            for k in range(NTAU_new):
+                data_new[i][j][k][3] = z_grid[k]
+                data_new[i][j][k][2] = k + 1
+                data_new[i][j][k][1] = data[i][j][0][1]
+                data_new[i][j][k][0] = data[i][j][0][0]
 
 
     # double all data, then save to new output file
