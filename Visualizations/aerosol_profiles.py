@@ -60,13 +60,22 @@ def plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude
                                 'aero_tau_13', 'sw_asym_13', 'sw_pi0_13',
                                 'haze_tau_optical_depth_per_bar', 'haze_asym', 'haze_pi0'))
         
+        df1['layer_pressure'] = df1['pres'].diff()
+        df2['layer_pressure'] = df2['pres'].diff()
+        
+        layer_pressures = list(df1['layer_pressure'].head(50))        
+        layer_pressures[0] = 10.0 ** (np.log10(layer_pressures[1]) - (np.log10(layer_pressures[2]) - np.log10(layer_pressures[1])))
+        layer_pressures = np.asarray(layer_pressures)
+
+
+        
         df1 = df1[(df1['lat'] == 1.8556)  & (df1['lon'] == 0.0)].reset_index(drop=True)
         df2 = df2[(df2['lat'] == 1.8556)  & (df2['lon'] == 180.0)].reset_index(drop=True)
         
         plt.clf()
         
         fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(14,11))
-        plt.subplots_adjust(wspace=0.35, hspace=0.15)
+        plt.subplots_adjust(wspace=0.25, hspace=0.15)
 
         optical_depths_1 = df1.aero_tau_1 + df1.aero_tau_2 + df1.aero_tau_3 + df1.aero_tau_4 + \
                         df1.aero_tau_5 + df1.aero_tau_6 + df1.aero_tau_7 + df1.aero_tau_8 + \
@@ -77,6 +86,8 @@ def plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude
                         df2.aero_tau_5 + df2.aero_tau_6 + df2.aero_tau_7 + df2.aero_tau_8 + \
                         df2.aero_tau_9 + df2.aero_tau_10 + df2.aero_tau_11 + df2.aero_tau_12 + \
                         df2.aero_tau_13
+        
+
 
         cum_optical_depths_1 = np.cumsum(list(optical_depths_1))
         cum_optical_depths_2 = np.cumsum(list(optical_depths_2))
@@ -85,36 +96,35 @@ def plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude
             pass
         else:
             if 'ALL' in planet_name:
-                ax[0,0].plot(df1.pres, np.cumsum(list(df1.aero_tau_2)), color=colors[8], linewidth=3, label='ZnS')
-                ax[0,0].plot(df1.pres, np.cumsum(list(df1.aero_tau_3)), color=colors[9], linewidth=3, label=r'Na$_2$S')
-                ax[0,0].plot(df1.pres, np.cumsum(list(df1.aero_tau_4)), color=colors[10], linewidth=3, label='MnS')
-                ax[0,0].plot(df1.pres, np.cumsum(list(df1.aero_tau_9)), color=colors[11], linewidth=3, label='Ni')
-                ax[0,0].plot(df1.pres, np.cumsum(list(df1.aero_tau_10)), color=colors[12], linewidth=3, label='Fe')
+                ax[0,0].plot(df1.pres, df1.aero_tau_2 / layer_pressures, color=colors[8], linewidth=3, label='ZnS')
+                ax[0,0].plot(df1.pres, df1.aero_tau_3 / layer_pressures, color=colors[9], linewidth=3, label=r'Na$_2$S')
+                ax[0,0].plot(df1.pres, df1.aero_tau_4 / layer_pressures, color=colors[10], linewidth=3, label='MnS')
+                ax[0,0].plot(df1.pres, df1.aero_tau_9 / layer_pressures, color=colors[11], linewidth=3, label='Ni')
+                ax[0,0].plot(df1.pres, df1.aero_tau_10 / layer_pressures, color=colors[12], linewidth=3, label='Fe')
 
-                ax[0,1].plot(df2.pres, np.cumsum(list(df1.aero_tau_2)), color=colors[8], linewidth=3, label='ZnS')
-                ax[0,1].plot(df2.pres, np.cumsum(list(df1.aero_tau_3)), color=colors[9], linewidth=3, label=r'Na$_2$S')
-                ax[0,1].plot(df2.pres, np.cumsum(list(df1.aero_tau_4)), color=colors[10], linewidth=3, label='MnS')
-                ax[0,1].plot(df2.pres, np.cumsum(list(df1.aero_tau_9)), color=colors[11], linewidth=3, label='Ni')
-                ax[0,1].plot(df2.pres, np.cumsum(list(df1.aero_tau_10)), color=colors[12], linewidth=3, label='Fe')
+                ax[0,1].plot(df2.pres, df1.aero_tau_2 / layer_pressures, color=colors[8], linewidth=3, label='ZnS')
+                ax[0,1].plot(df2.pres, df1.aero_tau_3 / layer_pressures, color=colors[9], linewidth=3, label=r'Na$_2$S')
+                ax[0,1].plot(df2.pres, df1.aero_tau_4 / layer_pressures, color=colors[10], linewidth=3, label='MnS')
+                ax[0,1].plot(df2.pres, df1.aero_tau_9 / layer_pressures, color=colors[11], linewidth=3, label='Ni')
+                ax[0,1].plot(df2.pres, df1.aero_tau_10 / layer_pressures, color=colors[12], linewidth=3, label='Fe')
 
+            ax[0,0].plot(df1.pres, df1.aero_tau_1 / layer_pressures, color=colors[0], linewidth=3, label='KCl')
+            ax[0,0].plot(df1.pres, df1.aero_tau_5 / layer_pressures, color=colors[1], linewidth=3, label='Cr')
+            ax[0,0].plot(df1.pres, df1.aero_tau_6 / layer_pressures, color=colors[2], linewidth=3, label='SiO$_2$')
+            ax[0,0].plot(df1.pres, df1.aero_tau_7 / layer_pressures, color=colors[3], linewidth=3, label=r'Mg$_2$SiO$_4$')
+            ax[0,0].plot(df1.pres, df1.aero_tau_8 / layer_pressures, color=colors[4], linewidth=3, label='VO')
+            ax[0,0].plot(df1.pres, df1.aero_tau_11 / layer_pressures, color=colors[5], linewidth=3, label=r'Ca$_2$SiO$_4$')
+            ax[0,0].plot(df1.pres, df1.aero_tau_12 / layer_pressures, color=colors[6], linewidth=3, label=r'CaTiO3')
+            ax[0,0].plot(df1.pres, df1.aero_tau_13 / layer_pressures, color=colors[7], linewidth=3, label=r'Al$_2$O$_3$')
 
-            ax[0,0].plot(df1.pres, np.cumsum(list(df1.aero_tau_1)),  color=colors[0], linewidth=3, label='KCl')
-            ax[0,0].plot(df1.pres, np.cumsum(list(df1.aero_tau_5)),  color=colors[1], linewidth=3, label='Cr')
-            ax[0,0].plot(df1.pres, np.cumsum(list(df1.aero_tau_6)),  color=colors[2], linewidth=3, label='SiO$_2$')
-            ax[0,0].plot(df1.pres, np.cumsum(list(df1.aero_tau_7)),  color=colors[3], linewidth=3, label=r'Mg$_2$SiO$_4$')
-            ax[0,0].plot(df1.pres, np.cumsum(list(df1.aero_tau_8)),  color=colors[4], linewidth=3, label='VO')
-            ax[0,0].plot(df1.pres, np.cumsum(list(df1.aero_tau_11)), color=colors[5], linewidth=3, label=r'Ca$_2$SiO$_4$')
-            ax[0,0].plot(df1.pres, np.cumsum(list(df1.aero_tau_12)), color=colors[6], linewidth=3, label=r'CaTiO3')
-            ax[0,0].plot(df1.pres, np.cumsum(list(df1.aero_tau_13)), color=colors[7], linewidth=3, label=r'Al$_2$O$_3$')
-
-            ax[0,1].plot(df2.pres, np.cumsum(list(df2.aero_tau_1)), color=colors[0], linewidth=3)
-            ax[0,1].plot(df2.pres, np.cumsum(list(df2.aero_tau_5)), color=colors[1], linewidth=3)
-            ax[0,1].plot(df2.pres, np.cumsum(list(df2.aero_tau_6)), color=colors[2], linewidth=3)
-            ax[0,1].plot(df2.pres, np.cumsum(list(df2.aero_tau_7)), color=colors[3], linewidth=3)
-            ax[0,1].plot(df2.pres, np.cumsum(list(df2.aero_tau_8)), color=colors[4], linewidth=3)
-            ax[0,1].plot(df2.pres, np.cumsum(list(df2.aero_tau_11)), color=colors[5], linewidth=3)
-            ax[0,1].plot(df2.pres, np.cumsum(list(df2.aero_tau_12)), color=colors[6], linewidth=3)
-            ax[0,1].plot(df2.pres, np.cumsum(list(df2.aero_tau_13)), color=colors[7], linewidth=3,)
+            ax[0,1].plot(df2.pres, df2.aero_tau_1 / layer_pressures, color=colors[0], linewidth=3)
+            ax[0,1].plot(df2.pres, df2.aero_tau_5 / layer_pressures, color=colors[1], linewidth=3)
+            ax[0,1].plot(df2.pres, df2.aero_tau_6 / layer_pressures, color=colors[2], linewidth=3)
+            ax[0,1].plot(df2.pres, df2.aero_tau_7 / layer_pressures, color=colors[3], linewidth=3)
+            ax[0,1].plot(df2.pres, df2.aero_tau_8 / layer_pressures, color=colors[4], linewidth=3)
+            ax[0,1].plot(df2.pres, df2.aero_tau_11 / layer_pressures, color=colors[5], linewidth=3)
+            ax[0,1].plot(df2.pres, df2.aero_tau_12 / layer_pressures, color=colors[6], linewidth=3)
+            ax[0,1].plot(df2.pres, df2.aero_tau_13 / layer_pressures, color=colors[7], linewidth=3)
 
             ax[1,0].plot(df1.pres, cum_optical_depths_1, color='black', linewidth=3, label='Substellar Point')
             ax[1,0].plot(df2.pres, cum_optical_depths_2, color='red', linewidth=3, label='Antistellar Point')
@@ -133,8 +143,9 @@ def plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude
             ax[1,0].set_yscale('log')
             ax[1,1].set_yscale('linear')
 
-            ax[0,0].set_ylim([1.01e-3, 2.0 * np.amax([cum_optical_depths_1, cum_optical_depths_2])])
-            ax[0,1].set_ylim([1.01e-3, 2.0 * np.amax([cum_optical_depths_1, cum_optical_depths_2])])
+            ax[0,0].set_ylim([0.1, 3e3])
+            ax[0,1].set_ylim([0.1, 3e3])
+
             ax[1,0].set_ylim([1.01e-3, 2.0 * np.amax([cum_optical_depths_1, cum_optical_depths_2])])
 
             ax[0,0].set_xlim([1.01e-5, 0.99e2])
@@ -142,8 +153,8 @@ def plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude
             ax[1,0].set_xlim([1.01e-5, 0.99e2])
             ax[1,1].set_xlim([1.01e-5, 0.99e2])
 
-            ax[0,0].set_ylabel(r'Cumulative Cloud $\tau$', fontsize=24)
-            ax[0,1].set_ylabel(r'Cumulative Cloud $\tau$', fontsize=24)
+            ax[0,0].set_ylabel(r'Cloud $\tau$ per bar', fontsize=24)
+            ax[0,1].set_ylabel(r'Cloud $\tau$ per bar', fontsize=24)
             ax[1,0].set_ylabel(r'All Clouds Cumulative $\tau$', fontsize=24)
             ax[1,1].set_ylabel('Temperature (K)', fontsize=24)
 
@@ -166,8 +177,8 @@ def plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude
             ax[1,0].legend()
             #ax[1,1].legend()
 
-            fig.text(0.23, 0.84, r"Substellar Profile", size=20, ha='center')
-            fig.text(0.66, 0.84, r"Antistellar Profile", size=20, ha='center')
+            fig.text(0.21, 0.85, r"Substellar Profile", size=16, ha='center')
+            fig.text(0.64, 0.85, r"Antistellar Profile", size=16, ha='center')
 
             fig.text(0.5, 0.04, r"Pressure (bar)", size=24, ha='center')
 

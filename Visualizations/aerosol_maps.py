@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import grab_input_data
+import matplotlib.ticker as ticker
+from matplotlib.ticker import MultipleLocator, LogLocator
 
 def plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, cloud_wavelength):
     # cloud colormap
@@ -86,14 +88,18 @@ def plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, c
             pressures = np.logspace(2 - num_orders_of_magnitude, 2, nlev - 1)
 
             optical_depths1 = get_optical_depth(file1, nlat, nlev)
-            mp1 = axes.contourf(lats, pressures, np.log10(optical_depths1.T), cmap=my_colors, levels=np.linspace(-2,2,100), extend='both')
+            mp1 = axes.contourf(lats, pressures, optical_depths1.T, locator=ticker.LogLocator(),
+                                cmap=my_colors, levels=np.logspace(-3,2,6), extend='both')
+
+
+
 
             axes.set_yscale("log")
             axes.set_ylim(1e2, 10 ** (2 - num_orders_of_magnitude))
 
             #cbar = fig.colorbar(mp1, ax=axes.ravel().tolist(), location='top', aspect=50, pad=0.02)
             cbar = fig.colorbar(mp1, aspect=20, pad=0.02)
-            cbar.set_label(r'log$_{10}$ Aerosol Optical Depth per bar at ' + str(cloud_wavelength) + ' $\mu$m',
+            cbar.set_label(r'Aerosol Optical Depth per bar at ' + str(cloud_wavelength) + ' $\mu$m',
                                                                                                  size=20, labelpad=10)
             cbar.ax.tick_params(labelsize=22)  # set your label size here
 

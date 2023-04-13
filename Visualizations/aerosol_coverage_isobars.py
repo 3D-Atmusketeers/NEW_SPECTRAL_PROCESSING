@@ -61,7 +61,8 @@ def plot_aerosol_coverage_isobars(
             hazes = False
 
         gravity = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name, 'fort.7', 'GA')
-        ir_absorbtion_coefficient = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', bbplanet_name, 'fort.7', 'ABSLW')
+        ir_absorbtion_coefficient = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/',
+                                                                   planet_name, 'fort.7', 'ABSLW')
 
         ir_photosphere_pressure_bars = (2. / 3.) * (gravity / ir_absorbtion_coefficient) / 10000
         ir_photosphere_pressure_bars = np.round(ir_photosphere_pressure_bars, 3)
@@ -128,7 +129,7 @@ def plot_aerosol_coverage_isobars(
                 NS_vels[i][j] = data[i][j][int(pressure_ind[i][j])][7]
                 vert_vels[i][j] = data[i][j][int(pressure_ind[i][j])][8]
 
-                # integrate aerosol optical depth above pressure level
+                # integrate aerosol optical depth above pressurm level
                 k = 0
 
                 while k <= int(pressure_ind[i][j]):
@@ -148,8 +149,25 @@ def plot_aerosol_coverage_isobars(
         test_y = np.linspace(min(lats), max(lats), len(lats))
 
         temp_map = axes.contourf(lons,
-                                 lats, np.concatenate([temps, temps], axis=1),
-                                 cmap=temperature_colors, levels=100)
+                                 lats, np.concatenate([temps, temps], axis=1), extend='both',
+                                 cmap=temperature_colors)
+        temp_cbar = fig.colorbar(
+        temp_map,
+        aspect=30,
+        pad=0.015,
+        orientation='horizontal')
+            
+        temp_cbar.set_label('Temperature (K)', fontsize=26)
+        
+        if (pressure_lev_bar < 1e-3):
+            temp_cbar.set_ticks(np.arange(700, 1800, 100))
+        elif 'hd189' in planet_name.lower():
+            temp_cbar.set_ticks(np.arange(600, 1600, 100))
+        else:
+            temp_cbar.set_ticks(np.arange(1000, 1800, 100))
+
+        
+        
         axes.streamplot(test_x, test_y,
                                np.concatenate([EW_vels, EW_vels], axis=1),
                                np.concatenate([NS_vels, NS_vels], axis=1),
@@ -183,17 +201,6 @@ def plot_aerosol_coverage_isobars(
         axes.patch.set_linewidth('2')
         axes.grid(color='w', alpha=0.5, ls=':')
 
-        temp_cbar = fig.colorbar(
-            temp_map,
-            aspect=30,
-            pad=0.015,
-            orientation='horizontal')  # ax=axes.ravel().tolist(),
-
-        temp_cbar.set_label('Temperature (K)', fontsize=26)
-
-        temp_tick_locator = ticker.MaxNLocator(nbins=6)
-        temp_cbar.locator = temp_tick_locator
-        temp_cbar.update_ticks()
 
         plt.savefig('../Figures/Temperature_Isobars_{}_bar_{}.png'.format(
             P_phots[0], planet_name), bbox_inches='tight', dpi=250)
@@ -247,9 +254,9 @@ def plot_aerosol_coverage_isobars(
 
 
             if plot_hazes:
-                cloud_cbar.set_label('Cloud and Haze Optical Depth, ' + str(cloud_wavelength) + ' $\\mu$m',fontsize=26)
+                cloud_cbar.set_label('Cumulative Cloud and Haze Optical Depth, ' + str(cloud_wavelength) + ' $\\mu$m',fontsize=26)
             else:
-                cloud_cbar.set_label('Cloud Optical Depth, ' + str(cloud_wavelength) + ' $\\mu$m', fontsize=26)
+                cloud_cbar.set_label('Cumulative Cloud Optical Depth, ' + str(cloud_wavelength) + ' $\\mu$m', fontsize=26)
 
             plt.savefig('../Figures/Cloud_Coverage_Isobars_{}_bar_{}.png'.format(
                 P_phots[0], planet_name), bbox_inches='tight', dpi=250)

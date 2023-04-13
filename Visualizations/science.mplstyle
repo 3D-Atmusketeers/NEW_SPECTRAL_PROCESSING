@@ -41,7 +41,7 @@ savefig.dpi : 100
 #axes.prop_cycle: cycler('color', ["black", "332288","88CCEE","44AA99","117733","999933","DDCC77","CC6677","882255","AA4499","brown","fd3c06","gray"])
 
 # Not good for colorblind people
-axes.prop_cycle: cycler('color', ['black', '7e1e9c', '15b01a', '448ee4', 'ff7fa7', '029386',   'ed872d',   'ae1717',   'gray'])
+axes.prop_cycle: cycler('color', ['black', '7e1e9c', '15b01a', '448ee4', 'ff7fa7', '029386',   'ed872d',   'ae1717',   'gray', 'e03fd8', '011288', '0b4008'])
 
 #font.family : serif
 #text.usetex : True

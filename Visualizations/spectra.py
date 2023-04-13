@@ -297,7 +297,14 @@ def plot_planet_spectra_blackbody_comparison_hz(planet_names, black_body_tempera
             rot_val = 360. / num_phases
 
             # Get the file path
-            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_0.00.00.0000.00.dat'
+            if planet_name == 'Peg51b':
+                INC_STRING = '0.17450'
+            elif planet_name == 'Taub':
+                INC_STRING = '0.7850'
+            else:
+                INC_STRING = '0.00'
+
+            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
 
             # Load in the planet spectra
             planet_spectra = pd.read_csv(file_path.format(str(i * rot_val)), header=None,
@@ -370,7 +377,7 @@ def plot_planet_spectra_blackbody_comparison_microns(planet_names, black_body_te
             rot_val = 360. / num_phases
 
             # Get the file path
-            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_0.00.00.0000.00.dat'
+            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
 
             # Load in the planet spectra
             planet_spectra = pd.read_csv(file_path.format(str(i * rot_val)), header=None,
@@ -488,7 +495,15 @@ def plot_filters(planet_names):
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12, 6))
     plt.subplots_adjust(hspace=0.05, wspace=0.25)
 
-    file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_names[0] + '_phase_{}_inc_0.00.00.0000.00.dat'
+    # Get the file path
+    if planet_names[0] == 'Peg51b':
+        INC_STRING = '0.17450'
+    elif planet_names[0] == 'Taub':
+        INC_STRING = '0.7850'
+    else:
+        INC_STRING = '0.00'
+
+    file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_names[0] + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
     spectra = pd.read_csv(
         file_path.format(
             str(0.0)),
@@ -541,7 +556,14 @@ def plot_spectra_simple(planet_names, num_phases):
             rot_val = 360. / num_phases
 
             # Get the file path
-            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_0.00.00.0000.00.dat'
+            if planet_name == 'Peg51b':
+                INC_STRING = '0.17450'
+            elif planet_name == 'Taub':
+                INC_STRING = '0.7850'
+            else:
+                INC_STRING = '0.00'
+
+            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
 
             # Load in the planet spectra
             planet_spectra = pd.read_csv(file_path.format(str(i * rot_val)), header=None,
@@ -562,9 +584,9 @@ def plot_spectra_simple(planet_names, num_phases):
 
 
         # Do somet figure stuff
-        ax.set_xlim(min(planet_spectra.wavelength * 1e6), max(planet_spectra.wavelength * 1e6))
-        ax.set_xlim(5, 12)
-        ax.set_ylim(0,5000)
+        #ax.set_xlim(min(planet_spectra.wavelength * 1e6), max(planet_spectra.wavelength * 1e6))
+        #ax.set_xlim(5, 12)
+        #ax.set_ylim(0,5000)
         ax.legend(fontsize=12, loc=(0, 1.03), ncol=5, mode='expand', title='Orbital Phase', title_fontsize=16)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
         ax.set_ylabel(r'Flux (W/m$^2$/micron)')
@@ -582,7 +604,7 @@ def plot_fp_fs_phase_curves(planet_names, planet_name_char_len, planet_radii, nu
 
     cm_name = 'batlow'
     cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
-    cm_file = np.roll(cm_file, 140, axis=0)
+    cm_file = np.roll(cm_file, 0, axis=0)
     my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
 
     # I currently only have MIRI coded in
@@ -608,7 +630,15 @@ def plot_fp_fs_phase_curves(planet_names, planet_name_char_len, planet_radii, nu
             integrated_signal_star.append(0)
 
             # Load in the planet spectra and convert to per microns
-            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_0.00.00.0000.00.dat'
+
+            # Get the file path
+            if planet_name == 'Peg51b':
+                INC_STRING = '0.17450'
+            elif planet_name == 'Taub':
+                INC_STRING = '0.7850'
+            else:
+                INC_STRING = '0.00'
+            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
 
             # Call the function to get the filtered star and planet spectra
             planet_spectra, star_spectra = filter_spectra(file_path, star_spectra, filt,
@@ -631,13 +661,22 @@ def plot_fp_fs_phase_curves(planet_names, planet_name_char_len, planet_radii, nu
         # Save the data
         pd.DataFrame({'Phase': np.arange(0, 360, rot_val), 'Fp_Fs_pmm': fp_fs_ratio * 1e6}
                      ).to_csv('OUTPUT_DATA/Fp_Fs_{}_Phase_Curves.txt'.format(planet_name), sep=' ')
+        
+        print(planet_name)
+
+        if '30met' in planet_name.lower():
+            linestyle_str='dashed'
+        else:
+            linestyle_str='solid'
 
         # Plot the data
         phases = np.linspace(0, 345, num_phases) / 360
         ax.plot(phases, fp_fs_ratio * 1e6,
-                linestyle='solid',
-                color=my_colors(k / len(planet_names)),
-                linewidth=1.5, label=planet_name)
+                #linestyle='solid',
+                #color=my_colors(k / len(planet_names)),
+                linestyle=linestyle_str,
+                linewidth=2,
+                label=planet_name)
 
     # Figure legend stuff
     ax.set_xlim(min(phases), max(phases))
@@ -679,7 +718,14 @@ def plot_fp_phase_curves(planet_names, planet_name_char_len, num_phases,
             integrated_planet_spectra.append(0)
 
             # Load in the planet spectra and convert to per microns
-            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_0.00.00.0000.00.dat'
+            # Get the file path
+            if planet_name == 'Peg51b':
+                INC_STRING = '0.17450'
+            elif planet_name == 'Taub':
+                INC_STRING = '0.7850'
+            else:
+                INC_STRING = '0.00'
+            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
 
             # Call the function to get the filtered star and planet spectra
             planet_spectra, star_spectra = filter_spectra(file_path, star_spectra, filt, transmission_filter_name, wav_subset, phase_degrees)
@@ -706,8 +752,9 @@ def plot_fp_phase_curves(planet_names, planet_name_char_len, num_phases,
         phases = np.linspace(0, 345, num_phases) / 360
         ax.plot(phases, fp,
                 linestyle='solid',
-                color=my_colors(k / len(planet_names)),
-                linewidth=1.5, label=planet_name)
+                #color=my_colors(k / len(planet_names)),
+                linewidth=2.0,
+                label=planet_name)
 
     # Figure legend stuff
     ax.set_xlim(min(phases), max(phases))
@@ -741,7 +788,16 @@ def plot_fp_fs_spectra(planet_names, planet_radii, num_phases, transmission_filt
         for i in range(num_phases):
             rot_val = 360. / num_phases
             phase_degrees = rot_val * i
-            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_0.00.00.0000.00.dat'
+
+            # Get the file path
+            if planet_name == 'Peg51b':
+                INC_STRING = '0.17450'
+            elif planet_name == 'Taub':
+                INC_STRING = '0.7850'
+            else:
+                INC_STRING = '0.00'
+
+            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
 
             # Call the function to get the filtered star and planet spectra
             planet_spectra, star_spectra = filter_spectra(file_path, star_spectra, filt, transmission_filter_name, wav_subset, phase_degrees)
@@ -795,9 +851,18 @@ def plot_fp_spectra(planet_names, planet_radii, num_phases, transmission_filter_
         for i in range(num_phases):
             rot_val = 360. / num_phases
             phase_degrees = rot_val * i
-            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_0.00.00.0000.00.dat'
+
+            # Get the file path
+            if planet_name == 'Peg51b':
+                INC_STRING = '0.17450'
+            elif planet_name == 'Taub':
+                INC_STRING = '0.7850'
+            else:
+                INC_STRING = '0.00'
+            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
 
             # Call the function to get the filtered star and planet spectra
+
             planet_spectra, star_spectra = filter_spectra(file_path, star_spectra, filt, transmission_filter_name, wav_subset, phase_degrees)
 
             if interp_function is None:
@@ -821,7 +886,7 @@ def plot_fp_spectra(planet_names, planet_radii, num_phases, transmission_filter_
                          ).to_csv('OUTPUT_DATA/Fp_Spectra_{}_{}.txt'.format(str(i * rot_val), planet_name), sep=' ')
 
         ax.set_xlim(min(planet_spectra.wavelength * 1e6), max(planet_spectra.wavelength * 1e6))
-        ax.legend(fontsize=12, loc=(0, 1.03), ncol=5, mode='expand', title='Orbital Phase', title_fontsize=18)
+        ax.legend(fontsize=12, loc=(0, 1.03), ncol=4, mode='expand', title='Orbital Phase', title_fontsize=18)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
         ax.set_ylabel(r'F$_p$ (W/m$^2$/micron)')  # (W m$^{-2}$)
         plt.savefig('../Figures/Fp_Spectra_{}.jpg'.format(planet_name), dpi=200, bbox_inches='tight')
