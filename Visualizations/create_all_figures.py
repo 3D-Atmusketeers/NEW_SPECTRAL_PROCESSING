@@ -26,7 +26,7 @@ plt.style.use('science.mplstyle')
 
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
-planet_names = ["HD209-PICKET-NUC-CLOUDS"]
+planet_names = ["GJ1214b-tholin-25clouds-30met"]
 
 
 # There are the different sets of opacity and EOS files
@@ -76,9 +76,9 @@ for planet_name in planet_names:
                                                             planet_name, "fort.7","RADEA")))
         print(planet_radii[0])
     else:
-        #planet_radii.append(17469282.0)
+        planet_radii.append(17469282.0)
         print("WARNING! fort.7 file not found for " + planet_name)
-        exit(0)
+        #exit(0)
 
     
 # Auto parse some of these params
@@ -139,7 +139,7 @@ print ()
 
 # Plot other planet characteristics
 #aerosol_maps.plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, cloud_wavelength)
-aerosol_profiles.plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
+#aerosol_profiles.plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
 #wind_maps.plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
 
 # Plotting the emission maps
@@ -163,12 +163,12 @@ print ()
 
 # If resolution is set to 0, don't convolve at all
 
-#spectra.plot_fp_spectra(planet_names,
-#                            planet_radii,
-#                            num_phases=8,
-#                            transmission_filter_name='None',
-#                            wav_subset=[5e-6, 12e-6],
-#                            resolution=100)
+spectra.plot_fp_spectra(planet_names,
+                            planet_radii,
+                            num_phases=24,
+                            transmission_filter_name='None',
+                            wav_subset=[5e-6, 12e-6],
+                            resolution=100)
 
 #spectra.plot_fp_fs_spectra(planet_names,
 #                            planet_radii,

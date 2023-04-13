@@ -2,11 +2,12 @@ from tqdm import tqdm
 import numpy as np
 from scipy import interpolate
 from scipy.signal import savgol_filter
+import pandas as pd
 
 ### ----- INPUTS AND OUTPUTS ----- ###
 
 
-def regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, NTAU, NLON_new, NTAU_new, HAZES):
+def regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, NTAU, NLON_new, NTAU_new, HAZES, max_pressure_bar):
     old_file = '../PLANET_MODELS/' + planet_name + '_with_clouds.txt'
     new_file = '../PLANET_MODELS/' + planet_name + '_with_clouds_regridded.txt'
 
@@ -65,8 +66,6 @@ def regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, NTAU, NLON
 
 
     def double_lons(data):
-
-
         data2 = np.copy(data)
 
         data3 = []
@@ -388,7 +387,19 @@ def regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, NTAU, NLON
     # load data and reshape data into more convenient dimensions
     print ('Old file:', old_file)
     data = np.loadtxt(old_file)
+    
 
+    # Get the largest value in the 3rd column of the data, pressure
+    max_pressure_bar_in_model = data[:,4].max()
+
+    if max_pressure_bar < max_pressure_bar_in_model:
+        data = pd.DataFrame(data)
+        data = data[data[4] <= max_pressure_bar]
+        data = data.to_numpy()
+        max_val = int(data[:,2].max())
+        NTAU = max_val
+        print('cutting off the bottom of the atmosphere')
+        
     data = data.reshape((NLAT, NLON, NTAU, NPARAMS))
     data_new = np.zeros((NLAT, NLON, NTAU_new, NPARAMS))
 

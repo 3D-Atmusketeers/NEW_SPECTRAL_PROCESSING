@@ -24,6 +24,9 @@ system_obliquity = 0
 # The NLAT and NLON can be changed, but these values work well
 NTAU = 500
 
+# Cut of the bottom of the atmosphere if needed
+max_pressure_bar = 0.1
+
 # Please don't touch these
 NLAT = 48
 NLON = 96
@@ -47,7 +50,7 @@ USE_FORT_FILES = True
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-none-0clouds-30met"]
+planet_names = ["GJ1214b-soot-0clouds-1met"]
 
 opacity_files = 'SET_1'
 
@@ -101,8 +104,10 @@ for q in range(len(planet_names)):
     # This is the path to the chemistry file
     # This assumes that 10x solar uses the 1x met chem tables, maybe a bad thing
     if (opacity_files == "SET_1"):
-        if (0.1  <= MET_X_SOLAR < 99.0):
+        if (0.1  <= MET_X_SOLAR < 10.0):
             chemistry_file_path = "DATA/SET_1/ordered_1x_solar_metallicity_chem.dat"
+        elif (10.0 <= MET_X_SOLAR < 99.0):
+            chemistry_file_path = "DATA/SET_1/ordered_30x_solar_metallicity_chem.dat"
         elif (99.0 <= MET_X_SOLAR < 150.0):
             chemistry_file_path = "DATA/SET_1/ordered_100x_solar_metallicity_chem.dat"
         elif (150.0  <= MET_X_SOLAR < 2000.0):
@@ -322,7 +327,7 @@ for q in range(len(planet_names)):
     inclination_strs = []
     phase_strs = []
     
-
+    
     # Convert the fort files to the correct format
     if USE_FORT_FILES == True:
         convert_fort_files.convert_to_correct_format(path, runname, planet_name, INITIAL_NTAU, surfp, oom, tgr, grav, gasconst)
@@ -334,11 +339,12 @@ for q in range(len(planet_names)):
                                         grav, MTLX, CLOUDS, MOLEF,
                                         aerosol_layers, INITIAL_NTAU,
                                         gasconst, HAZE_TYPE, HAZES, wav_loc)
-
-    # Regrid the file to constant altitude and the correct number of layers
-    altitude_regridding.regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, INITIAL_NTAU, NLON, NTAU, HAZES)
-    print ("Regridded the planet to constant altitude")
     
+    # Regrid the file to constant altitude and the correct number of layers
+    altitude_regridding.regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, INITIAL_NTAU, NLON, NTAU, HAZES, max_pressure_bar)
+    
+    print ("Regridded the planet to constant altitude")
+
     # If you already have the Final planet file creates you can commend out run_grid and double planet file
     run_grid.run_all_grid(planet_name, phases, inclinations, system_obliquity, NTAU, NLAT, NLON, grid_lat_min, grid_lat_max, grid_lon_min, grid_lon_max, ONLY_PHASE)
 
@@ -354,15 +360,16 @@ for q in range(len(planet_names)):
         for W0_VAL in W0_VALS:
             for doppler_val in dopplers:
                 run_exo(input_paths, inclination_strs, phase_strs, doppler_val)
+    
 
 
 
 
-#print("Moving the files out of the clean directory")
-#for filename in os.listdir('DATA'):
-#    if re.match(r'init_*', filename):
-#        shutil.move(os.path.join('DATA', filename), os.path.join('../PLANET_MODELS', filename))
+print("Moving the files out of the clean directory")
+for filename in os.listdir('DATA'):
+    if re.match(r'init_*', filename):
+        shutil.move(os.path.join('DATA', filename), os.path.join('../PLANET_MODELS', filename))
 
-#for filename in os.listdir('OUT'):
-#    if re.match(r'Spec_*', filename):
-#        shutil.move(os.path.join('OUT', filename), os.path.join('../FINISHED_SPECTRA', filename))
+for filename in os.listdir('OUT'):
+    if re.match(r'Spec_*', filename):
+        shutil.move(os.path.join('OUT', filename), os.path.join('../FINISHED_SPECTRA', filename))
