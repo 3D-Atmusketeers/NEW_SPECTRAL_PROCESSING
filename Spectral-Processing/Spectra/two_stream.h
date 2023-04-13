@@ -507,6 +507,7 @@ void two_stream(int NLAYER, int kmin, double *w0_array, double *g0_array, \
              (pow(LAMBDAS[J], 2.0) - (1.0 / pow(mu_0, 2.0)));
   }
 
+
   J = 0;
   for(L=1; L<2*NEW_NLAYER-1; L+=2)
   {
@@ -562,7 +563,7 @@ void two_stream(int NLAYER, int kmin, double *w0_array, double *g0_array, \
 
   //for(J=0; J<NEW_NLAYER; J++)
   //{
-  //    printf("\'NEW\', %d, %le, %le, %le, \n",  J, TEMPS[J], TAUCS[J], HEMISPHERIC_SOURCE_FNC[J] / (2 * PI));
+  //    printf("\'NEW\', %d, %le, %le, %le, \n",  J, TEMPS[J], TAUCS[J], QUADRATURE_TWO_STREAM[0]);
   //}
 
 

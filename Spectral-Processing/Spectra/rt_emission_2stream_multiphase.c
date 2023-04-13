@@ -1472,7 +1472,8 @@ int RT_Emit_3D(double PHASE)
                 if(atmos.lon[m]>=90.0-PHASE && atmos.lon[m]<=270.0-PHASE)
                 {
                     for(j=0; j<NTAU; j++)
-                    {
+                    {   
+                        //printf("%d %.3e %.3e \n", j, tau_em[l][m][j-1], dtau_em[l][m][j]);
                         if(j==0)
                         {
                             tau_em[l][m][j]=dtau_em[l][m][j];
@@ -1504,7 +1505,7 @@ int RT_Emit_3D(double PHASE)
 
                     for (j = 0; j<NTAU; j++)
                     {
-                        if (dtau_em[l][m][j] < 1e-10 || tau_em[l][m][j] < 1e-10 || temperature_3d[l][m][j] < 200 || kappa_nu_array[l][m][j] < 1e-10)
+                        if (dtau_em[l][m][j] < 1e-50 || tau_em[l][m][j] < 1e-50 || temperature_3d[l][m][j] < 200 || kappa_nu_array[l][m][j] < 1e-50)
                         {
                           kmin = j+1;
                         }
@@ -1536,9 +1537,9 @@ int RT_Emit_3D(double PHASE)
                     //{
                     //    for (j = kmin; j<NTAU; j++)
                     //    {
-                    //        printf("%d %.3e %.3e %.3e %.3e %.3e %.3e %.3e\n", j, pi0_tot[l][m][j], \
+                    //        printf("%d %.3e %.3e %.3e %.3e %.3e %.3e %.3e %.3e\n", j, pi0_tot[l][m][j], \
                     //           asym_tot[l][m][j], temperature_3d[l][m][j], tau_em[l][m][j], \
-                    //           atmos.incident_frac[l][m][NTAU-10], dtau_em[l][m][j], intensity[l][m]);
+                    //           atmos.incident_frac[l][m][NTAU-10], dtau_em[l][m][j], intensity[l][m], reflected_intensity[l][m]);
                     //    }
                     //}
 

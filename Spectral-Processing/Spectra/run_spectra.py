@@ -25,7 +25,8 @@ system_obliquity = 0
 NTAU = 500
 
 # Cut of the bottom of the atmosphere if needed
-max_pressure_bar = 0.1
+# DONT MESS WITH THIS, ISAAC HASN'T FULLY CODED IT!!!!!
+max_pressure_bar = 100
 
 # Please don't touch these
 NLAT = 48
@@ -327,7 +328,7 @@ for q in range(len(planet_names)):
     inclination_strs = []
     phase_strs = []
     
-    
+    """
     # Convert the fort files to the correct format
     if USE_FORT_FILES == True:
         convert_fort_files.convert_to_correct_format(path, runname, planet_name, INITIAL_NTAU, surfp, oom, tgr, grav, gasconst)
@@ -347,7 +348,7 @@ for q in range(len(planet_names)):
 
     # If you already have the Final planet file creates you can commend out run_grid and double planet file
     run_grid.run_all_grid(planet_name, phases, inclinations, system_obliquity, NTAU, NLAT, NLON, grid_lat_min, grid_lat_max, grid_lon_min, grid_lon_max, ONLY_PHASE)
-
+    """
     # Get all the files that you want to run
     input_paths, inclination_strs, phase_strs = get_run_lists(phases, inclinations)
     
@@ -365,11 +366,11 @@ for q in range(len(planet_names)):
 
 
 
-print("Moving the files out of the clean directory")
-for filename in os.listdir('DATA'):
-    if re.match(r'init_*', filename):
-        shutil.move(os.path.join('DATA', filename), os.path.join('../PLANET_MODELS', filename))
+#print("Moving the files out of the clean directory")
+#for filename in os.listdir('DATA'):
+#    if re.match(r'init_*', filename):
+#        shutil.move(os.path.join('DATA', filename), os.path.join('../PLANET_MODELS', filename))
 
-for filename in os.listdir('OUT'):
-    if re.match(r'Spec_*', filename):
-        shutil.move(os.path.join('OUT', filename), os.path.join('../FINISHED_SPECTRA', filename))
+#for filename in os.listdir('OUT'):
+#    if re.match(r'Spec_*', filename):
+#        shutil.move(os.path.join('OUT', filename), os.path.join('../FINISHED_SPECTRA', filename))
