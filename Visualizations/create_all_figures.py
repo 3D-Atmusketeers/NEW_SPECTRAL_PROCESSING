@@ -26,7 +26,7 @@ plt.style.use('science.mplstyle')
 
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
-planet_names = ["GJ1214b-tholin-25clouds-30met"]
+planet_names = ["GJ1214b-none-0clouds-1met"]
 
 
 # There are the different sets of opacity and EOS files
@@ -151,6 +151,17 @@ print ()
 print ("Plotting the spectra...")
 print ()
 print ()
+
+planet_name = planet_names[0]
+spectra.plot_blackbody_phase_curve(planet_name,
+                            planet_radii,
+                            num_phases=24,
+                            transmission_filter_name='MIRI',
+                            wav_subset=[5e-6, 30e-6],
+                            resolution=100,
+                            temp=300)
+
+
 #spectra.plot_planet_spectra_blackbody_comparison_hz(planet_names,
 #                                                 black_body_temperatures=[437, 553],
 #                                                 num_phases=2)
@@ -163,12 +174,12 @@ print ()
 
 # If resolution is set to 0, don't convolve at all
 
-spectra.plot_fp_spectra(planet_names,
-                            planet_radii,
-                            num_phases=24,
-                            transmission_filter_name='None',
-                            wav_subset=[5e-6, 12e-6],
-                            resolution=100)
+#spectra.plot_fp_spectra(planet_names,
+#                            planet_radii,
+#                            num_phases=24,
+#                            transmission_filter_name='None',
+#                            wav_subset=[5e-6, 12e-6],
+#                            resolution=100)
 
 #spectra.plot_fp_fs_spectra(planet_names,
 #                            planet_radii,

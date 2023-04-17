@@ -20,10 +20,10 @@ h = 6.6260701e-34
 c = 3e8
 
 
-def filter_spectra(file_path, star_spectra, filt, transmission_filter_name, wav_subset, phase_degrees):
+def filter_spectra(planet_spectra, star_spectra, filt, transmission_filter_name, wav_subset, phase_degrees):
     # Load in the planet spectra and convert to per microns
-    planet_spectra = pd.read_csv(file_path.format(str(phase_degrees)), header=None, delim_whitespace=True, names=['wavelength', 'flux', 'reflected'])
-    planet_spectra.flux = planet_spectra.flux * (3.0e8 / planet_spectra.wavelength ** 2) / 1e6
+    #planet_spectra = pd.read_csv(file_path.format(str(phase_degrees)), header=None, delim_whitespace=True, names=['wavelength', 'flux', 'reflected'])
+    #planet_spectra.flux = planet_spectra.flux * (3.0e8 / planet_spectra.wavelength ** 2) / 1e6
 
     if transmission_filter_name == 'MIRI':
         # Only use the data points within the filter wavelength range that we want
@@ -377,6 +377,14 @@ def plot_planet_spectra_blackbody_comparison_microns(planet_names, black_body_te
             rot_val = 360. / num_phases
 
             # Get the file path
+            if planet_name == 'Peg51b':
+                INC_STRING = '0.17450'
+            elif planet_name == 'Taub':
+                INC_STRING = '0.7850'
+            else:
+                INC_STRING = '0.00'
+
+            # Get the file path
             file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
 
             # Load in the planet spectra
@@ -641,7 +649,7 @@ def plot_fp_fs_phase_curves(planet_names, planet_name_char_len, planet_radii, nu
             file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
 
             # Call the function to get the filtered star and planet spectra
-            planet_spectra, star_spectra = filter_spectra(file_path, star_spectra, filt,
+            planet_spectra, star_spectra = filter_spectra(planet_spectra, star_spectra, filt,
                                                           transmission_filter_name, wav_subset, phase_degrees)
 
             # Get the star and planet plus star signals
@@ -728,7 +736,7 @@ def plot_fp_phase_curves(planet_names, planet_name_char_len, num_phases,
             file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
 
             # Call the function to get the filtered star and planet spectra
-            planet_spectra, star_spectra = filter_spectra(file_path, star_spectra, filt, transmission_filter_name, wav_subset, phase_degrees)
+            planet_spectra, star_spectra = filter_spectra(planet_spectra,star_spectra, filt, transmission_filter_name, wav_subset, phase_degrees)
 
             if interp_function is None:
                 planet_spectra.flux = planet_spectra.flux
@@ -800,7 +808,7 @@ def plot_fp_fs_spectra(planet_names, planet_radii, num_phases, transmission_filt
             file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
 
             # Call the function to get the filtered star and planet spectra
-            planet_spectra, star_spectra = filter_spectra(file_path, star_spectra, filt, transmission_filter_name, wav_subset, phase_degrees)
+            planet_spectra, star_spectra = filter_spectra(planet_spectra, star_spectra, filt, transmission_filter_name, wav_subset, phase_degrees)
 
             # Get the planet to star flux ratio
             signal, signal_star = get_fp_fs(interp_function, star_radius, planet_spectra, planet_radius, star_spectra)
@@ -863,7 +871,7 @@ def plot_fp_spectra(planet_names, planet_radii, num_phases, transmission_filter_
 
             # Call the function to get the filtered star and planet spectra
 
-            planet_spectra, star_spectra = filter_spectra(file_path, star_spectra, filt, transmission_filter_name, wav_subset, phase_degrees)
+            planet_spectra, star_spectra = filter_spectra(planet_spectra, star_spectra, filt, transmission_filter_name, wav_subset, phase_degrees)
 
             if interp_function is None:
                 planet_spectra.flux = planet_spectra.flux
@@ -891,4 +899,100 @@ def plot_fp_spectra(planet_names, planet_radii, num_phases, transmission_filter_
         ax.set_ylabel(r'F$_p$ (W/m$^2$/micron)')  # (W m$^{-2}$)
         plt.savefig('../Figures/Fp_Spectra_{}.jpg'.format(planet_name), dpi=200, bbox_inches='tight')
 
+    return None
+
+
+def plot_blackbody_phase_curve(planet_name, planet_radii,num_phases,transmission_filter_name, wav_subset,resolution,temp):
+    cm_name = 'batlow'
+    cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
+    cm_file = np.roll(cm_file, 140, axis=0)
+    my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
+
+    # I currently only have MIRI coded in
+    filt, interp_function = get_filter(which_filter=transmission_filter_name)
+
+    # Figure aesthetics
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12, 6), sharex=True, sharey=False)
+    plt.subplots_adjust(hspace=0.05, wspace=0.25)
+
+    # Set up the blackbody at a given temperature
+    bb = BlackBody(temperature=temp * u.K)
+
+    # The wavelengths to use
+    wav = np.linspace(5, 12, 1000) * u.um
+
+    # Get the flux at that wavelength
+    flux = bb(wav) * np.pi * u.sr
+
+    # Convert to si, same as the output of the emission code
+    flux = flux.to(u.J / (u.m * u.m * u.Hz * u.s))
+
+    # Convert the wavelengths to meters
+    wav = wav * 1e-6
+
+    # Create a dataframe called bb_df out of the lists wav and flux
+    bb_spectra = pd.DataFrame({'wavelength': wav, 'flux': flux})
+    bb_spectra.flux = bb_spectra.flux * (3.0e8 / bb_spectra.wavelength ** 2) / 1e6
+
+    planet_radius = planet_radii[0]
+
+    # Get the star spectra
+    star_spectra, star_radius = get_star_spectra(planet_name)
+
+    # Set the arrays for the integrated signals
+    integrated_signal = []
+    integrated_signal_star = []
+
+    # Get the star spectra
+    star_spectra, star_radius = get_star_spectra(planet_name)
+
+    for i in range(num_phases):
+        # For reading in the file names
+        rot_val = 360. / num_phases
+        phase_degrees = rot_val * i
+
+        # Add a zero as a placeholder
+        integrated_signal.append(0)
+        integrated_signal_star.append(0)
+
+        # Call the function to get the filtered star and planet spectra
+        planet_spectra, star_spectra = filter_spectra(bb_spectra, star_spectra, filt,
+                                                        transmission_filter_name, wav_subset, phase_degrees)
+
+        # Get the star and planet plus star signals
+        signal, signal_star = get_fp_fs(interp_function, star_radius, planet_spectra, planet_radius, star_spectra)
+
+        # Integrate the total signal and the star signal
+        integrated_signal[i] = trapz(signal, x=planet_spectra.wavelength * 1e6)
+        integrated_signal_star[i] = trapz(signal_star, x=planet_spectra.wavelength * 1e6)
+
+    # Convert both the signal and the star signal to arrays
+    integrated_signal = np.asarray(integrated_signal)
+    integrated_signal_star = np.asarray(integrated_signal_star)
+
+    # Divide out the two integrated signals
+    fp_fs_ratio = (integrated_signal / integrated_signal_star - 1.0)
+    
+    print(fp_fs_ratio)
+    # Save the data
+    #pd.DataFrame({'Phase': np.arange(0, 360, rot_val), 'Fp_Fs_pmm': fp_fs_ratio * 1e6}
+    #                ).to_csv('OUTPUT_DATA/Blackbody_Phase_Curves.txt'.format, sep=' ')
+    
+    """
+    # Plot the data
+    phases = np.linspace(0, 345, num_phases) / 360
+    ax.plot(phases, fp_fs_ratio * 1e6,
+            #linestyle='solid',
+            #color=my_colors(k / len(planet_names)),
+            linewidth=2,
+            label=planet_name)
+
+    # Figure legend stuff
+    ax.set_xlim(min(phases), max(phases))
+    ax.legend(fontsize=12, loc=(0, 1.03), ncol=2, mode='expand')
+    ax.set_xlabel('Orbital Phase')
+    ax.set_ylabel(r'F$_p$/F$_s$ (ppm)')
+    plt.savefig('../Figures/Blackbody_Phase_Curve.jpg', dpi=200, bbox_inches='tight')
+    #plt.clf()
+    """
     return None
