@@ -16,7 +16,7 @@ import setup_opac_versions
 
 # Phases in degrees, inclination in radians (sorry)
 # An inclination of 0 corresponds to edge on
-phases = [180.0]
+phases = [90.0]
 inclinations = [0.0]
 system_obliquity = 0
 
@@ -51,7 +51,7 @@ USE_FORT_FILES = True
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-tholin-25clouds-30met"]
+planet_names = ["GJ1214b-tholin-0clouds-1met"]
 
 opacity_files = 'SET_1'
 
@@ -346,10 +346,10 @@ for q in range(len(planet_names)):
     altitude_regridding.regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, INITIAL_NTAU, NLON, NTAU, HAZES, max_pressure_bar)
     
     print ("Regridded the planet to constant altitude")
-    """
+
     # If you already have the Final planet file creates you can commend out run_grid and double planet file
     run_grid.run_all_grid(planet_name, phases, inclinations, system_obliquity, NTAU, NLAT, NLON, grid_lat_min, grid_lat_max, grid_lon_min, grid_lon_max, ONLY_PHASE)
-    
+
     # Get all the files that you want to run
     input_paths, inclination_strs, phase_strs = get_run_lists(phases, inclinations)
     
@@ -373,4 +373,3 @@ for filename in os.listdir('DATA'):
 for filename in os.listdir('OUT'):
     if re.match(r'Spec_*', filename):
         shutil.move(os.path.join('OUT', filename), os.path.join('../FINISHED_SPECTRA', filename))
-"""

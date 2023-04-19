@@ -3,7 +3,7 @@ import sys
 import shutil
 import fileinput
 import contextlib
-
+import time
 
 @contextlib.contextmanager
 def change_directory(path):
@@ -62,13 +62,14 @@ print ("")
 #gcm_folder = input("Enter the name of the directory with all the GCMS you want to run: ")
 gcm_folder = 'GCM-OUTPUT'
 finished_gcms = [name for name in os.listdir(gcm_folder) if os.path.isdir(os.path.join(gcm_folder, name))]
+finished_gcms = ['GJ1214b-tholin-0clouds-1met']
 
 # Ask the user for some input
 #question = "Do you want to run " + str(finished_gcms) 
 #answer = query_yes_no(question)
 answer = True
 
-phases = [0.0]
+phases = [90.0]
 
 
 source_file_name = "Run_sbatch"
@@ -76,6 +77,7 @@ source_file_name = "Run_sbatch"
 
 if answer == True:
     for i in range(len(finished_gcms)):
+        time.sleep(60)  
         for j, phase in enumerate(phases):
             # copy the file run_spectra.py to a new file with the extension finished_gcms[i]
             shutil.copyfile("Spectra/run_spectra.py", "Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + ".py")
@@ -104,9 +106,11 @@ if answer == True:
                         elif line.startswith("python run_spectra.py"):
                             line = f"python run_spectra_{finished_gcms[i]}_{str(phase)}.py\n"
                         temp_file.write(line)
+                        
                 shutil.move(temp_file_name, new_file_name)
                 sbatch_command = f"sbatch {new_file_name}"
                 os.system(sbatch_command)
+                time.sleep(60)  
 
 else:
     print("Exit, you chose not to execute this program")
