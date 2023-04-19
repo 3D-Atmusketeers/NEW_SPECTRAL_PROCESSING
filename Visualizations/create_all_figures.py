@@ -26,8 +26,50 @@ plt.style.use('science.mplstyle')
 
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
-planet_names = ["GJ1214b-none-0clouds-1met"]
+planet_names = ["HD189-DOGRAY",
+ "HD189-DOGRAY-NUC-CLOUDS-COMPACT",
+ "HD189-PICKET-NUC-CLOUDS",
+ "HD209-DOGRAY-ALL-CLOUDS-COMPACT",
+ "HD209-PICKET-ALL-CLOUDS",
+ "HD189-DOGRAY-ALL-CLOUDS",
+ "HD189-PICKET",
+ "HD189-PICKET-NUC-CLOUDS-COMPACT",
+ "HD209-DOGRAY-NUC-CLOUDS",
+ "HD209-PICKET-ALL-CLOUDS-COMPACT",
+ "HD189-DOGRAY-ALL-CLOUDS-COMPACT",
+ "HD189-PICKET-ALL-CLOUDS",
+ "HD209-DOGRAY",
+ "HD209-DOGRAY-NUC-CLOUDS-COMPACT",
+ "HD209-PICKET-NUC-CLOUDS",
+ "HD189-DOGRAY-NUC-CLOUDS",
+ "HD189-PICKET-ALL-CLOUDS-COMPACT",
+ "HD209-DOGRAY-ALL-CLOUDS",
+ "HD209-PICKET",
+ "HD209-PICKET-NUC-CLOUDS-COMPACT"]
 
+
+"""
+["HD189-DOGRAY",
+ "HD189-DOGRAY-NUC-CLOUDS-COMPACT",
+ "HD189-PICKET-NUC-CLOUDS",
+ "HD209-DOGRAY-ALL-CLOUDS-COMPACT",
+ "HD209-PICKET-ALL-CLOUDS",
+ "HD189-DOGRAY-ALL-CLOUDS",
+ "HD189-PICKET",
+ "HD189-PICKET-NUC-CLOUDS-COMPACT",
+ "HD209-DOGRAY-NUC-CLOUDS",
+ "HD209-PICKET-ALL-CLOUDS-COMPACT",
+ "HD189-DOGRAY-ALL-CLOUDS-COMPACT",
+ "HD189-PICKET-ALL-CLOUDS",
+ "HD209-DOGRAY",
+ "HD209-DOGRAY-NUC-CLOUDS-COMPACT",
+ "HD209-PICKET-NUC-CLOUDS",
+ "HD189-DOGRAY-NUC-CLOUDS",
+ "HD189-PICKET-ALL-CLOUDS-COMPACT",
+ "HD209-DOGRAY-ALL-CLOUDS",
+ "HD209-PICKET",
+ "HD209-PICKET-NUC-CLOUDS-COMPACT"]
+"""
 
 # There are the different sets of opacity and EOS files
 # There are somethings that need to be changed in the template inputs file to make this happen
@@ -152,14 +194,14 @@ print ("Plotting the spectra...")
 print ()
 print ()
 
-planet_name = planet_names[0]
-spectra.plot_blackbody_phase_curve(planet_name,
-                            planet_radii,
-                            num_phases=24,
-                            transmission_filter_name='MIRI',
-                            wav_subset=[5e-6, 30e-6],
-                            resolution=100,
-                            temp=300)
+#planet_name = planet_names[0]
+#spectra.plot_blackbody_phase_curve(planet_name,
+#                            planet_radii,
+#                            num_phases=24,
+#                            transmission_filter_name='MIRI',
+#                            wav_subset=[5e-6, 30e-6],
+#                            resolution=100,
+#                            temp=300)
 
 
 #spectra.plot_planet_spectra_blackbody_comparison_hz(planet_names,
@@ -170,13 +212,13 @@ spectra.plot_blackbody_phase_curve(planet_name,
 #                                                 num_phases=2)
 #spectra.plot_star_spectra_test(planet_names)
 #spectra.plot_filters(planet_names)
-#spectra.plot_spectra_simple(planet_names, num_phases=4)
+spectra.plot_spectra_simple(planet_names, num_phases=2)
 
 # If resolution is set to 0, don't convolve at all
 
 #spectra.plot_fp_spectra(planet_names,
 #                            planet_radii,
-#                            num_phases=24,
+#                            num_phases=4,
 #                            transmission_filter_name='None',
 #                            wav_subset=[5e-6, 12e-6],
 #                            resolution=100)

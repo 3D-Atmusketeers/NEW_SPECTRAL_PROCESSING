@@ -584,8 +584,8 @@ def plot_spectra_simple(planet_names, num_phases):
 
             ax.plot(planet_spectra.wavelength * 1e6,
                     planet_spectra.flux,
-                    color=my_colors(i / num_phases),
-                    linewidth=1.5,
+                    #color=my_colors(i / num_phases),
+                    linewidth=1,
                     label=str(np.round(rot_val * i / 360., 3)))
 
 
@@ -593,11 +593,12 @@ def plot_spectra_simple(planet_names, num_phases):
 
         # Do somet figure stuff
         #ax.set_xlim(min(planet_spectra.wavelength * 1e6), max(planet_spectra.wavelength * 1e6))
-        #ax.set_xlim(5, 12)
-        #ax.set_ylim(0,5000)
+        ax.set_xlim(0.5, 12)
+        ax.set_ylim(1e2,1e6)
         ax.legend(fontsize=12, loc=(0, 1.03), ncol=5, mode='expand', title='Orbital Phase', title_fontsize=16)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
         ax.set_ylabel(r'Flux (W/m$^2$/micron)')
+        ax.set_yscale('log')
         plt.savefig('../Figures/Planet_Simple_Spectra_{}.jpg'.format(planet_name), dpi=200, bbox_inches='tight')
         plt.clf()
 
@@ -868,6 +869,14 @@ def plot_fp_spectra(planet_names, planet_radii, num_phases, transmission_filter_
             else:
                 INC_STRING = '0.00'
             file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
+
+            # Load in the planet spectra
+            planet_spectra = pd.read_csv(file_path.format(str(i * rot_val)), header=None,
+                                         delim_whitespace=True, names=['wavelength', 'flux', 'reflected'])
+            planet_spectra.flux = planet_spectra.flux * (3.0e8 / planet_spectra.wavelength ** 2) / 1e6
+
+            # Reset the index
+            planet_spectra = planet_spectra.reset_index(drop=True)
 
             # Call the function to get the filtered star and planet spectra
 
