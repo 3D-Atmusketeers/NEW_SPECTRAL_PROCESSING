@@ -62,16 +62,13 @@ print ("")
 #gcm_folder = input("Enter the name of the directory with all the GCMS you want to run: ")
 gcm_folder = 'GCM-OUTPUT'
 finished_gcms = [name for name in os.listdir(gcm_folder) if os.path.isdir(os.path.join(gcm_folder, name))]
-finished_gcms = ['GJ1214b-tholin-0clouds-1met']
 
 # Ask the user for some input
 #question = "Do you want to run " + str(finished_gcms) 
 #answer = query_yes_no(question)
 answer = True
 
-phases = [90.0]
-
-
+phases = [0.0]
 source_file_name = "Run_sbatch"
 
 

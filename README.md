@@ -11,10 +11,13 @@ Recently, Isaac has added a lot of stuff to the files. Hopefully this makes it w
 ************         HOW TO RUN      ************
 *************************************************
 
-Spectral-Processing/set_up_spectra_folders.py
-    This will copy the entire spectral-processing for EACH FOLDER and run it
-Spectral-Processing/move_finished_files.py
-    This will move all the finished files back to the central folder again
+Spectral-Processing/run_entire_suite.py
+    This will run the entire suite
+    Make sure to set the GCM folders and the phases that you want run
+    ALSO THIS HAS TO BE DONE IN TWO STEPS.
+    FIRST, RUN STEP 1. THEN WHEN THAT IS ALL DONE, RUN STEP 2.
+
+
 Visualizations/create_all_figures.py
     This will create all the figures that I've so far coded up. Several more need to be added
 
