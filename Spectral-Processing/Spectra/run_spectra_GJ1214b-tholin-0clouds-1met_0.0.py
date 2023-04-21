@@ -16,7 +16,7 @@ import setup_opac_versions
 
 # Phases in degrees, inclination in radians (sorry)
 # An inclination of 0 corresponds to edge on
-phases = [90.0]
+phases = [0.0]
 inclinations = [0.0]
 system_obliquity = 0
 
@@ -316,10 +316,15 @@ for q in range(len(planet_names)):
                 file.write(filedata)
             
             # Run Eliza's code
-            os.system('make clean')
+            #os.system('make clean')
             os.system('make rt_emission_aerosols.exe')
-            os.system('./rt_emission_aerosols.exe')
 
+            # Rename rt_emission_aerosols.exe to include planet_name, phase, doppler, and inclination
+            file_name = f"rt_emission_aerosols_{planet_name}_phase_{phase_strs[i]}.exe"
+            os.rename("rt_emission_aerosols.exe", file_name)
+            
+            # Run the renamed executable
+            os.system(f"./{file_name}")
         return None
 
 
@@ -329,47 +334,40 @@ for q in range(len(planet_names)):
     phase_strs = []
     
 
-    # Convert the fort files to the correct format
-    if USE_FORT_FILES == True:
-        convert_fort_files.convert_to_correct_format(path, runname, planet_name, INITIAL_NTAU, surfp, oom, tgr, grav, gasconst)
-        print ("Converted the fort files to the new format")
-    else:
-        pass
-    
-    add_clouds.add_clouds_to_gcm_output(path, runname, planet_name,
-                                        grav, MTLX, CLOUDS, MOLEF,
-                                        aerosol_layers, INITIAL_NTAU,
-                                        gasconst, HAZE_TYPE, HAZES, wav_loc, MET_X_SOLAR)
+    RUN_REGRIDDING = False
 
-    
-    # Regrid the file to constant altitude and the correct number of layers
-    altitude_regridding.regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, INITIAL_NTAU, NLON, NTAU, HAZES, max_pressure_bar)
-    
-    print ("Regridded the planet to constant altitude")
+    if RUN_REGRIDDING == True:
+        # Convert the fort files to the correct format    
+        if USE_FORT_FILES == True:
+            convert_fort_files.convert_to_correct_format(path, runname, planet_name, INITIAL_NTAU, surfp, oom, tgr, grav, gasconst)
+            print ("Converted the fort files to the new format")
+        else:
+            pass
+        
+        add_clouds.add_clouds_to_gcm_output(path, runname, planet_name,
+                                            grav, MTLX, CLOUDS, MOLEF,
+                                            aerosol_layers, INITIAL_NTAU,
+                                            gasconst, HAZE_TYPE, HAZES, wav_loc, MET_X_SOLAR)
 
-    # If you already have the Final planet file creates you can commend out run_grid and double planet file
-    run_grid.run_all_grid(planet_name, phases, inclinations, system_obliquity, NTAU, NLAT, NLON, grid_lat_min, grid_lat_max, grid_lon_min, grid_lon_max, ONLY_PHASE)
+        
+        # Regrid the file to constant altitude and the correct number of layers
+        altitude_regridding.regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, INITIAL_NTAU, NLON, NTAU, HAZES, max_pressure_bar)
 
-    # Get all the files that you want to run
-    input_paths, inclination_strs, phase_strs = get_run_lists(phases, inclinations)
-    
-    # If you want to manually set these values you can leave them here
-    # Normally they will not affect it, unless you manually set them in two_stream.h
-    W0_VALS = [0.0]
-    G0_VALS = [0.0]
-    
-    for G0_VAL in G0_VALS:
-        for W0_VAL in W0_VALS:
-            for doppler_val in dopplers:
-                run_exo(input_paths, inclination_strs, phase_strs, doppler_val)
-    
+        print ("Regridded the planet to constant altitude")
 
+        # If you already have the Final planet file creates you can commend out run_grid and double planet file
+        run_grid.run_all_grid(planet_name, phases, inclinations, system_obliquity, NTAU, NLAT, NLON, grid_lat_min, grid_lat_max, grid_lon_min, grid_lon_max, ONLY_PHASE)
+    else:        
+        # Get all the files that you want to run
+        input_paths, inclination_strs, phase_strs = get_run_lists(phases, inclinations)
+        
+        # If you want to manually set these values you can leave them here
+        # Normally they will not affect it, unless you manually set them in two_stream.h
+        W0_VALS = [0.0]
+        G0_VALS = [0.0]
 
-print("Moving the files out of the clean directory")
-for filename in os.listdir('DATA'):
-    if re.match(r'init_*', filename):
-        shutil.move(os.path.join('DATA', filename), os.path.join('../PLANET_MODELS', filename))
-
-for filename in os.listdir('OUT'):
-    if re.match(r'Spec_*', filename):
-        shutil.move(os.path.join('OUT', filename), os.path.join('../FINISHED_SPECTRA', filename))
+        
+        for G0_VAL in G0_VALS:
+            for W0_VAL in W0_VALS:
+                for doppler_val in dopplers:
+                    run_exo(input_paths, inclination_strs, phase_strs, doppler_val)

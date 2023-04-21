@@ -51,7 +51,7 @@ USE_FORT_FILES = True
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-tholin-25clouds-30met"]
+planet_names = ["GJ1214b-tholin-0clouds-1met"]
 
 opacity_files = 'SET_1'
 
@@ -316,10 +316,15 @@ for q in range(len(planet_names)):
                 file.write(filedata)
             
             # Run Eliza's code
-            os.system('make clean')
+            #os.system('make clean')
             os.system('make rt_emission_aerosols.exe')
-            os.system('./rt_emission_aerosols.exe')
 
+            # Rename rt_emission_aerosols.exe to include planet_name, phase, doppler, and inclination
+            file_name = f"rt_emission_aerosols_{planet_name}_phase_{phase_strs[i]}.exe"
+            os.rename("rt_emission_aerosols.exe", file_name)
+            
+            # Run the renamed executable
+            os.system(f"./{file_name}")
         return None
 
 
@@ -329,10 +334,10 @@ for q in range(len(planet_names)):
     phase_strs = []
     
 
-    # Convert the fort files to the correct format
-    STEP_ONE = True
-    
-    if STEP_ONE == True:
+    RUN_REGRIDDING = False
+
+    if RUN_REGRIDDING == True:
+        # Convert the fort files to the correct format    
         if USE_FORT_FILES == True:
             convert_fort_files.convert_to_correct_format(path, runname, planet_name, INITIAL_NTAU, surfp, oom, tgr, grav, gasconst)
             print ("Converted the fort files to the new format")
@@ -347,12 +352,12 @@ for q in range(len(planet_names)):
         
         # Regrid the file to constant altitude and the correct number of layers
         altitude_regridding.regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, INITIAL_NTAU, NLON, NTAU, HAZES, max_pressure_bar)
-        
+
         print ("Regridded the planet to constant altitude")
-    else:
+
         # If you already have the Final planet file creates you can commend out run_grid and double planet file
         run_grid.run_all_grid(planet_name, phases, inclinations, system_obliquity, NTAU, NLAT, NLON, grid_lat_min, grid_lat_max, grid_lon_min, grid_lon_max, ONLY_PHASE)
-        
+    else:        
         # Get all the files that you want to run
         input_paths, inclination_strs, phase_strs = get_run_lists(phases, inclinations)
         
@@ -360,6 +365,7 @@ for q in range(len(planet_names)):
         # Normally they will not affect it, unless you manually set them in two_stream.h
         W0_VALS = [0.0]
         G0_VALS = [0.0]
+
         
         for G0_VAL in G0_VALS:
             for W0_VAL in W0_VALS:
