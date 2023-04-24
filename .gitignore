@@ -32,3 +32,8 @@ Spectral-Processing/Spectra/OUT/*
 !Spectral-Processing/Spectra/DATA/.gitkeep
 !Spectral-Processing/Spectra/SCATTERING_DATA/.gitkeep
 !Spectral-Processing/Spectra/OUT/.gitkeep
+
+# Ignore the files generated to run many files at once
+Spectral-Processing/Spectra/rt_emission_aerosols_*
+Spectral-Processing/Spectra/Run_sbatch_*
+Spectral-Processing/Spectra/run_spectra_*

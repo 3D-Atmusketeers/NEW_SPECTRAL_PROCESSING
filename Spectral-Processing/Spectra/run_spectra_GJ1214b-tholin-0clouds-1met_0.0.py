@@ -322,6 +322,10 @@ for q in range(len(planet_names)):
             # Rename rt_emission_aerosols.exe to include planet_name, phase, doppler, and inclination
             file_name = f"rt_emission_aerosols_{planet_name}_phase_{phase_strs[i]}.exe"
             os.rename("rt_emission_aerosols.exe", file_name)
+
+
+            print(f"./{file_name}")
+            exit(0)
             
             # Run the renamed executable
             os.system(f"./{file_name}")
