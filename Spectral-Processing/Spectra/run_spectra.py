@@ -334,9 +334,11 @@ for q in range(len(planet_names)):
     phase_strs = []
     
 
-    RUN_REGRIDDING = False
+    STEP_ONE = False
+    STEP_TWO = False
+    STEP_THREE = False
 
-    if RUN_REGRIDDING == True:
+    if STEP_ONE:
         # Convert the fort files to the correct format    
         if USE_FORT_FILES == True:
             convert_fort_files.convert_to_correct_format(path, runname, planet_name, INITIAL_NTAU, surfp, oom, tgr, grav, gasconst)
@@ -354,10 +356,10 @@ for q in range(len(planet_names)):
         altitude_regridding.regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, INITIAL_NTAU, NLON, NTAU, HAZES, max_pressure_bar)
 
         print ("Regridded the planet to constant altitude")
-
+    elif STEP_TWO:     
         # If you already have the Final planet file creates you can commend out run_grid and double planet file
         run_grid.run_all_grid(planet_name, phases, inclinations, system_obliquity, NTAU, NLAT, NLON, grid_lat_min, grid_lat_max, grid_lon_min, grid_lon_max, ONLY_PHASE)
-    else:        
+    elif STEP_THREE:
         # Get all the files that you want to run
         input_paths, inclination_strs, phase_strs = get_run_lists(phases, inclinations)
         
@@ -371,3 +373,5 @@ for q in range(len(planet_names)):
             for W0_VAL in W0_VALS:
                 for doppler_val in dopplers:
                     run_exo(input_paths, inclination_strs, phase_strs, doppler_val)
+    else:
+        print('The process is being set incorrectly!')

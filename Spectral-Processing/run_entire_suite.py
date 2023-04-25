@@ -32,8 +32,12 @@ print ("")
 gcm_folder = 'GCM-OUTPUT'
 finished_gcms = [name for name in os.listdir(gcm_folder) if os.path.isdir(os.path.join(gcm_folder, name))]
 
+phases = [0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0, 195.0, 210.0, 225.0, 240.0, 255.0, 270.0, 285.0, 300.0, 315.0, 330.0, 345.0]
 phases = [0.0]
-RUN_REGRIDDING = False
+
+STEP_ONE = True
+STEP_TWO = False
+STEP_THREE = False
 
 source_file_name = "Run_sbatch"
 for i in range(len(finished_gcms)):
@@ -53,19 +57,24 @@ for i in range(len(finished_gcms)):
                 line = 'phases = [' + str(phase) + ']\n'
             sys.stdout.write(line)
         
-        if RUN_REGRIDDING == True:
+        if STEP_ONE == True:
             # Replace the phase in the run_spectra file with the correct one
             for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + ".py"], inplace=True):
-                if line.strip().startswith('RUN_REGRIDDING'):
-                    line = '    RUN_REGRIDDING = True\n'
+                if line.strip().startswith('STEP_ONE'):
+                    line = '    STEP_ONE = True\n'
                 sys.stdout.write(line)
-        else:
-                # Replace the phase in the run_spectra file with the correct one
+        if STEP_TWO == True:
+            # Replace the phase in the run_spectra file with the correct one
             for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + ".py"], inplace=True):
-                if line.strip().startswith('RUN_REGRIDDING'):
-                    line = '    RUN_REGRIDDING = False\n'
-                sys.stdout.write(line)               
-            
+                if line.strip().startswith('STEP_TWO'):
+                    line = '    STEP_TWO = True\n'
+                sys.stdout.write(line)
+        if STEP_THREE == True:
+            # Replace the phase in the run_spectra file with the correct one
+            for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + ".py"], inplace=True):
+                if line.strip().startswith('STEP_THREE'):
+                    line = '    STEP_THREE = True\n'
+                sys.stdout.write(line)
 
         # Run the spectra for that folder
         with change_directory("../Spectral-Processing/Spectra/"):
@@ -82,16 +91,15 @@ for i in range(len(finished_gcms)):
 
             shutil.move(temp_file_name, new_file_name)
             sbatch_command = f"sbatch {new_file_name}"
+            os.system(sbatch_command)
 
-            print(sbatch_command)
-            #os.system(sbatch_command)
+            #python_command = f"python run_spectra_{finished_gcms[i]}_{str(phase)}.py"
+            #os.system(python_command)
+        
+        if STEP_THREE == True:
+            # Wait until the file is created before proceeding to the next iteration
+            executable = f"Spectra/rt_emission_aerosols_{finished_gcms[i]}_phase_{str(phase)}.exe"
 
-            python_command = f"python run_spectra_{finished_gcms[i]}_{str(phase)}.py"
-            os.system(python_command)
-
-        # Wait until the file is created before proceeding to the next iteration
-        executable = f"Spectra/rt_emission_aerosols_{finished_gcms[i]}_phase_{str(phase)}.exe"
-
-        while not os.path.exists(executable):
-            print("You've gotta wait for the jobs to be executed in series unfortunately")
-            time.sleep(1)
+            while not os.path.exists(executable):
+                print("You've gotta wait for the jobs to be executed in series unfortunately")
+                time.sleep(1)

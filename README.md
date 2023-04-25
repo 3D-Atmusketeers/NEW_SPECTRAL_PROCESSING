@@ -13,10 +13,10 @@ Recently, Isaac has added a lot of stuff to the files. Hopefully this makes it w
 
 Spectral-Processing/run_entire_suite.py
     This will run the entire suite
-    Make sure to set the GCM folders and the phases that you want run
-    ALSO THIS HAS TO BE DONE IN TWO STEPS.
-    FIRST, RUN STEP 1. THEN WHEN THAT IS ALL DONE, RUN STEP 2.
 
+    STEP_ONE: Regrid to constant altitude. This should be done with only 1 phase!!!!
+    STEP_TWO: Create all the init files. NEEDS ALL THE PHASES
+    STEP_THREE: Run the regridding, need to wait in between all the executables!
 
 Visualizations/create_all_figures.py
     This will create all the figures that I've so far coded up. Several more need to be added

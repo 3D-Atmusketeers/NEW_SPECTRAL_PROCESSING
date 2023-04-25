@@ -805,10 +805,19 @@ def plot_fp_fs_spectra(planet_names, planet_radii, num_phases, transmission_filt
                 INC_STRING = '0.7850'
             else:
                 INC_STRING = '0.00'
-
+                
             file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
 
+            # Load in the planet spectra
+            planet_spectra = pd.read_csv(file_path.format(str(i * rot_val)), header=None,
+                                         delim_whitespace=True, names=['wavelength', 'flux', 'reflected'])
+            planet_spectra.flux = planet_spectra.flux * (3.0e8 / planet_spectra.wavelength ** 2) / 1e6
+
+            # Reset the index
+            planet_spectra = planet_spectra.reset_index(drop=True)
+
             # Call the function to get the filtered star and planet spectra
+
             planet_spectra, star_spectra = filter_spectra(planet_spectra, star_spectra, filt, transmission_filter_name, wav_subset, phase_degrees)
 
             # Get the planet to star flux ratio
