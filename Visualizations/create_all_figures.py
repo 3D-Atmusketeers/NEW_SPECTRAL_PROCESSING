@@ -18,6 +18,7 @@ import grab_input_data
 import aerosol_maps
 import aerosol_profiles
 import wind_maps
+#import wind_isobars
 #import emission_maps
 
 # Make it pretty!
@@ -183,6 +184,8 @@ print ()
 #aerosol_maps.plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, cloud_wavelength)
 #aerosol_profiles.plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
 #wind_maps.plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
+#wind_isobars.plot_wind_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes=False, extra_pressure_level_bar=0.01)
+
 
 # Plotting the emission maps
 #emission_maps.plot_emission_maps(planet_names, nlat, nlon, nlev)
