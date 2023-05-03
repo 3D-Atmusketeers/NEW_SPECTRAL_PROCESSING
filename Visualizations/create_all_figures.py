@@ -27,50 +27,7 @@ plt.style.use('science.mplstyle')
 
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
-planet_names = ["HD189-DOGRAY",
- "HD189-DOGRAY-NUC-CLOUDS-COMPACT",
- "HD189-PICKET-NUC-CLOUDS",
- "HD209-DOGRAY-ALL-CLOUDS-COMPACT",
- "HD209-PICKET-ALL-CLOUDS",
- "HD189-DOGRAY-ALL-CLOUDS",
- "HD189-PICKET",
- "HD189-PICKET-NUC-CLOUDS-COMPACT",
- "HD209-DOGRAY-NUC-CLOUDS",
- "HD209-PICKET-ALL-CLOUDS-COMPACT",
- "HD189-DOGRAY-ALL-CLOUDS-COMPACT",
- "HD189-PICKET-ALL-CLOUDS",
- "HD209-DOGRAY",
- "HD209-DOGRAY-NUC-CLOUDS-COMPACT",
- "HD209-PICKET-NUC-CLOUDS",
- "HD189-DOGRAY-NUC-CLOUDS",
- "HD189-PICKET-ALL-CLOUDS-COMPACT",
- "HD209-DOGRAY-ALL-CLOUDS",
- "HD209-PICKET",
- "HD209-PICKET-NUC-CLOUDS-COMPACT"]
-
-
-"""
-["HD189-DOGRAY",
- "HD189-DOGRAY-NUC-CLOUDS-COMPACT",
- "HD189-PICKET-NUC-CLOUDS",
- "HD209-DOGRAY-ALL-CLOUDS-COMPACT",
- "HD209-PICKET-ALL-CLOUDS",
- "HD189-DOGRAY-ALL-CLOUDS",
- "HD189-PICKET",
- "HD189-PICKET-NUC-CLOUDS-COMPACT",
- "HD209-DOGRAY-NUC-CLOUDS",
- "HD209-PICKET-ALL-CLOUDS-COMPACT",
- "HD189-DOGRAY-ALL-CLOUDS-COMPACT",
- "HD189-PICKET-ALL-CLOUDS",
- "HD209-DOGRAY",
- "HD209-DOGRAY-NUC-CLOUDS-COMPACT",
- "HD209-PICKET-NUC-CLOUDS",
- "HD189-DOGRAY-NUC-CLOUDS",
- "HD189-PICKET-ALL-CLOUDS-COMPACT",
- "HD209-DOGRAY-ALL-CLOUDS",
- "HD209-PICKET",
- "HD209-PICKET-NUC-CLOUDS-COMPACT"]
-"""
+planet_names = ["GJ1214b-soot-0clouds-1met"]
 
 # There are the different sets of opacity and EOS files
 # There are somethings that need to be changed in the template inputs file to make this happen
@@ -169,7 +126,7 @@ print ("Plotting the isobaric projections...")
 print ()
 print ()
 #aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes=False, extra_pressure_level_bar=0)
-#aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes = False, extra_pressure_level_bar = 0.001)
+aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes = True, extra_pressure_level_bar = 80)
 
 
 
@@ -215,7 +172,7 @@ print ()
 #                                                 num_phases=2)
 #spectra.plot_star_spectra_test(planet_names)
 #spectra.plot_filters(planet_names)
-spectra.plot_spectra_simple(planet_names, num_phases=2)
+#spectra.plot_spectra_simple(planet_names, num_phases=2)
 
 # If resolution is set to 0, don't convolve at all
 

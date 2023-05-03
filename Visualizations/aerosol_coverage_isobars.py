@@ -90,6 +90,7 @@ def plot_aerosol_coverage_isobars(
         data = df.to_numpy()
         data = data.reshape((nlat, nlon, nlevel, nparams))
 
+
         # need to get indices for given pressure level
         pressure_ind = np.zeros((nlat, nlon))
 
@@ -139,9 +140,10 @@ def plot_aerosol_coverage_isobars(
                                   data[i][j][k][45]
 
 
-                    # The hazes are optical depth per bar
+                    # The hazes are optical depth, and have been multiplied by the pressure level thickness
                     if plot_hazes:
-                        taus[i][j] += data[i][j][k][48] * (data[i][j][k+1][4] - data[i][j][k][4])
+                        taus[i][j] += data[i][j][k][48]
+
                     k += 1
 
         # stream plot
