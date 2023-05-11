@@ -4,7 +4,8 @@ import numpy as np
 
 def get_input_data(path, runname, input_file, input_param):
     # define the input_param and the regex pattern
-    pattern = r"\b" + input_param + r"\s+(.*)"
+    pattern = r"\b" + input_param + r"\s*=\s*(.*?)\s*(?:$|\||&)"
+
 
     # compile the regex pattern
     regex = re.compile(pattern)

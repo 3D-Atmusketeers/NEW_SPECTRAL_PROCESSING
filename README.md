@@ -14,12 +14,32 @@ Recently, Isaac has added a lot of stuff to the files. Hopefully this makes it w
 Spectral-Processing/run_entire_suite.py
     This will run the entire suite
 
+    The best way to do this is to use the Run_all_sbatch command. You will have to do this in 3 steps unfortunatly.
+    The benefit is that it is very fast to get everything in parallel.
+
+
     STEP_ONE: Regrid to constant altitude. This should be done with only 1 phase!!!!
     STEP_TWO: Create all the init files. NEEDS ALL THE PHASES
     STEP_THREE: Run the regridding, need to wait in between all the executables!
 
+
+    The main part of the program that this is calling is Spectra/run_spectra.py
+    This will run all the subprograms for regridding, interpolating, and finally running the post-processing
+
+    Some things to keep in mind
+        NLAT: The final number of layers the model will have, try 250 or 500
+        opacity_files: Which set of opacity files you're using
+
+    The code is pretty good at grabbing all the needed data from the file name and the fort.7, however, its not perfect
+    Make sure that you check that the code is using what you want it to in the terminal output!
+    Especially the star data! This is the hardest to get, because its basically only going off the file name.
+
+    Also, if you care about getting the cloud dependent wavelength properties, you do have to set that in run_spectra.py
+    This is only for specific visualization stuff, not the general postprocessing
+
+
 Visualizations/create_all_figures.py
-    This will create all the figures that I've so far coded up. Several more need to be added
+    This will create all the figures that I've so far coded up
 
 After all of this the empty folders will probably need to be deleted.
 
@@ -97,7 +117,6 @@ This will run everything at once. It is very powerful, but will copy over huge a
 
 Files that are needed:
 fort.26, fort.50, fort.7, fort.62
-
 
 IMPORTANT NOTE:
 set_up_spectra_folders WILL copy over folders and stuff, but you will have to reorganize once everything is run

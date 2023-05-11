@@ -16,7 +16,7 @@ import setup_opac_versions
 
 # Phases in degrees, inclination in radians (sorry)
 # An inclination of 0 corresponds to edge on
-phases = [180.0]
+phases = [0.0]
 inclinations = [0.0]
 system_obliquity = 0
 
@@ -51,7 +51,7 @@ USE_FORT_FILES = True
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-tholin-0clouds-1met"]
+planet_names = ["GJ1214b-soot_2xpi0-0clouds-100met"]
 
 opacity_files = 'SET_1'
 
@@ -101,7 +101,7 @@ for q in range(len(planet_names)):
     MET_X_SOLAR    = 10.0 ** grab_input_data.get_input_data(path, runname, "fort.7","METALLICITY")
     HAZES          = grab_input_data.get_input_data(path, runname, "fort.7","HAZES")
     MOLEF          = grab_input_data.get_input_data(path, runname, "fort.7", "MOLEF")
-
+    
     # This is the path to the chemistry file
     # This assumes that 10x solar uses the 1x met chem tables, maybe a bad thing
     if (opacity_files == "SET_1"):
@@ -142,6 +142,9 @@ for q in range(len(planet_names)):
         HAZE_TYPE = 'tholin'
     else:
         HAZE_TYPE = 'None'
+    
+    if ("2xpi0".lower() in planet_names[q].lower()):
+        HAZE_TYPE = 'soot-2xpi0'
 
     if (HAZE_TYPE == 'soot' or HAZE_TYPE == 'soot-2xpi0' or HAZE_TYPE == 'tholin' or HAZE_TYPE == 'sulfur'):
         HAZES = True
@@ -193,7 +196,7 @@ for q in range(len(planet_names)):
     print("Orbital Period = ", P_ROT)
     print("MTLX = ", MTLX)
     print("There are hazes? ", HAZES)
-    print(aerosol_layers, "aerosol layers")
+    print(aerosol_layers, "cloud layers")
     print("Haze type:", HAZE_TYPE)
     print("GCM Layers = ", INITIAL_NTAU)
     print("Mean Molecular Weight", MEAN_MOLECULAR_WEIGHT)
@@ -335,8 +338,8 @@ for q in range(len(planet_names)):
     
 
     STEP_ONE = False
-    STEP_TWO = False
-    STEP_THREE = False
+    STEP_TWO = True
+    STEP_THREE = True
 
     if STEP_ONE:
         # Convert the fort files to the correct format    
@@ -356,10 +359,10 @@ for q in range(len(planet_names)):
         altitude_regridding.regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, INITIAL_NTAU, NLON, NTAU, HAZES, max_pressure_bar)
 
         print ("Regridded the planet to constant altitude")
-    elif STEP_TWO:     
+    if STEP_TWO:     
         # If you already have the Final planet file creates you can commend out run_grid and double planet file
         run_grid.run_all_grid(planet_name, phases, inclinations, system_obliquity, NTAU, NLAT, NLON, grid_lat_min, grid_lat_max, grid_lon_min, grid_lon_max, ONLY_PHASE)
-    elif STEP_THREE:
+    if STEP_THREE:
         # Get all the files that you want to run
         input_paths, inclination_strs, phase_strs = get_run_lists(phases, inclinations)
         

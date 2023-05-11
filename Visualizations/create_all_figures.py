@@ -19,7 +19,7 @@ import aerosol_maps
 import aerosol_profiles
 import wind_maps
 #import wind_isobars
-#import emission_maps
+import emission_maps
 
 # Make it pretty!
 plt.style.use('science.mplstyle')
@@ -27,7 +27,8 @@ plt.style.use('science.mplstyle')
 
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
-planet_names = ["GJ1214b-soot-0clouds-1met"]
+
+planet_names = ['HD209-DOGRAY','HD209-PICKET']
 
 # There are the different sets of opacity and EOS files
 # There are somethings that need to be changed in the template inputs file to make this happen
@@ -53,7 +54,6 @@ else:
     exit(0)
 
 
-
 #from tqdm import tqdm
 #import time
 #print("WARNING! Downloading Viruses Now...")
@@ -76,7 +76,8 @@ for planet_name in planet_names:
                                                             planet_name, "fort.7","RADEA")))
         print(planet_radii[0])
     else:
-        planet_radii.append(17469282.0)
+        #planet_radii.append(17469282.0)
+        planet_radii.append(0.9853199e+08) # HD 209
         print("WARNING! fort.7 file not found for " + planet_name)
         #exit(0)
 
@@ -126,7 +127,7 @@ print ("Plotting the isobaric projections...")
 print ()
 print ()
 #aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes=False, extra_pressure_level_bar=0)
-aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes = True, extra_pressure_level_bar = 80)
+#aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes = True, extra_pressure_level_bar = 80)
 
 
 
@@ -145,10 +146,10 @@ print ()
 
 
 # Plotting the emission maps
-#emission_maps.plot_emission_maps(planet_names, nlat, nlon, nlev)
+emission_maps.plot_emission_maps(planet_names, nlat, nlon, nlev)
 
 
-
+"""
 # Plot the spectra
 print ("Plotting the spectra...")
 print ()
@@ -161,27 +162,27 @@ print ()
 #                            transmission_filter_name='MIRI',
 #                            wav_subset=[5e-6, 30e-6],
 #                            resolution=100,
-#                            temp=300)
+#                            temp=1000)
 
 
 #spectra.plot_planet_spectra_blackbody_comparison_hz(planet_names,
 #                                                 black_body_temperatures=[437, 553],
 #                                                 num_phases=2)
-#spectra.plot_planet_spectra_blackbody_comparison_microns(planet_names,
-#                                                 black_body_temperatures=[437, 553],
-#                                                 num_phases=2)
-#spectra.plot_star_spectra_test(planet_names)
+spectra.plot_planet_spectra_blackbody_comparison_microns(planet_names,
+                                                 black_body_temperatures=[1000, 2000],
+                                                 num_phases=2)
+spectra.plot_star_spectra_test(planet_names)
 #spectra.plot_filters(planet_names)
-#spectra.plot_spectra_simple(planet_names, num_phases=2)
+spectra.plot_spectra_simple(planet_names, num_phases=2)
 
 # If resolution is set to 0, don't convolve at all
 
-#spectra.plot_fp_spectra(planet_names,
-#                            planet_radii,
-#                            num_phases=4,
-#                            transmission_filter_name='None',
-#                            wav_subset=[5e-6, 12e-6],
-#                            resolution=100)
+spectra.plot_fp_spectra(planet_names,
+                            planet_radii,
+                            num_phases=8,
+                            transmission_filter_name='None',
+                            wav_subset=[5e-6, 12e-6],
+                            resolution=100)
 
 #spectra.plot_fp_fs_spectra(planet_names,
 #                            planet_radii,
@@ -191,11 +192,11 @@ print ()
 #                            resolution=100)
 
 # If resolution is set to 0, don't convolve at all
-#spectra.plot_fp_phase_curves(planet_names,
-#                          planet_name_char_len,
-#                          num_phases=24,
-#                          transmission_filter_name='MIRI',
-#                          wav_subset=[5e-6, 30e-6])
+spectra.plot_fp_phase_curves(planet_names,
+                          planet_name_char_len,
+                          num_phases=24,
+                          transmission_filter_name='MIRI',
+                          wav_subset=[5e-6, 30e-6])
 
 #spectra.plot_fp_fs_phase_curves(planet_names,
 #                          planet_name_char_len,
@@ -203,3 +204,4 @@ print ()
 #                          num_phases=24,
 #                          transmission_filter_name='MIRI',
 #                          wav_subset=[5e-6, 30e-6])
+"""

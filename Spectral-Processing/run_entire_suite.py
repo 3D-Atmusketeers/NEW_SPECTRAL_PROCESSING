@@ -39,6 +39,12 @@ STEP_ONE = True
 STEP_TWO = False
 STEP_THREE = False
 
+# For the first step you're only generating the non-rotated stuff
+# So you don't need to have all the jobs send off for the different phases
+# If you do, they'll save over each other
+if (STEP_ONE == TRUE):
+    phases = [0.0]
+
 source_file_name = "Run_sbatch"
 for i in range(len(finished_gcms)):
     for j, phase in enumerate(phases):

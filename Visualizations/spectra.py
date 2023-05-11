@@ -435,9 +435,10 @@ def plot_planet_spectra_blackbody_comparison_microns(planet_names, black_body_te
             j = j + 1
 
         # Do some figure stuff
-        #ax.set_ylim(1e-12, 1e-8)
-        ax.set_ylim(0, 2000)
-        ax.set_xlim(5, 20)
+        ax.set_ylim(1e3, 1e5)
+        #ax.set_ylim(0, 2000)
+        ax.set_xlim(5, 12)
+        ax.set_yscale('log')
         ax.legend(fontsize=12, loc=(0, 1.05), ncol=2, mode='expand', title_fontsize=16)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
         ax.set_ylabel(r'Flux (W/m$^2$micron)')  # (W m$^{-2}$)
