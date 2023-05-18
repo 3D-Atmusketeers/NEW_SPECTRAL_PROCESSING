@@ -1176,7 +1176,7 @@ int RT_Emit_3D(double PHASE)
     }
     printf("solid %f\n", solid);
     for(i=0; i<NLAMBDA; i++)
-    //for(i=5000; i<5001; i++)
+    //for(i=6600; i<6800; i++)
     {
         // Get the points on the wavelength grids
         wavelength_microns = atmos.lambda[i] * 1e6;
@@ -1533,7 +1533,7 @@ int RT_Emit_3D(double PHASE)
                     reflected_intensity[l][m] = intensity_vals[1];
 
 
-                    //if (l == 14 && m == 34)
+                    //if (l == 38 && m == 45)
                     //{
                     //    for (j = kmin; j<NTAU; j++)
                     //    {
@@ -1543,7 +1543,8 @@ int RT_Emit_3D(double PHASE)
                     //    }
                     //}
 
-
+                    //printf("%d %d %d %.3e %.3e %.3e %.3e\n", j, l, m, temperature_3d[l][m][kmin], tau_em[l][m][kmin], \
+                    //           dtau_em[l][m][kmin], intensity[l][m]);
 
                     if (reflected_intensity[l][m] < 1e-50)
                     {

@@ -22,7 +22,7 @@ system_obliquity = 0
 
 # I recommend leaving these as is
 # The NLAT and NLON can be changed, but these values work well
-NTAU = 500
+NTAU = 250
 
 # Cut of the bottom of the atmosphere if needed
 # DONT MESS WITH THIS, ISAAC HASN'T FULLY CODED IT!!!!!
@@ -51,7 +51,7 @@ USE_FORT_FILES = True
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-soot_2xpi0-0clouds-100met"]
+planet_names = ["HD209_Test"]
 
 opacity_files = 'SET_1'
 
@@ -95,6 +95,7 @@ for q in range(len(planet_names)):
     P_ROT          = (grab_input_data.get_input_data(path, runname, "fort.7","WW") / (2.0*np.pi)*(24*3600)) ** -1.0
     oom            = grab_input_data.get_input_data(path, runname, "fort.7","OOM_IN")
     MTLX           = grab_input_data.get_input_data(path, runname, "fort.7","MTLX")
+
 
 
     # Necessary for choosing the chem table!
@@ -337,9 +338,9 @@ for q in range(len(planet_names)):
     phase_strs = []
     
 
-    STEP_ONE = False
-    STEP_TWO = True
-    STEP_THREE = True
+    STEP_ONE = True
+    STEP_TWO = False
+    STEP_THREE = False
 
     if STEP_ONE:
         # Convert the fort files to the correct format    
@@ -376,5 +377,3 @@ for q in range(len(planet_names)):
             for W0_VAL in W0_VALS:
                 for doppler_val in dopplers:
                     run_exo(input_paths, inclination_strs, phase_strs, doppler_val)
-    else:
-        print('The process is being set incorrectly!')
