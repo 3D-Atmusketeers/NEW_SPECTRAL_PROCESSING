@@ -51,7 +51,7 @@ USE_FORT_FILES = True
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["HD209_Test"]
+planet_names = ["WASP-43b-core6"]
 
 opacity_files = 'SET_1'
 
@@ -99,8 +99,11 @@ for q in range(len(planet_names)):
 
 
     # Necessary for choosing the chem table!
-    MET_X_SOLAR    = 10.0 ** grab_input_data.get_input_data(path, runname, "fort.7","METALLICITY")
-    HAZES          = grab_input_data.get_input_data(path, runname, "fort.7","HAZES")
+    #MET_X_SOLAR    = 10.0 ** grab_input_data.get_input_data(path, runname, "fort.7","METALLICITY")
+    #HAZES          = grab_input_data.get_input_data(path, runname, "fort.7","HAZES")
+
+    MET_X_SOLAR = 1
+    HAZES       = False
     MOLEF          = grab_input_data.get_input_data(path, runname, "fort.7", "MOLEF")
     
     # This is the path to the chemistry file
@@ -185,6 +188,11 @@ for q in range(len(planet_names)):
     ORB_SEP      = float(grab_input_data.read_planet_and_star_params(planet_name, "a (au)")) * 1.496e11
     STELLAR_TEMP = float(grab_input_data.read_planet_and_star_params(planet_name, "T* (K)"))
     R_STAR       = float(grab_input_data.read_planet_and_star_params(planet_name, "R* (R_sun)")) * 695700000
+
+    star_name    = 'WASP 43b'
+    ORB_SEP      = 0.01526 * 1.496e11
+    STELLAR_TEMP = 4286
+    R_STAR       = 0.6747 * 695700000
 
     print("Planet characteristics")
     print("These are the cloud types in order, and the corresponding amounts")
@@ -339,8 +347,8 @@ for q in range(len(planet_names)):
     
 
     STEP_ONE = True
-    STEP_TWO = False
-    STEP_THREE = False
+    STEP_TWO = True
+    STEP_THREE = True
 
     if STEP_ONE:
         # Convert the fort files to the correct format    

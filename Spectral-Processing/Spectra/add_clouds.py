@@ -501,12 +501,8 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
                 df['pi013'][i] = 0
             if ((INITIAL_NTAU-z)%INITIAL_NTAU == 0):
                 max_cloud_level13 = 0
-
-            
-
     else:
         pass
-    exit(0)
 
     if HAZES == True:
         df['tau_haze'] = 1.0
