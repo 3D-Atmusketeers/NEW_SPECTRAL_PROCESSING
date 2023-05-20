@@ -38,6 +38,17 @@ STEP_ONE = False
 STEP_TWO = True
 STEP_THREE = False
 
+# Count the number of true statements
+true_count = sum([STEP_ONE, STEP_TWO, STEP_THREE])
+
+# Check if more than one statement is true
+if true_count > 1:
+    # Code to be executed if more than one statement is true
+    print("You can't have more than one step be true")
+    exit(0)
+else:
+    pass
+
 # For the first step you're only generating the non-rotated stuff
 # So you don't need to have all the jobs send off for the different phases
 # If you do, they'll save over each other
