@@ -102,8 +102,8 @@ for q in range(len(planet_names)):
     #MET_X_SOLAR    = 10.0 ** grab_input_data.get_input_data(path, runname, "fort.7","METALLICITY")
     #HAZES          = grab_input_data.get_input_data(path, runname, "fort.7","HAZES")
 
-    MET_X_SOLAR = 1
-    HAZES       = False
+    #MET_X_SOLAR = 1
+    #HAZES       = False
     MOLEF          = grab_input_data.get_input_data(path, runname, "fort.7", "MOLEF")
     
     # This is the path to the chemistry file
@@ -189,10 +189,10 @@ for q in range(len(planet_names)):
     STELLAR_TEMP = float(grab_input_data.read_planet_and_star_params(planet_name, "T* (K)"))
     R_STAR       = float(grab_input_data.read_planet_and_star_params(planet_name, "R* (R_sun)")) * 695700000
 
-    star_name    = 'WASP 43b'
-    ORB_SEP      = 0.01526 * 1.496e11
-    STELLAR_TEMP = 4286
-    R_STAR       = 0.6747 * 695700000
+    #star_name    = 'WASP 43b'
+    #ORB_SEP      = 0.01526 * 1.496e11
+    #STELLAR_TEMP = 4286
+    #R_STAR       = 0.6747 * 695700000
 
     print("Planet characteristics")
     print("These are the cloud types in order, and the corresponding amounts")
@@ -347,8 +347,8 @@ for q in range(len(planet_names)):
     
 
     STEP_ONE = True
-    STEP_TWO = True
-    STEP_THREE = True
+    STEP_TWO = False
+    STEP_THREE = False
 
     if STEP_ONE:
         # Convert the fort files to the correct format    
