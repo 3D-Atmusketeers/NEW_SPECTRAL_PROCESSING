@@ -99,8 +99,8 @@ for q in range(len(planet_names)):
 
 
     # Necessary for choosing the chem table!
-    #MET_X_SOLAR    = 10.0 ** grab_input_data.get_input_data(path, runname, "fort.7","METALLICITY")
-    #HAZES          = grab_input_data.get_input_data(path, runname, "fort.7","HAZES")
+    MET_X_SOLAR    = 10.0 ** grab_input_data.get_input_data(path, runname, "fort.7","METALLICITY")
+    HAZES          = grab_input_data.get_input_data(path, runname, "fort.7","HAZES")
 
     #MET_X_SOLAR = 1
     #HAZES       = False
