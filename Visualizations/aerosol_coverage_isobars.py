@@ -206,7 +206,7 @@ def plot_aerosol_coverage_isobars(
 
         plt.savefig('../Figures/Temperature_Isobars_{}_bar_{}.png'.format(
             P_phots[0], planet_name), bbox_inches='tight', dpi=250)
-
+        
         if any(i > 1e-20 for i in molef) or hazes:
             plt.clf()
             fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(12, 9))
