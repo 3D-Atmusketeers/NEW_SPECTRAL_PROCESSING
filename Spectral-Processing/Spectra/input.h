@@ -10,8 +10,8 @@ Defines input values and files for 3-D emission spectra
 /* I/O SETTINGS. */
 
 /* File names */
-#define OUTPUT_PREFIX "OUT/Spec_0_WASP-43b-core6_phase_0.0_inc_0.00.00.0"      /* output name */
-#define T_P_3D_FILE "DATA/init_WASP-43b-core6_phase_0.0_inc_0.0.txt"         /* input file */
+#define OUTPUT_PREFIX "OUT/Spec_0_WASP-43b-ALL-core2_phase_240.0_inc_0.00.00.0"      /* output name */
+#define T_P_3D_FILE "DATA/init_WASP-43b-ALL-core2_phase_240.0_inc_0.0.txt"         /* input file */
 
 /* Output settings */
 #define N_PHASE 1                          /* Number of phases [96 max; lon grid in increments of 3.75] */
@@ -34,13 +34,13 @@ Defines input values and files for 3-D emission spectra
 
 /* Planet parameters */
 #define INPUT_INCLINATION 0.0  /* Planet inclination in radians            */
-#define INPUT_PHASE 0.0              /* Planet inclination in degrees           */
+#define INPUT_PHASE 240.0              /* Planet inclination in degrees           */
 #define G 47.02                   /* Planet surface gravity                 */
 
 #define R_PLANET 74070000.0              /* Planet radius at base of atmosphere      */
-#define ORB_SEP 2282896000.0                // This is some distance
-#define STELLAR_TEMP 4286      // Stellar Blackbody temperature
-#define R_STAR 469388790.0                  /* Stellar radius                         */
+#define ORB_SEP 3193394248.2979274                // This is some distance
+#define STELLAR_TEMP 6432.0      // Stellar Blackbody temperature
+#define R_STAR 917628300.0                  /* Stellar radius                         */
 #define P_ROT  0.8134457736737181                   /* Rotation period in days (= P_ORB for tidally locked planet)    */
 #define HAZE_TYPE "None"
 #define HAZES 0

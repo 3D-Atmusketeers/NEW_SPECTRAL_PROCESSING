@@ -16,7 +16,7 @@ import setup_opac_versions
 
 # Phases in degrees, inclination in radians (sorry)
 # An inclination of 0 corresponds to edge on
-phases = [0.0]
+phases = [240.0]
 inclinations = [0.0]
 system_obliquity = 0
 
@@ -51,7 +51,7 @@ USE_FORT_FILES = True
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["WASP-43b-core6"]
+planet_names = ["WASP-43b-ALL-core2"]
 
 opacity_files = 'SET_1'
 
@@ -96,14 +96,9 @@ for q in range(len(planet_names)):
     oom            = grab_input_data.get_input_data(path, runname, "fort.7","OOM_IN")
     MTLX           = grab_input_data.get_input_data(path, runname, "fort.7","MTLX")
 
-
-
     # Necessary for choosing the chem table!
     MET_X_SOLAR    = 10.0 ** grab_input_data.get_input_data(path, runname, "fort.7","METALLICITY")
     HAZES          = grab_input_data.get_input_data(path, runname, "fort.7","HAZES")
-
-    #MET_X_SOLAR = 1
-    #HAZES       = False
     MOLEF          = grab_input_data.get_input_data(path, runname, "fort.7", "MOLEF")
     
     # This is the path to the chemistry file
@@ -346,9 +341,9 @@ for q in range(len(planet_names)):
     phase_strs = []
     
 
-    STEP_ONE = True
+    STEP_ONE = False
     STEP_TWO = False
-    STEP_THREE = False
+    STEP_THREE = True
 
     if STEP_ONE:
         # Convert the fort files to the correct format    
@@ -380,7 +375,6 @@ for q in range(len(planet_names)):
         W0_VALS = [0.0]
         G0_VALS = [0.0]
 
-        
         for G0_VAL in G0_VALS:
             for W0_VAL in W0_VALS:
                 for doppler_val in dopplers:

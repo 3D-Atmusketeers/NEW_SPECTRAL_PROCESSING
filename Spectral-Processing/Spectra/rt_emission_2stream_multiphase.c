@@ -1176,7 +1176,6 @@ int RT_Emit_3D(double PHASE)
     }
     printf("solid %f\n", solid);
     for(i=0; i<NLAMBDA; i++)
-    //for(i=6600; i<6800; i++)
     {
         // Get the points on the wavelength grids
         wavelength_microns = atmos.lambda[i] * 1e6;
@@ -1505,7 +1504,7 @@ int RT_Emit_3D(double PHASE)
 
                     for (j = 0; j<NTAU; j++)
                     {
-                        if (dtau_em[l][m][j] < 1e-50 || tau_em[l][m][j] < 1e-50 || temperature_3d[l][m][j] < 200 || kappa_nu_array[l][m][j] < 1e-50)
+                        if (dtau_em[l][m][j] < 1e-6 || tau_em[l][m][j] < 1e-5 || temperature_3d[l][m][j] < 200 || kappa_nu_array[l][m][j] < 1e-10)
                         {
                           kmin = j+1;
                         }
@@ -1533,18 +1532,16 @@ int RT_Emit_3D(double PHASE)
                     reflected_intensity[l][m] = intensity_vals[1];
 
 
-                    //if (l == 38 && m == 45)
-                    //{
-                    //    for (j = kmin; j<NTAU; j++)
-                    //    {
-                    //        printf("%d %.3e %.3e %.3e %.3e %.3e %.3e %.3e %.3e\n", j, pi0_tot[l][m][j], \
-                    //           asym_tot[l][m][j], temperature_3d[l][m][j], tau_em[l][m][j], \
-                    //           atmos.incident_frac[l][m][NTAU-10], dtau_em[l][m][j], intensity[l][m], reflected_intensity[l][m]);
-                    //    }
-                    //}
+                    if (l == 31 && m == 38)
+                    {
+                        for (j = kmin; j<NTAU; j++)
+                        {
+                            printf("%d %.3e %.3e %.3e %.3e %.3e\n", j, temperature_3d[l][m][j], tau_em[l][m][j], dtau_em[l][m][j], kappa_nu_array[l][m][j], intensity[l][m]);
+                        }
+                        printf("\n\n");
+                    }
 
-                    //printf("%d %d %d %.3e %.3e %.3e %.3e\n", j, l, m, temperature_3d[l][m][kmin], tau_em[l][m][kmin], \
-                    //           dtau_em[l][m][kmin], intensity[l][m]);
+                    //printf("%d %d %d %.3e %.3e %.3e %.3e\n", j, l, m, temperature_3d[l][m][kmin], tau_em[l][m][kmin], dtau_em[l][m][kmin], intensity[l][m]);
 
                     if (reflected_intensity[l][m] < 1e-50)
                     {
