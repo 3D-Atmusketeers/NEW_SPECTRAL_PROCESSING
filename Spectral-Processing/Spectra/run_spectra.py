@@ -16,13 +16,13 @@ import setup_opac_versions
 
 # Phases in degrees, inclination in radians (sorry)
 # An inclination of 0 corresponds to edge on
-phases = [240.0]
+phases = [0.0]
 inclinations = [0.0]
 system_obliquity = 0
 
 # I recommend leaving these as is
 # The NLAT and NLON can be changed, but these values work well
-NTAU = 250
+NTAU = 500
 
 # Cut of the bottom of the atmosphere if needed
 # DONT MESS WITH THIS, ISAAC HASN'T FULLY CODED IT!!!!!
@@ -49,9 +49,14 @@ ONLY_PHASE = True
 USE_FORT_FILES = True
 
 
+# This is a polynomial fit of the GCM TP profiles in order to smooth it for the post processing
+# If false, just use the GCM TP profiles
+smoothing = True
+
+
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["WASP-43b-ALL-core2"]
+planet_names = ["GJ1214b-tholin-0clouds-30met"]
 
 opacity_files = 'SET_1'
 
@@ -116,11 +121,19 @@ for q in range(len(planet_names)):
             chemistry_file_path = "DATA/SET_1/ordered_3000x_solar_metallicity_chem.dat"
         else:
             print("Error in choosing which metallicy the chemistry file should be")
-
+    
     elif (opacity_files == "SET_2"):
-        chemistry_file_path = "DATA/SET_2/eos_solar_doppler.dat"
+        if (0.1  <= MET_X_SOLAR < 10.0):
+            chemistry_file_path = "DATA/SET_2/eos_solar_doppler.dat"
+        else:
+            print("Error in choosing which metallicy the chemistry file should be")
+            exit(0)
     elif (opacity_files == "SET_3"):
-        chemistry_file_path = "DATA/SET_3/eos_solar_doppler.dat"
+        if (0.1  <= MET_X_SOLAR < 10.0):
+            chemistry_file_path = "DATA/SET_3/eos_solar_doppler.dat"
+        else:
+            print("Error in choosing which metallicy the chemistry file should be")
+            exit(0)
     else:
         print("Error in choosing the chemistry file!")
 
@@ -360,7 +373,7 @@ for q in range(len(planet_names)):
 
         
         # Regrid the file to constant altitude and the correct number of layers
-        altitude_regridding.regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, INITIAL_NTAU, NLON, NTAU, HAZES, max_pressure_bar)
+        altitude_regridding.regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, INITIAL_NTAU, NLON, NTAU, HAZES, max_pressure_bar, smoothing)
 
         print ("Regridded the planet to constant altitude")
     if STEP_TWO:     

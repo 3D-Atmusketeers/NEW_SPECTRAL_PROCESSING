@@ -7,11 +7,9 @@ import pandas as pd
 ### ----- INPUTS AND OUTPUTS ----- ###
 
 
-def regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, NTAU, NLON_new, NTAU_new, HAZES, max_pressure_bar):
+def regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, NTAU, NLON_new, NTAU_new, HAZES, max_pressure_bar, smoothing):
     old_file = '../PLANET_MODELS/' + planet_name + '_with_clouds.txt'
     new_file = '../PLANET_MODELS/' + planet_name + '_with_clouds_regridded.txt'
-
-    smoothing = False
     NPARAMS = 51
 
     #########################################
@@ -425,10 +423,12 @@ def regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, NTAU, NLON
 
                 temps = data[i][j][:,5]
 
-                temps = savgol_filter(temps, 7, 3)        # (data, window size, polynomial degree)
+                smooth_temps = savgol_filter(temps, 7, 3)        # (data, window size, polynomial degree)
 
-                data[i][j][:,5] = temps
-
+                #coeffs = np.polyfit(np.arange(len(temps)), temps, 5)  # Fit a 3rd order polynomial
+                #interpolated_temps = np.polyval(coeffs, np.arange(len(temps)))  # Evaluate the polynomial
+                
+                data[i][j][:,5] = smooth_temps
 
 
 

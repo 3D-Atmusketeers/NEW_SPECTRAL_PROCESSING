@@ -1176,6 +1176,7 @@ int RT_Emit_3D(double PHASE)
     }
     printf("solid %f\n", solid);
     for(i=0; i<NLAMBDA; i++)
+    //for(i=6632; i<6633; i++)
     {
         // Get the points on the wavelength grids
         wavelength_microns = atmos.lambda[i] * 1e6;
@@ -1213,11 +1214,10 @@ int RT_Emit_3D(double PHASE)
                             pressure = 9.99e9;
                         }
 
-                        if(atmos.T_3d[o][c][j] < 201.0 || atmos.T_3d[o][c+1][j] < 201.0)
+                        if(atmos.T_3d[o][c][j] < 201.0 || atmos.T_3d[o][c+1][j] < 201.0 || atmos.T_3d[o+1][c][j] < 201.0 || atmos.T_3d[o+1][c+1][j] < 201.0)
                         {
                             temperature = 0.0;
                         }
-
                         else
                         {
                             temperature = lint2D(atmos.lon[c], atmos.lon[c+1], atmos.lat[o], atmos.lat[o+1], atmos.T_3d[o][c][j], atmos.T_3d[o][c+1][j], atmos.T_3d[o+1][c][j], atmos.T_3d[o+1][c+1][j], phi_lon_solid[l][m][j]-PHASE, theta_lat_solid[l][m][j]);
@@ -1339,6 +1339,7 @@ int RT_Emit_3D(double PHASE)
                                                   temperature, pressure);
                             }
                         }
+
 
                         kappa_nu_array[l][m][j] = kappa_nu;
                         dtau_em[l][m][j] = kappa_nu * dl[l][m][j];
@@ -1472,7 +1473,6 @@ int RT_Emit_3D(double PHASE)
                 {
                     for(j=0; j<NTAU; j++)
                     {   
-                        //printf("%d %.3e %.3e \n", j, tau_em[l][m][j-1], dtau_em[l][m][j]);
                         if(j==0)
                         {
                             tau_em[l][m][j]=dtau_em[l][m][j];
@@ -1504,7 +1504,7 @@ int RT_Emit_3D(double PHASE)
 
                     for (j = 0; j<NTAU; j++)
                     {
-                        if (dtau_em[l][m][j] < 1e-6 || tau_em[l][m][j] < 1e-5 || temperature_3d[l][m][j] < 200 || kappa_nu_array[l][m][j] < 1e-10)
+                        if (dtau_em[l][m][j] < 1e-50 || tau_em[l][m][j] < 1e-50 || temperature_3d[l][m][j] < 200 || kappa_nu_array[l][m][j] < 1e-50)
                         {
                           kmin = j+1;
                         }
@@ -1532,14 +1532,14 @@ int RT_Emit_3D(double PHASE)
                     reflected_intensity[l][m] = intensity_vals[1];
 
 
-                    if (l == 31 && m == 38)
-                    {
-                        for (j = kmin; j<NTAU; j++)
-                        {
-                            printf("%d %.3e %.3e %.3e %.3e %.3e\n", j, temperature_3d[l][m][j], tau_em[l][m][j], dtau_em[l][m][j], kappa_nu_array[l][m][j], intensity[l][m]);
-                        }
-                        printf("\n\n");
-                    }
+                    //if (l == 36 && m == 24)
+                    //{
+                    //    for (j = 0; j<NTAU; j++)
+                    //    {
+                    //        printf("%d %.3e %.3e %.3e\n", j, temperature_3d[l][m][j], tau_em[l][m][j], dtau_em[l][m][j]);
+                    //    }
+                    //    printf("\n\n");
+                    //}
 
                     //printf("%d %d %d %.3e %.3e %.3e %.3e\n", j, l, m, temperature_3d[l][m][kmin], tau_em[l][m][kmin], dtau_em[l][m][kmin], intensity[l][m]);
 
