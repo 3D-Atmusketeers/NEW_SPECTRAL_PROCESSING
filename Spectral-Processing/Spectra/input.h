@@ -19,7 +19,7 @@ Defines input values and files for 3-D emission spectra
 #define CLOUDS 0                           /* 0:Off; 1:On */
 
 /* Grid settings */
-#define NTAU 500                            /* Number of altitude points in grid      */
+#define NTAU 100                            /* Number of altitude points in grid      */
 #define NLAT  48                           /* Number of latitude points in 3-D  grid */
 #define NLON  96                           /* Number of longitude points in 3-D grid */
 

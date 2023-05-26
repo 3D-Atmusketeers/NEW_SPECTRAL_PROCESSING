@@ -1175,8 +1175,8 @@ int RT_Emit_3D(double PHASE)
         }
     }
     printf("solid %f\n", solid);
-    for(i=0; i<NLAMBDA; i++)
-    //for(i=6632; i<6633; i++)
+    //for(i=0; i<NLAMBDA; i++)
+    for(i=6632; i<6633; i++)
     {
         // Get the points on the wavelength grids
         wavelength_microns = atmos.lambda[i] * 1e6;
@@ -1323,7 +1323,7 @@ int RT_Emit_3D(double PHASE)
                         /* No Doppler Effects at all */
                         else
                         {
-                            if(temperature < 201.0)
+                            if(temperature < 201.0 || pressure < 1e-5)
                             {
                                 kappa_nu = 0.0;
                             }
@@ -1340,6 +1340,15 @@ int RT_Emit_3D(double PHASE)
                             }
                         }
 
+                        //if (l == 36 && m == 24)
+                        //{
+                        //    printf("%le %le %le %le %le %le %le \n", kappa_nu,
+                        //                            opac.kappa[i][h][g],
+                        //                            opac.kappa[i][h][g+1],
+                        //                            opac.kappa[i][h+1][g],
+                        //                            opac.kappa[i][h+1][g+1],
+                        //                            temperature, pressure);
+                        //}
 
                         kappa_nu_array[l][m][j] = kappa_nu;
                         dtau_em[l][m][j] = kappa_nu * dl[l][m][j];

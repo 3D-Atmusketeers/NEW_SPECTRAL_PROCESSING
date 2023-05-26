@@ -680,18 +680,18 @@ void TotalOpac() {
           opac.kappa[i][j][k] = opacC2H2.kappa[i][j][k]
                               + opacCH4.kappa[i][j][k]
                               + opacCO.kappa[i][j][k]
-	                          + opacCO2.kappa[i][j][k]
-	                          + opacFeH.kappa[i][j][k]
-	                          + opacH2O.kappa[i][j][k]
-	                          + opacH2S.kappa[i][j][k]
-	                          + opacHCN.kappa[i][j][k]
-	                          + opacK.kappa[i][j][k]
-	                          + opacNa.kappa[i][j][k]
-	                          + opacNH3.kappa[i][j][k]
+	                            + opacCO2.kappa[i][j][k]
+	                            + opacFeH.kappa[i][j][k]
+	                            + opacH2O.kappa[i][j][k]
+	                            + opacH2S.kappa[i][j][k]
+	                            + opacHCN.kappa[i][j][k]
+	                            + opacK.kappa[i][j][k]
+	                            + opacNa.kappa[i][j][k]
+	                            + opacNH3.kappa[i][j][k]
                               + opacTiO.kappa[i][j][k]
                               + opacVO.kappa[i][j][k]
- 	                          + opacscat.kappa[i][j][k]
- 	                          + opacCIA.kappa[i][j][k];
+ 	                            + opacscat.kappa[i][j][k]
+ 	                            + opacCIA.kappa[i][j][k];
       }
     }
   }
@@ -736,4 +736,3 @@ void TotalOpac() {
 }
 
 /* ------- end -------------- TotalOpac.c ------------------------ */
-
