@@ -28,31 +28,35 @@ plt.style.use('science.mplstyle')
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
 
-planet_names = [#"GJ1214b-none-0clouds-100met",
-                #"GJ1214b-none-25clouds-30met",
-                #"GJ1214b-soot-25clouds-1met",
-                #"GJ1214b-soot_2xpi0-25clouds-100met",
-                "GJ1214b-tholin-0clouds-30met"]
-                #"GJ1214b-none-0clouds-1met",
-                #"GJ1214b-soot-0clouds-100met",
-                #"GJ1214b-soot-25clouds-30met",
-                #"GJ1214b-soot_2xpi0-25clouds-1met",
-                #"GJ1214b-tholin-25clouds-100met",
+planet_names = [#"GJ1214b-none-0clouds-1met",
                 #"GJ1214b-none-0clouds-30met",
-                #"GJ1214b-soot-0clouds-1met",
-                #"GJ1214b-soot_2xpi0-0clouds-100met",
-                #"GJ1214b-soot_2xpi0-25clouds-30met",
-                #"GJ1214b-tholin-25clouds-1met",
-                #"GJ1214b-none-25clouds-100met",
-                #"GJ1214b-soot-0clouds-30met",
-                #"GJ1214b-soot_2xpi0-0clouds-1met",
-                #"GJ1214b-tholin-0clouds-100met",
-                #"GJ1214b-tholin-25clouds-30met",
-                #"GJ1214b-none-25clouds-1met"]
-                #"GJ1214b-soot-25clouds-100met",
-                #"GJ1214b-soot_2xpi0-0clouds-30met"]
-                #"GJ1214b-tholin-0clouds-1met"]
+                #"GJ1214b-none-0clouds-100met",
+                #"GJ1214b-none-25clouds-1met",
+                #"GJ1214b-none-25clouds-30met",
+                #"GJ1214b-none-25clouds-100met"
 
+                #"GJ1214b-soot-0clouds-1met",   
+                #"GJ1214b-soot-0clouds-30met",
+                #"GJ1214b-soot-0clouds-100met",
+                #"GJ1214b-soot-25clouds-1met",
+                #"GJ1214b-soot-25clouds-30met",
+                #"GJ1214b-soot-25clouds-100met",
+
+                #"GJ1214b-soot_2xpi0-0clouds-1met",
+                #"GJ1214b-soot_2xpi0-0clouds-30met",
+                #"GJ1214b-soot_2xpi0-0clouds-100met",
+                #"GJ1214b-soot_2xpi0-25clouds-1met",
+                #"GJ1214b-soot_2xpi0-25clouds-30met",
+                #"GJ1214b-soot_2xpi0-25clouds-100met",
+
+                "GJ1214b-tholin-0clouds-1met",
+                "GJ1214b-tholin-0clouds-30met",
+                "GJ1214b-tholin-0clouds-100met",
+                "GJ1214b-tholin-25clouds-1met",
+                "GJ1214b-tholin-25clouds-30met",
+                "GJ1214b-tholin-25clouds-100met"]
+
+                
 
 # There are the different sets of opacity and EOS files
 # There are somethings that need to be changed in the template inputs file to make this happen

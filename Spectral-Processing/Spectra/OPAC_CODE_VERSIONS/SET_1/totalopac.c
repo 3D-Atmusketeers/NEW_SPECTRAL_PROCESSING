@@ -124,6 +124,46 @@ void TotalOpac() {
     }
   }
 
+  /* Fill in CO opacities */
+  
+  opacCO.T = dvector(0, NTEMP-1);
+  opacCO.P = dvector(0, NPRESSURE-1);
+  opacCO.Plog10 = dvector(0, NPRESSURE-1);
+  opacCO.kappa = malloc(NLAMBDA*sizeof(double));
+  for(i=0; i<NLAMBDA; i++){
+    opacCO.kappa[i] = malloc(NPRESSURE*sizeof(double));
+    for(j=0; j<NPRESSURE; j++){
+      opacCO.kappa[i][j] = malloc(NTEMP*sizeof(double));
+    }
+  }
+  opacCO.abundance = dmatrix(0, NPRESSURE-1, 0, NTEMP-1);
+
+  for(j=0; j<NPRESSURE; j++){
+    for(k=0; k<NTEMP; k++){
+      opacCO.abundance[j][k] = chem.CO[j][k];
+    }
+  }
+
+  strcpy(filename, CO_FILE);
+
+  ReadOpacTable(opacCO, filename);
+ 
+  printf("Read CO Opacity done\n");
+
+
+  //for(j=0; j<NPRESSURE; j++)
+  //{
+  //    printf("%d %le %le %le %le\n", j, opacCO.kappa[0][j][0], opacCO.kappa[0][j][1], opacCO.kappa[0][j][2], opacCO.kappa[0][j][3]);
+  //}
+  
+  //printf("\n\n");
+  //for(j=0; j<NPRESSURE; j++)
+  //{
+  //    printf("%d %le %le %le %le\n", j, opacCO.kappa[6632][j][0], opacCO.kappa[6632][j][1], opacCO.kappa[6632][j][2], opacCO.kappa[6632][j][3]);
+  //}
+  //printf("EXITING HERE!\n");
+  //exit(0);  
+
   /* Fill in C2H2 opacities */
 
   opacC2H2.T = dvector(0, NTEMP-1);
@@ -150,6 +190,9 @@ void TotalOpac() {
 
   printf("Read C2H2 Opacity done\n");
 
+
+
+
   /* Fill in CH4 opacities */
   
   opacCH4.T = dvector(0, NTEMP-1);
@@ -175,32 +218,6 @@ void TotalOpac() {
   ReadOpacTable(opacCH4, filename);
  
   printf("Read CH4 Opacity done\n");
-
-  /* Fill in CO opacities */
-  
-  opacCO.T = dvector(0, NTEMP-1);
-  opacCO.P = dvector(0, NPRESSURE-1);
-  opacCO.Plog10 = dvector(0, NPRESSURE-1);
-  opacCO.kappa = malloc(NLAMBDA*sizeof(double));
-  for(i=0; i<NLAMBDA; i++){
-    opacCO.kappa[i] = malloc(NPRESSURE*sizeof(double));
-    for(j=0; j<NPRESSURE; j++){
-      opacCO.kappa[i][j] = malloc(NTEMP*sizeof(double));
-    }
-  }
-  opacCO.abundance = dmatrix(0, NPRESSURE-1, 0, NTEMP-1);
-
-  for(j=0; j<NPRESSURE; j++){
-    for(k=0; k<NTEMP; k++){
-      opacCO.abundance[j][k] = chem.CO[j][k];
-    }
-  }
-
-  strcpy(filename, CO_FILE);
-
-  ReadOpacTable(opacCO, filename);
- 
-  printf("Read CO Opacity done\n");
 
   /* Fill in CO2 opacities */
   

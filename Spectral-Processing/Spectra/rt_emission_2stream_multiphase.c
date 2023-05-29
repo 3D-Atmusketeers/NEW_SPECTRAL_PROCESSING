@@ -1175,8 +1175,7 @@ int RT_Emit_3D(double PHASE)
         }
     }
     printf("solid %f\n", solid);
-    //for(i=0; i<NLAMBDA; i++)
-    for(i=6632; i<6633; i++)
+    for(i=0; i<NLAMBDA; i++)
     {
         // Get the points on the wavelength grids
         wavelength_microns = atmos.lambda[i] * 1e6;
@@ -1215,6 +1214,7 @@ int RT_Emit_3D(double PHASE)
                         }
 
                         if(atmos.T_3d[o][c][j] < 201.0 || atmos.T_3d[o][c+1][j] < 201.0 || atmos.T_3d[o+1][c][j] < 201.0 || atmos.T_3d[o+1][c+1][j] < 201.0)
+                        //if(atmos.T_3d[o][c][j] < 201.0 || atmos.T_3d[o][c+1][j] < 201.0)
                         {
                             temperature = 0.0;
                         }
@@ -1339,16 +1339,6 @@ int RT_Emit_3D(double PHASE)
                                                   temperature, pressure);
                             }
                         }
-
-                        //if (l == 36 && m == 24)
-                        //{
-                        //    printf("%le %le %le %le %le %le %le \n", kappa_nu,
-                        //                            opac.kappa[i][h][g],
-                        //                            opac.kappa[i][h][g+1],
-                        //                            opac.kappa[i][h+1][g],
-                        //                            opac.kappa[i][h+1][g+1],
-                        //                            temperature, pressure);
-                        //}
 
                         kappa_nu_array[l][m][j] = kappa_nu;
                         dtau_em[l][m][j] = kappa_nu * dl[l][m][j];
@@ -1513,7 +1503,7 @@ int RT_Emit_3D(double PHASE)
 
                     for (j = 0; j<NTAU; j++)
                     {
-                        if (dtau_em[l][m][j] < 1e-50 || tau_em[l][m][j] < 1e-50 || temperature_3d[l][m][j] < 200 || kappa_nu_array[l][m][j] < 1e-50)
+                        if (dtau_em[l][m][j] < 1e-10 || tau_em[l][m][j] < 1e-10 || temperature_3d[l][m][j] < 200 || kappa_nu_array[l][m][j] < 1e-50)
                         {
                           kmin = j+1;
                         }

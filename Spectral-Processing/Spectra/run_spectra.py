@@ -22,7 +22,7 @@ system_obliquity = 0
 
 # I recommend leaving these as is
 # The NLAT and NLON can be changed, but these values work well
-NTAU = 100
+NTAU = 250
 
 # Cut of the bottom of the atmosphere if needed
 # DONT MESS WITH THIS, ISAAC HASN'T FULLY CODED IT!!!!!
