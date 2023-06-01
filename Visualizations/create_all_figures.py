@@ -28,26 +28,27 @@ plt.style.use('science.mplstyle')
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
 
-planet_names = [#"GJ1214b-none-0clouds-1met",
-                #"GJ1214b-none-0clouds-30met",
-                #"GJ1214b-none-0clouds-100met",
-                #"GJ1214b-none-25clouds-1met",
-                #"GJ1214b-none-25clouds-30met",
-                #"GJ1214b-none-25clouds-100met"
+planet_names = ["GJ1214b-none-0clouds-1met"]
+"""
+                "GJ1214b-none-0clouds-30met",
+                "GJ1214b-none-0clouds-100met",
+                "GJ1214b-none-25clouds-1met",
+                "GJ1214b-none-25clouds-30met",
+                "GJ1214b-none-25clouds-100met",
 
-                #"GJ1214b-soot-0clouds-1met",   
-                #"GJ1214b-soot-0clouds-30met",
-                #"GJ1214b-soot-0clouds-100met",
-                #"GJ1214b-soot-25clouds-1met",
-                #"GJ1214b-soot-25clouds-30met",
-                #"GJ1214b-soot-25clouds-100met",
+                "GJ1214b-soot-0clouds-1met",   
+                "GJ1214b-soot-0clouds-30met",
+                "GJ1214b-soot-0clouds-100met",
+                "GJ1214b-soot-25clouds-1met",
+                "GJ1214b-soot-25clouds-30met",
+                "GJ1214b-soot-25clouds-100met",
 
-                #"GJ1214b-soot_2xpi0-0clouds-1met",
-                #"GJ1214b-soot_2xpi0-0clouds-30met",
-                #"GJ1214b-soot_2xpi0-0clouds-100met",
-                #"GJ1214b-soot_2xpi0-25clouds-1met",
-                #"GJ1214b-soot_2xpi0-25clouds-30met",
-                #"GJ1214b-soot_2xpi0-25clouds-100met",
+                "GJ1214b-soot_2xpi0-0clouds-1met",
+                "GJ1214b-soot_2xpi0-0clouds-30met",
+                "GJ1214b-soot_2xpi0-0clouds-100met",
+                "GJ1214b-soot_2xpi0-25clouds-1met",
+                "GJ1214b-soot_2xpi0-25clouds-30met",
+                "GJ1214b-soot_2xpi0-25clouds-100met",
 
                 "GJ1214b-tholin-0clouds-1met",
                 "GJ1214b-tholin-0clouds-30met",
@@ -55,8 +56,7 @@ planet_names = [#"GJ1214b-none-0clouds-1met",
                 "GJ1214b-tholin-25clouds-1met",
                 "GJ1214b-tholin-25clouds-30met",
                 "GJ1214b-tholin-25clouds-100met"]
-
-                
+"""    
 
 # There are the different sets of opacity and EOS files
 # There are somethings that need to be changed in the template inputs file to make this happen
@@ -173,7 +173,7 @@ print ()
 
 
 # Plotting the emission maps
-#emission_maps.plot_emission_maps(planet_names, nlat, nlon, nlev)
+emission_maps.plot_emission_maps(planet_names, nlat, nlon, nlev)
 
 
 # Plot the spectra
@@ -182,33 +182,33 @@ print ()
 print ()
 
 #planet_name = planet_names[0]
-#spectra.plot_blackbody_phase_curve(planet_name,
-#                            planet_radii,
-#                            num_phases=4,
-#                            transmission_filter_name='MIRI',
-#                            wav_subset=[5e-6, 30e-6],
-#                            resolution=100,
-#                            temp=1000)
+spectra.plot_blackbody_phase_curve(planet_name,
+                            planet_radii,
+                            num_phases=4,
+                            transmission_filter_name='MIRI',
+                            wav_subset=[5e-6, 12e-6],
+                            resolution=100,
+                            temp=600)
 
 
-spectra.plot_planet_spectra_blackbody_comparison_hz(planet_names,
-                                                 black_body_temperatures=[400, 600, 800],
-                                                 num_phases=2)
+spectra.plot_planet_spectra_blackbody_comparison_hz(planet_names,black_body_temperatures=[400, 600, 800],num_phases=4)
+
 #spectra.plot_planet_spectra_blackbody_comparison_microns(planet_names,
 #                                                 black_body_temperatures=[1000, 2000],
 #                                                 num_phases=2)
+
 #spectra.plot_star_spectra_test(planet_names)
 #spectra.plot_filters(planet_names)
 #spectra.plot_spectra_simple(planet_names, num_phases=2)
 
 # If resolution is set to 0, don't convolve at all
 
-spectra.plot_fp_spectra(planet_names,
-                            planet_radii,
-                            num_phases=8,
-                            transmission_filter_name='None',
-                            wav_subset=[5e-6, 12e-6],
-                            resolution=100)
+#spectra.plot_fp_spectra(planet_names,
+#                            planet_radii,
+#                            num_phases=8,
+#                            transmission_filter_name='None',
+#                            wav_subset=[5e-6, 12e-6],
+#                            resolution=100)
 
 #spectra.plot_fp_fs_spectra(planet_names,
 #                            planet_radii,

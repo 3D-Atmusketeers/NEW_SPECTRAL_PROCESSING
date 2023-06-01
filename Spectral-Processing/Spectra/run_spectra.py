@@ -56,7 +56,7 @@ smoothing = True
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-tholin-0clouds-30met"]
+planet_names = ["GJ1214b-none-0clouds-1met"]
 
 opacity_files = 'SET_1'
 
@@ -227,9 +227,9 @@ for q in range(len(planet_names)):
     print("Star characteristics")
     print("!!!!!   MAKE SURE TO CHECK THESE, IT IS HARD TO STRING MATCH  !!!!!!!")
     print("You matched", star_name, "on planet", planet_name)
-    print("Orbital Separation = ",ORB_SEP)
+    print("Orbital Separation = ",ORB_SEP / 1.496e11)
     print("Star Temp = ",STELLAR_TEMP)
-    print("Star Radius = ",R_STAR)
+    print("Star Radius = ",R_STAR / 695700000)
 
 
     # Are these used?

@@ -1203,9 +1203,16 @@ int RT_Emit_3D(double PHASE)
                     {
                         Locate(NLAT, atmos.lat, theta_lat_solid[l][m][j], &o);
                         Locate(NLON, atmos.lon, phi_lon_solid[l][m][j]-PHASE, &c);
-
-                        pressure = lint2D(atmos.lon[c], atmos.lon[c+1], atmos.lat[o], atmos.lat[o+1], atmos.P_3d[o][c][j], atmos.P_3d[o][c+1][j], atmos.P_3d[o+1][c][j], atmos.P_3d[o+1][c+1][j], phi_lon_solid[l][m][j]-PHASE, theta_lat_solid[l][m][j]);
-
+                        
+                        if(atmos.P_3d[o][c][j] < 1e-10 || atmos.P_3d[o][c+1][j] < 1e-10 || atmos.P_3d[o+1][c][j] < 1e-10 || atmos.P_3d[o+1][c+1][j] < 1e-10)
+                        {
+                            pressure = 0;
+                        }
+                        else
+                        {
+                            pressure = lint2D(atmos.lon[c], atmos.lon[c+1], atmos.lat[o], atmos.lat[o+1], atmos.P_3d[o][c][j], atmos.P_3d[o][c+1][j], atmos.P_3d[o+1][c][j], atmos.P_3d[o+1][c+1][j], phi_lon_solid[l][m][j]-PHASE, theta_lat_solid[l][m][j]);
+                        }
+                        
                         //The pressure breaks this if it's too high
                         if (pressure > 9.99e9)
                         {
@@ -1485,7 +1492,7 @@ int RT_Emit_3D(double PHASE)
             }
         }
 
-
+        
         //Calculate the intensity of emergent rays at each latitude and longitude
         average = 0.0;
         for(l=0; l<NLAT; l++)
@@ -1535,7 +1542,7 @@ int RT_Emit_3D(double PHASE)
                     //{
                     //    for (j = 0; j<NTAU; j++)
                     //    {
-                    //        printf("%d %.3e %.3e %.3e\n", j, temperature_3d[l][m][j], tau_em[l][m][j], dtau_em[l][m][j]);
+                    //        printf("%d %.3e %.3e %.3e %.3e\n", j, temperature_3d[l][m][j], pressure_array[l][m][j], tau_em[l][m][j], dtau_em[l][m][j]);
                     //    }
                     //    printf("\n\n");
                     //}
@@ -1565,6 +1572,7 @@ int RT_Emit_3D(double PHASE)
                 }
             }
         }
+        
 
 
         /*
@@ -1586,19 +1594,16 @@ int RT_Emit_3D(double PHASE)
             {
                 if(atmos.lon[m]>=90.0-PHASE && atmos.lon[m]<=270.0-PHASE)
                 {
-                    if (l == 45 && m == 45)
+                    for(j=0; j<NTAU; j++)
                     {
-                        for(j=0; j<NTAU; j++)
-                        {
-                            intensity[l][m] += Planck(temperature_3d[l][m][j], atmos.lambda[i]) * exp(-tau_em[l][m][j]) * dtau_em[l][m][j];
-
-                            printf("\'OLD\', %d, %le, %le, %le, \n", j, temperature_3d[l][m][j], tau_em[l][m][j],  intensity[l][m]);
-                        }
+                        intensity[l][m] += Planck(temperature_3d[l][m][j], atmos.lambda[i]) * exp(-tau_em[l][m][j]) * dtau_em[l][m][j];
+                        //printf("\'OLD\', %d, %le, %le, %le, \n", j, temperature_3d[l][m][j], tau_em[l][m][j],  intensity[l][m]);
                     }
                 }
             }
         }
         */
+        
 
         /*Calculate the total flux received by us*/
         flux_pl[i] = 0.0;

@@ -55,7 +55,8 @@ def get_fp_fs(interp_function, star_radius, planet_spectra, planet_radius, star_
         signal = (regridded_star_spectrum * star_radius**2. + planet_spectra.flux * planet_radius ** 2.) * \
                  (planet_spectra.wavelength / h * c) * interp_function(planet_spectra.wavelength)
         signal_star = (regridded_star_spectrum * star_radius ** 2.) * (planet_spectra.wavelength / h * c) * \
-            interp_function(planet_spectra.wavelength)
+                       interp_function(planet_spectra.wavelength)
+    
 
     return signal, signal_star
 
@@ -101,7 +102,7 @@ def get_star_spectra(planet_name):
         flux_si = flux_Watt_m_2_microns * np.pi * u.sr
         star_spectra = pd.DataFrame(list(zip(wavelengths_meters.value, flux_si.value)), columns=['wavelength', 'flux'])
 
-        star_radius = 0.204 * 6.957e8
+        star_radius = 0.215 * 6.957e8
 
     elif ("peg51".lower() in planet_name.lower()):
         print("Using a peg 51b stellar spectra")
@@ -464,7 +465,7 @@ def plot_star_spectra_test(planet_names):
             linewidth=0.5)
 
         # blackbody comparison
-        Teffs = [3000, 4000, 5000, 6000]
+        Teffs = [3250]
         for Teff in Teffs:
             bb = BlackBody(temperature=Teff * u.K)
             wav = np.linspace(0.1, 20.0, 1000) * u.um
@@ -484,7 +485,7 @@ def plot_star_spectra_test(planet_names):
                 alpha=1.0,
                 linewidth=1.5)
 
-        plt.ylim(1e4, 3e8)
+        plt.ylim(1e4, 1e7)
         plt.xlim(0.1, np.max(star_spectra.wavelength * 1e6))
         plt.yscale('log')
         plt.xlabel('Wavelengths (microns)')
@@ -638,8 +639,6 @@ def plot_fp_fs_phase_curves(planet_names, planet_name_char_len, planet_radii, nu
             # Add a zero as a placeholder
             integrated_signal.append(0)
             integrated_signal_star.append(0)
-
-            # Load in the planet spectra and convert to per microns
 
             # Get the file path
             if planet_name == 'Peg51b':
