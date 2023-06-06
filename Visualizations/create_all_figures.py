@@ -23,6 +23,8 @@ import emission_maps
 
 import basemap_hemispheric_projections
 
+import cross_correlation
+
 # Make it pretty!
 plt.style.use('science.mplstyle')
 
@@ -58,7 +60,7 @@ planet_names = ["GJ1214b-none-0clouds-1met",
                 "GJ1214b-tholin-25clouds-30met",
                 "GJ1214b-tholin-25clouds-100met"]
 
-planet_names = ["GJ1214b-soot_2xpi0-0clouds-100met"]
+planet_names = ["HD209-DOGRAY"]
 
 
 # Set the opacity files to use
@@ -141,8 +143,10 @@ else:
 #emission_maps.plot_emission_maps(planet_names, nlat, nlon, nlev)
 
 
-basemap_hemispheric_projections.plot_observer_projection(planet_names, nlat, nlon,
-                                                         planet_radii, pressure_in_mbar=10)
+#basemap_hemispheric_projections.plot_observer_projection(planet_names, nlat, nlon,planet_radii, pressure_in_mbar=10)
+                                                         
+cross_correlation.plot_cross_correlations(planet_names, num_phases=24)
+                                            
 
 
 

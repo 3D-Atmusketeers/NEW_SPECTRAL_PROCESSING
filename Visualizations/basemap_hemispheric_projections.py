@@ -52,9 +52,7 @@ def plot_observer_projection(planet_names, nlat, nlon,
         file = '../Spectral-Processing/Spectra/DATA/init_' + planet_name + '_phase_0.0_inc_0.0'
 
         rotation_rate = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name, 'fort.7', 'WW')
-
-        print(rotation_rate)
-
+        
         # Parameters
         pressure_min = pressure_in_mbar
         r_p = planet_radius
