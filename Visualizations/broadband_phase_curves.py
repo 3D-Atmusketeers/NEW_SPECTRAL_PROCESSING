@@ -9,6 +9,10 @@ import matplotlib as pl
 import re
 from scipy import interpolate
 
+#print ("Plotting the broadband phase curves...")
+#print ()
+#print ()
+
 def record_phase_peak(phases, sw_fluxes, lw_fluxes, planet_name):
     """
     phases: list of phases or something

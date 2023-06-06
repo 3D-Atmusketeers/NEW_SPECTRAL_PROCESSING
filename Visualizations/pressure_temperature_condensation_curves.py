@@ -15,6 +15,11 @@ import math
 import matplotlib.pylab as pl
 import grab_input_data
 
+
+#print ("Plotting the pressure temperature condensation curves...")
+#print ()
+#print ()
+
 def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
     base = '../Spectral-Processing/PLANET_MODELS/'
     column_names = ['lat', 'lon', 'level', 'alt', 'pres', 'temp', 'u', 'v', 'w']
@@ -48,9 +53,9 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
         data = data.reshape(nlat, nlon, nlev, nparams)
 
         # plot all TP-profiles (expensive)
-        for i in range(48):
-            for j in range(96):
-                axes.semilogy(data[i][j][:, 5], data[i][j][:, 4], alpha=0.2, color='gray', linewidth=1)
+        for i in range(nlat):
+            for j in range(nlon):
+                axes.semilogy(data[i][j][:, 5], data[i][j][:, 4], alpha=0.2, color='gray', linewidth=0.2)
 
         # colormap
         cm_name = 'bamO'
@@ -58,9 +63,9 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
         cm_file = np.roll(cm_file, 140, axis=0)
         my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
 
-        colors = np.linspace(0, 1, 96)
+        colors = np.linspace(0, 1, nlon)
         # set color cycle
-        color_idx = 48
+        color_idx = nlat
 
         # plot colored equatorial TP-profiles
         for i in range(96):
@@ -158,13 +163,7 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
             
             # KCl, cr, sio2, Mg$_2$SiO$_4$, VO, Ni, Ca$_2$SiO$_4$, CaTiO$_3$, Al$_2$O$_3$
             new_pressures = np.logspace(-5, 2, 200)
-            
-            print(press_con)
-            print(len(press_con))
-            print(kcl)
-            print(len(kcl))
-            print(MET_X_SOLAR)
-            print(planet_name)
+    
 
             f_kcl = interp1d(press_con, kcl, fill_value='extrapolate')
             f_zns = interp1d(press_con, zns, fill_value='extrapolate')
@@ -219,6 +218,7 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
         sm._A = []
         tp_cbar = fig.colorbar(sm, aspect=15, pad=0.02, ticks=[0, -60, -120, 60, 120])
         tp_cbar.set_label('Lon (deg)', fontsize=24, labelpad=5)
+
 
         fig.text(0.5, 0.03, r"Temperature (K)", size=24, ha='center')
 

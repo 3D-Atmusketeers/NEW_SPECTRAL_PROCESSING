@@ -20,6 +20,10 @@ h = 6.6260701e-34
 c = 3e8
 
 
+#print ("Plotting the spectra...")
+#print ()
+#print ()
+
 def filter_spectra(planet_spectra, star_spectra, filt, transmission_filter_name, wav_subset, phase_degrees):
     # Load in the planet spectra and convert to per microns
     #planet_spectra = pd.read_csv(file_path.format(str(phase_degrees)), header=None, delim_whitespace=True, names=['wavelength', 'flux', 'reflected'])

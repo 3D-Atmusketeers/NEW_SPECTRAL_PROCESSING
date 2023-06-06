@@ -10,6 +10,9 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from matplotlib import ticker
 
+#print ("Plotting the isobaric projections...")
+#print ()
+#print ()
 
 def plot_aerosol_coverage_isobars(
         planet_names,

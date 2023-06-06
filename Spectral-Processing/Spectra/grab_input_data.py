@@ -26,8 +26,8 @@ def get_input_data(path, runname, input_file, input_param):
         for match in matches:
             # extract the values from the match, including scientific notation
             if (input_param == 'RADEA'):
-                #values = re.findall(r"[+\-]?[^A-Za-z]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)", match)
-                values = re.findall(r"(?:=|\s*)([-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?)", match)
+                values = re.findall(r"[+\-]?[^A-Za-z]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)", match)
+                #values = re.findall(r'=\s*([-+]?\d+(?:\.\d+)?(?:[Ee][-+]?\d+)?)', match)
             else:
                 values = re.findall(r"[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?", match)
 

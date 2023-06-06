@@ -21,6 +21,8 @@ import wind_maps
 import wind_isobars
 import emission_maps
 
+import basemap_hemispheric_projections
+
 # Make it pretty!
 plt.style.use('science.mplstyle')
 
@@ -28,8 +30,7 @@ plt.style.use('science.mplstyle')
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
 
-planet_names = ["GJ1214b-none-0clouds-1met"]
-"""
+planet_names = ["GJ1214b-none-0clouds-1met",
                 "GJ1214b-none-0clouds-30met",
                 "GJ1214b-none-0clouds-100met",
                 "GJ1214b-none-25clouds-1met",
@@ -56,21 +57,12 @@ planet_names = ["GJ1214b-none-0clouds-1met"]
                 "GJ1214b-tholin-25clouds-1met",
                 "GJ1214b-tholin-25clouds-30met",
                 "GJ1214b-tholin-25clouds-100met"]
-"""    
 
-# There are the different sets of opacity and EOS files
-# There are somethings that need to be changed in the template inputs file to make this happen
-# If you change the underlying data files these might need to be changed
-#if any(substring in planet_names[0].upper() for substring in ["GJ1214"]):
-#    opacity_files = 'SET_1'
-#elif any(substring in planet_names[0].upper() for substring in ["HD209", "HD189"]):
-#    opacity_files = 'SET_3'
-#else:
-#    print("Something is going wrong with how the opacity files are being chosen")
-#    exit(0)
+planet_names = ["GJ1214b-soot_2xpi0-0clouds-100met"]
 
+
+# Set the opacity files to use
 opacity_files = 'SET_1'
-
 if opacity_files == 'SET_1':
     cloud_wavelength = 5.0
 elif opacity_files == 'SET_2':
@@ -81,13 +73,6 @@ else:
     print("YOU NEED TO SET WHICH OPACITY SET YOU'RE USING")
     exit(0)
 
-
-#from tqdm import tqdm
-#import time
-#print("WARNING! Downloading Viruses Now...")
-#print("Virus Download Progress:")
-#for i in tqdm(np.linspace(0,1,30)):
-#    time.sleep(0.1)
 
 # Get the number of GCMS
 num_gcms = len(planet_names)
@@ -102,7 +87,7 @@ for planet_name in planet_names:
     if os.path.isfile('../Spectral-Processing/GCM-OUTPUT/' + planet_name + '/Planet_Run/fort.7'):
         planet_radii.append(float(grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/',
                                                             planet_name, "fort.7","RADEA")))
-        print(planet_radii[0])
+        print("Planet Radii: ", planet_radii[0])
     else:
         planet_radii.append(17469282.0)
         #planet_radii.append(0.9853199e+08) # HD 209
@@ -112,24 +97,12 @@ for planet_name in planet_names:
     
 # Auto parse some of these params
 # If the file doesn't exist, take a guess and print a warning
+print("nlat, nlon, nlev are being set manually in create_all_figures")
 column_names = ['lat', 'lon', 'level','alt', 'pres', 'temp', 'u', 'v', 'w']
-if os.path.isfile('../Spectral-Processing/PLANET_MODELS/' + planet_names[0] + '.txt'):
-    df = pd.read_csv('../Spectral-Processing/PLANET_MODELS/' + planet_names[0] + '.txt',
-                     delim_whitespace=True, names=column_names)
-    nlat = len(set(df.lat))
-    nlon = len(set(df.lon))
-    nlev = len(set(df.level))
-
-    # Get the number of orders of magnitude
-    num_orders_of_magnitude = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/',
-                                                            planet_names[0], "fort.7", "OOM_IN")
-else:
-    print("nlat, nlon, nlev are being set manually in create_all_figures")
-    nlat = 48
-    nlon = 96
-    nlev = 50
-
-    num_orders_of_magnitude = 7
+nlat = 48
+nlon = 96
+nlev = 50
+num_orders_of_magnitude = 7
 
 
 # Code to check whether the names are a list
@@ -141,9 +114,7 @@ else:
 
 
 # Plot the broadband phase curves
-print ("Plotting the broadband phase curves...")
-print ()
-print ()
+
 #broadband_phase_curves.plot_reflected_phasecurves(planet_names, nlon, two_sets_of_planets=False)
 #broadband_phase_curves.plot_thermal_phasecurves(planet_names, nlon, two_sets_of_planets=False)
 #broadband_phase_curves.plot_reflected_starlight_maps(planet_names)
@@ -151,17 +122,11 @@ print ()
 # Plot the isobaric cloud maps
 # If the extra_pressure level is greater than 0, its plots it also
 # If it is 0, then it plots the IR photosphere pressure
-print ("Plotting the isobaric projections...")
-print ()
-print ()
 #aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes=False, extra_pressure_level_bar=0)
 #aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes = True, extra_pressure_level_bar = 80)
 
 
 # Plot the ptc curves
-print ("Plotting the pressure temperature condensation curves...")
-print ()
-print ()
 #pressure_temperature_condensation_curves.plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
 
 
@@ -173,25 +138,26 @@ print ()
 
 
 # Plotting the emission maps
-emission_maps.plot_emission_maps(planet_names, nlat, nlon, nlev)
+#emission_maps.plot_emission_maps(planet_names, nlat, nlon, nlev)
+
+
+basemap_hemispheric_projections.plot_observer_projection(planet_names, nlat, nlon,
+                                                         planet_radii, pressure_in_mbar=10)
+
 
 
 # Plot the spectra
-print ("Plotting the spectra...")
-print ()
-print ()
-
 #planet_name = planet_names[0]
-spectra.plot_blackbody_phase_curve(planet_name,
-                            planet_radii,
-                            num_phases=4,
-                            transmission_filter_name='MIRI',
-                            wav_subset=[5e-6, 12e-6],
-                            resolution=100,
-                            temp=600)
+#spectra.plot_blackbody_phase_curve(planet_name,
+#                            planet_radii,
+#                            num_phases=4,
+#                            transmission_filter_name='MIRI',
+#                            wav_subset=[5e-6, 12e-6],
+#                            resolution=100,
+#                            temp=600)
 
 
-spectra.plot_planet_spectra_blackbody_comparison_hz(planet_names,black_body_temperatures=[400, 600, 800],num_phases=4)
+#spectra.plot_planet_spectra_blackbody_comparison_hz(planet_names,black_body_temperatures=[400, 600, 800],num_phases=4)
 
 #spectra.plot_planet_spectra_blackbody_comparison_microns(planet_names,
 #                                                 black_body_temperatures=[1000, 2000],
@@ -224,9 +190,9 @@ spectra.plot_planet_spectra_blackbody_comparison_hz(planet_names,black_body_temp
 #                          transmission_filter_name='MIRI',
 #                          wav_subset=[5e-6, 12e-6])
 
-spectra.plot_fp_fs_phase_curves(planet_names,
-                          planet_name_char_len,
-                          planet_radii,
-                          num_phases=24,
-                          transmission_filter_name='MIRI',
-                          wav_subset=[5e-6, 12e-6])
+#spectra.plot_fp_fs_phase_curves(planet_names,
+#                          planet_name_char_len,
+#                          planet_radii,
+#                          num_phases=24,
+#                          transmission_filter_name='MIRI',
+#                          wav_subset=[5e-6, 12e-6])

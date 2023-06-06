@@ -56,7 +56,7 @@ smoothing = True
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-none-0clouds-1met"]
+planet_names = ["GJ1214b-soot_2xpi0-0clouds-100met"]
 
 opacity_files = 'SET_1'
 
@@ -342,7 +342,7 @@ for q in range(len(planet_names)):
             # Rename rt_emission_aerosols.exe to include planet_name, phase, doppler, and inclination
             file_name = f"rt_emission_aerosols_{planet_name}_phase_{phase_strs[i]}.exe"
             os.rename("rt_emission_aerosols.exe", file_name)
-            
+
             # Run the renamed executable
             os.system(f"./{file_name}")
         return None
