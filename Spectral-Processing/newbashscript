@@ -1,0 +1,6 @@
+#!/bin/bash
+
+python -m numpy.f2py -c testing1.f90 -m fortranpythonfile
+
+
+python run_entire_suite.py
