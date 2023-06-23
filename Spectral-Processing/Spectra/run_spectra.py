@@ -13,6 +13,7 @@ import re
 import shutil
 import grab_input_data
 import setup_opac_versions
+from createfort7dictionary import fort7dict
 
 # Phases in degrees, inclination in radians (sorry)
 # An inclination of 0 corresponds to edge on
@@ -93,18 +94,18 @@ for q in range(len(planet_names)):
     runname     = planet_name + '/Planet_Run'
     path        = '../GCM-OUTPUT/'
 
-    aerosol_layers = int(grab_input_data.get_input_data(path, runname,"fort.7", "AERLAYERS"))
-    grav           = grab_input_data.get_input_data(path, runname, "fort.7","GA")
-    gasconst       = grab_input_data.get_input_data(path, runname, "fort.7","GASCON")
-    R_PLANET       = grab_input_data.get_input_data(path, runname, "fort.7","RADEA")
-    P_ROT          = (grab_input_data.get_input_data(path, runname, "fort.7","WW") / (2.0*np.pi)*(24*3600)) ** -1.0
-    oom            = grab_input_data.get_input_data(path, runname, "fort.7","OOM_IN")
-    MTLX           = grab_input_data.get_input_data(path, runname, "fort.7","MTLX")
+    aerosol_layers = int(fort7dict['AERLAYERS'])
+    grav           = fort7dict['GA']
+    gasconst       = fort7dict['GASCON']
+    R_PLANET       = fort7dict['RADEA']
+    P_ROT          = fort7dict['WW'] / (2.0*np.pi)*(24*3600)) ** -1.0
+    oom            = fort7dict['OOM_IN']
+    MTLX           = fort7dict['MTLX']
 
     # Necessary for choosing the chem table!
-    MET_X_SOLAR    = 10.0 ** grab_input_data.get_input_data(path, runname, "fort.7","METALLICITY")
-    HAZES          = grab_input_data.get_input_data(path, runname, "fort.7","HAZES")
-    MOLEF          = grab_input_data.get_input_data(path, runname, "fort.7", "MOLEF")
+    MET_X_SOLAR    = 10.0 ** fort7dict['METALLICITY']
+    HAZES          = fort7dict['HAZES']
+    MOLEF          = fort7dict['MOLEF']
     
     # This is the path to the chemistry file
     # This assumes that 10x solar uses the 1x met chem tables, maybe a bad thing
@@ -138,16 +139,18 @@ for q in range(len(planet_names)):
         print("Error in choosing the chemistry file!")
 
     GAS_CONSTANT_R = 8.314462618
-    GASCON = grab_input_data.get_input_data(path, runname, "fort.7","GASCON")
+    GASCON = fort7dict['GASCON']
     MEAN_MOLECULAR_WEIGHT = np.round((GAS_CONSTANT_R/GASCON) * 1000, 4)
 
-    print ()
-    print ()
+    print ('\n')
+    print ('\n')
     print ("*************************************")
     print ("*************************************")
     print ("RUNNING: " + planet_name)
 
-    # THIS IS A PROBLEM BECAUSE SOOT IS NOT DEFINED IN fort.7
+    HAZE_TYPE = fort7dict['HAZETYPE']
+
+    '''
     if ("SOOT".lower() in planet_names[q].lower()):
         HAZE_TYPE = 'soot'
     elif ("THOLIN".lower() in planet_names[q].lower()):
@@ -157,11 +160,12 @@ for q in range(len(planet_names)):
     
     if ("2xpi0".lower() in planet_names[q].lower()):
         HAZE_TYPE = 'soot-2xpi0'
-
+    
     if (HAZE_TYPE == 'soot' or HAZE_TYPE == 'soot-2xpi0' or HAZE_TYPE == 'tholin' or HAZE_TYPE == 'sulfur'):
         HAZES = True
     else:
         HAZES = False
+    '''
 
     # Whether  there are clouds
     # 0 is no clouds, 1 is clouds
