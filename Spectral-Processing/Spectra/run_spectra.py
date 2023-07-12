@@ -13,11 +13,15 @@ import re
 import shutil
 import grab_input_data
 import setup_opac_versions
-from createfort7dictionary import fort7dict
+os.system('rm -f fortrantopythonfile.cpython-39-x86_64-linux-gnu.so')
+os.system('python -m numpy.f2py -c fortran_readfort7.f90 -m fortrantopythonfile')
+fort7dict = grab_input_data.create_dict()
 
 # Phases in degrees, inclination in radians (sorry)
 # An inclination of 0 corresponds to edge on
+#phases = [0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0, 195.0, 210.0, 225.0, 240.0, 255.0, 270.0, 285.0, 300.0, 315.0]
 phases = [0.0]
+#phases = [0.0]
 inclinations = [0.0]
 system_obliquity = 0
 
@@ -57,7 +61,7 @@ smoothing = True
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-soot_2xpi0-0clouds-100met"]
+planet_names = ["WASP18b_NUC_25LAYERS_SOOT_DENSE"]
 
 opacity_files = 'SET_1'
 
@@ -98,7 +102,7 @@ for q in range(len(planet_names)):
     grav           = fort7dict['GA']
     gasconst       = fort7dict['GASCON']
     R_PLANET       = fort7dict['RADEA']
-    P_ROT          = fort7dict['WW'] / (2.0*np.pi)*(24*3600)) ** -1.0
+    P_ROT          = fort7dict['WW'] / (2.0*np.pi)*(24*3600) ** -1.0
     oom            = fort7dict['OOM_IN']
     MTLX           = fort7dict['MTLX']
 
