@@ -11,10 +11,11 @@ import add_clouds
 import convert_fort_files
 import re
 import shutil
-import grab_input_data
 import setup_opac_versions
+from Clean_suite import automaticclean
 os.system('rm -f fortrantopythonfile.cpython-39-x86_64-linux-gnu.so')
 os.system('python -m numpy.f2py -c fortran_readfort7.f90 -m fortrantopythonfile')
+import grab_input_data
 fort7dict = grab_input_data.create_dict()
 
 # Phases in degrees, inclination in radians (sorry)
@@ -400,3 +401,7 @@ for q in range(len(planet_names)):
             for W0_VAL in W0_VALS:
                 for doppler_val in dopplers:
                     run_exo(input_paths, inclination_strs, phase_strs, doppler_val)
+
+#uncomment this out if you would like the files to automatically delete the bonus files that are created
+
+#automaticclean(__file__)
