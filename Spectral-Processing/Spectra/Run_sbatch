@@ -27,11 +27,5 @@
 module load gcc/10.3.0
 module load python3.9-anaconda
 
-#only comment this out if you are not using Run_all_sbatch
-
-#rm -f fortrantopythonfile.cpython-39-x86_64-linux-gnu.so
-#python -m numpy.f2py -c fortran_readfort7.f90 -m fortrantopythonfile
-#python createfort7dictionary.py
-
 python run_spectra.py
 
