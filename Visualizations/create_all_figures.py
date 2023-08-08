@@ -19,9 +19,9 @@ import aerosol_maps
 import aerosol_profiles
 import wind_maps
 import wind_isobars
-import emission_maps
+#import emission_maps
 
-import basemap_hemispheric_projections
+#import basemap_hemispheric_projections
 
 import cross_correlation
 
@@ -32,39 +32,19 @@ plt.style.use('science.mplstyle')
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
 
-planet_names = ["GJ1214b-none-0clouds-1met",
-                "GJ1214b-none-0clouds-30met",
-                "GJ1214b-none-0clouds-100met",
-                "GJ1214b-none-25clouds-1met",
-                "GJ1214b-none-25clouds-30met",
-                "GJ1214b-none-25clouds-100met",
+planet_names = ["HD189-PICKET", "HD189-PICKET-NUC-CLOUDS", "HD189-PICKET-NUC-CLOUDS-COMPACT",
+                "HD189-DOGRAY", "HD189-DOGRAY-NUC-CLOUDS", "HD189-DOGRAY-NUC-CLOUDS-COMPACT",
+                "HD209-PICKET", "HD209-PICKET-NUC-CLOUDS", "HD209-PICKET-NUC-CLOUDS-COMPACT",
+                "HD209-DOGRAY", "HD209-DOGRAY-NUC-CLOUDS", "HD209-DOGRAY-NUC-CLOUDS-COMPACT"]
 
-                "GJ1214b-soot-0clouds-1met",   
-                "GJ1214b-soot-0clouds-30met",
-                "GJ1214b-soot-0clouds-100met",
-                "GJ1214b-soot-25clouds-1met",
-                "GJ1214b-soot-25clouds-30met",
-                "GJ1214b-soot-25clouds-100met",
-
-                "GJ1214b-soot_2xpi0-0clouds-1met",
-                "GJ1214b-soot_2xpi0-0clouds-30met",
-                "GJ1214b-soot_2xpi0-0clouds-100met",
-                "GJ1214b-soot_2xpi0-25clouds-1met",
-                "GJ1214b-soot_2xpi0-25clouds-30met",
-                "GJ1214b-soot_2xpi0-25clouds-100met",
-
-                "GJ1214b-tholin-0clouds-1met",
-                "GJ1214b-tholin-0clouds-30met",
-                "GJ1214b-tholin-0clouds-100met",
-                "GJ1214b-tholin-25clouds-1met",
-                "GJ1214b-tholin-25clouds-30met",
-                "GJ1214b-tholin-25clouds-100met"]
-
-planet_names = ["HD209-DOGRAY"]
+planet_names = ["HD189-PICKET_medres", "HD189-PICKET-NUC-CLOUDS_medres", "HD189-PICKET-NUC-CLOUDS-COMPACT_medres",
+                "HD189-DOGRAY_medres", "HD189-DOGRAY-NUC-CLOUDS_medres", "HD189-DOGRAY-NUC-CLOUDS-COMPACT_medres",
+                "HD209-PICKET_medres", "HD209-PICKET-NUC-CLOUDS_medres", "HD209-PICKET-NUC-CLOUDS-COMPACT_medres",
+                "HD209-DOGRAY_medres", "HD209-DOGRAY-NUC-CLOUDS_medres", "HD209-DOGRAY-NUC-CLOUDS-COMPACT"]
 
 
 # Set the opacity files to use
-opacity_files = 'SET_1'
+opacity_files = 'SET_3'
 if opacity_files == 'SET_1':
     cloud_wavelength = 5.0
 elif opacity_files == 'SET_2':
@@ -91,10 +71,15 @@ for planet_name in planet_names:
                                                             planet_name, "fort.7","RADEA")))
         print("Planet Radii: ", planet_radii[0])
     else:
-        planet_radii.append(17469282.0)
-        #planet_radii.append(0.9853199e+08) # HD 209
-        print("WARNING! fort.7 file not found for " + planet_name)
-        #exit(0)
+        if "hd189" in planet_name.lower():
+            planet_radii.append(0.81358e+08) # HD 189
+        elif "hd209" in planet_name.lower():
+            planet_radii.append(0.9853199e+08) # HD 209
+        elif "gj1214" in planet_name.lower():
+            planet_radii.append(17469282.0)
+        else:
+            print("WARNING! fort.7 file not found for " + planet_name)
+            exit(0)
 
     
 # Auto parse some of these params
@@ -116,7 +101,6 @@ else:
 
 
 # Plot the broadband phase curves
-
 #broadband_phase_curves.plot_reflected_phasecurves(planet_names, nlon, two_sets_of_planets=False)
 #broadband_phase_curves.plot_thermal_phasecurves(planet_names, nlon, two_sets_of_planets=False)
 #broadband_phase_curves.plot_reflected_starlight_maps(planet_names)
@@ -145,10 +129,8 @@ else:
 
 #basemap_hemispheric_projections.plot_observer_projection(planet_names, nlat, nlon,planet_radii, pressure_in_mbar=10)
                                                          
-cross_correlation.plot_cross_correlations(planet_names, num_phases=24)
+#cross_correlation.plot_cross_correlations(planet_names, num_phases=24)
                                             
-
-
 
 # Plot the spectra
 #planet_name = planet_names[0]
@@ -169,16 +151,11 @@ cross_correlation.plot_cross_correlations(planet_names, num_phases=24)
 
 #spectra.plot_star_spectra_test(planet_names)
 #spectra.plot_filters(planet_names)
-#spectra.plot_spectra_simple(planet_names, num_phases=2)
+spectra.plot_spectra_simple(planet_names, num_phases=4)
 
 # If resolution is set to 0, don't convolve at all
 
-#spectra.plot_fp_spectra(planet_names,
-#                            planet_radii,
-#                            num_phases=8,
-#                            transmission_filter_name='None',
-#                            wav_subset=[5e-6, 12e-6],
-#                            resolution=100)
+#spectra.plot_fp_spectra(planet_names,num_phases=6,transmission_filter_name='None',wav_subset=[0, 100],resolution=0)
 
 #spectra.plot_fp_fs_spectra(planet_names,
 #                            planet_radii,
@@ -188,15 +165,15 @@ cross_correlation.plot_cross_correlations(planet_names, num_phases=24)
 #                            resolution=100)
 
 # If resolution is set to 0, don't convolve at all
-#spectra.plot_fp_phase_curves(planet_names,
-#                          planet_name_char_len,
-#                          num_phases=24,
-#                          transmission_filter_name='MIRI',
-#                          wav_subset=[5e-6, 12e-6])
+spectra.plot_fp_phase_curves(planet_names,
+                          planet_name_char_len,
+                          num_phases=24,
+                          transmission_filter_name='MIRI',
+                          wav_subset=[5e-6, 12e-6])
 
 #spectra.plot_fp_fs_phase_curves(planet_names,
 #                          planet_name_char_len,
 #                          planet_radii,
 #                          num_phases=24,
-#                          transmission_filter_name='MIRI',
+#                          transmission_filter_name='None',
 #                          wav_subset=[5e-6, 12e-6])

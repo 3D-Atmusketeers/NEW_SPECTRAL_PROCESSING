@@ -599,8 +599,8 @@ def plot_spectra_simple(planet_names, num_phases):
 
         # Do somet figure stuff
         #ax.set_xlim(min(planet_spectra.wavelength * 1e6), max(planet_spectra.wavelength * 1e6))
-        ax.set_xlim(0.5, 12)
-        ax.set_ylim(1e2,1e6)
+        #ax.set_xlim(0.5, 12)
+        #ax.set_ylim(1e2,1e6)
         ax.legend(fontsize=12, loc=(0, 1.03), ncol=5, mode='expand', title='Orbital Phase', title_fontsize=16)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
         ax.set_ylabel(r'Flux (W/m$^2$/micron)')
@@ -867,7 +867,7 @@ def plot_fp_fs_spectra(planet_names, planet_radii, num_phases, transmission_filt
     return None
 
 
-def plot_fp_spectra(planet_names, planet_radii, num_phases, transmission_filter_name, wav_subset, resolution):
+def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subset, resolution):
     cm_name = 'batlow'
     cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
     cm_file = np.roll(cm_file, 140, axis=0)
@@ -923,14 +923,16 @@ def plot_fp_spectra(planet_names, planet_radii, num_phases, transmission_filter_
             ax.plot(planet_spectra.wavelength * 1e6,
                     flux,
                     color=my_colors(i / num_phases),
-                    linewidth=1.5,
+                    linewidth=1.0,
                     label=str(np.round(rot_val * i / 360., 3)))
 
             pd.DataFrame({'Wavelength (microns)': planet_spectra.wavelength * 1e6, 'Planet_Flux_micron': flux}
                          ).to_csv('OUTPUT_DATA/Fp_Spectra_{}_{}.txt'.format(str(i * rot_val), planet_name), sep=' ')
 
         ax.set_xlim(min(planet_spectra.wavelength * 1e6), max(planet_spectra.wavelength * 1e6))
-        ax.legend(fontsize=12, loc=(0, 1.03), ncol=4, mode='expand', title='Orbital Phase', title_fontsize=18)
+        #ax.set_yscale('log')
+        ax.set_ylim(0, 200000)
+        ax.legend(fontsize=12, loc=(0, 1.03), ncol=6, mode='expand', title='Orbital Phase', title_fontsize=18)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
         ax.set_ylabel(r'F$_p$ (W/m$^2$/micron)')  # (W m$^{-2}$)
         plt.savefig('../Figures/Fp_Spectra_{}.jpg'.format(planet_name), dpi=200, bbox_inches='tight')
