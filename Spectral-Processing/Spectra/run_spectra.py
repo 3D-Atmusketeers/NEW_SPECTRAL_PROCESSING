@@ -39,6 +39,8 @@ NLON = 96
 # 3 is rotation only
 dopplers = [0]
 
+Planet_name = ''
+print('planet name ', Planet_name)
 # If you only need to change the phase you can use this knob
 # It skips a lot of steps for the regridding
 ONLY_PHASE = True
@@ -46,18 +48,33 @@ ONLY_PHASE = True
 #this is automatically set to true if the current phase is the lowest phase run
 LOWEST_PHASE = False
 if LOWEST_PHASE:
+    os.system('rm -rf ' + Planet_name + 'fortfiles')
+    os.mkdir(Planet_name + 'fortfiles')
+    os.chdir('..')
+    directory_name = os.getcwd()
+    os.chdir('GCM-OUTPUT')
+    print(directory_name)
+    os.chdir(Planet_name + '/Planet_Run')
+    os.system('cp fort.7 ' + str(directory_name) + '/Spectra/' + Planet_name + 'fortfiles')
+    os.chdir(str(directory_name) + '/Spectra')
+    os.system('cp fortran_readfort7.f90 ' + Planet_name + 'fortfiles')
+    os.chdir(Planet_name + 'fortfiles')
     os.system('rm -f fortrantopythonfile.cpython-39-x86_64-linux-gnu.so')
     os.system('python -m numpy.f2py -c fortran_readfort7.f90 -m fortrantopythonfile')
     import grab_input_data
     fort7dict = grab_input_data.create_dict()
+    os.chdir(str(directory_name) + '/Spectra/')
 else:
     imported = False
     while not imported:
         try:
+            os.chdir(planet_name + 'fortfiles')
             import grab_input_data
             fort7dict = grab_input_data.create_dict()
             imported = True
+            chdir(str(directory_name) + '/Spectra')
         except:
+            chdir(str(directory_name) + '/Spectra')
             print('stuck in numpy fortran loop')
             time.sleep(10)
 

@@ -5,7 +5,7 @@
 *************************************************
 This is a guide for how to use the files here
 
-Recently, Isaac has added a lot of stuff to the files. Hopefully this makes it way easier to use, but it also may cause problems if not documented.
+Recently, Isaac and Alex have changed how to run the post processing. It is now much easier and faster. 
 
 *************************************************
 ************         HOW TO RUN      ************
@@ -14,14 +14,16 @@ Recently, Isaac has added a lot of stuff to the files. Hopefully this makes it w
 Spectral-Processing/run_entire_suite.py
     This will run the entire suite
 
-    The best way to do this is to use the Run_all_sbatch command. You will have to do this in 3 steps unfortunatly.
-    The benefit is that it is very fast to get everything in parallel.
-
-
-    STEP_ONE: Regrid to constant altitude. This should be done with only 1 phase!!!!
-    STEP_TWO: Create all the init files. NEEDS ALL THE PHASES
-    STEP_THREE: Run the regridding, need to wait in between all the executables!
-
+    The entire post processing suite will run by typing 'sbatch Run_all_sbatch' in your command line. A good go to for runtime is at least 24 hours. 
+    The benefit is that it is very fast to get everything in parallel, and now everything is run by one click of the button. 
+    
+    Be sure to specify which phases you want run in run_entire_suite.py . 
+	
+    There are three parts to the post processing — altitude regridding, init files, and the final calculations. 
+    STEP_ONE: Altitude regridding takes around an hour and submits one job. It creates 4 files for every planet and places them in /PLANET_MODELS/ . 
+    STEP_TWO: The init files are placed in /Spectra/DATA/ . It will create a separate init file for every phase you run. These take around 20 minutes. 
+    STEP_THREE: Finally, the ending calculations will be placed in /Spectra/OUT/ . There will be two data files for each phase ran. These can take 12 hours depending on the cloudiness of your model. 
+    All three above steps are run at the same time. The code will automatically determine if the altitude regridding and the init files need to be made. This means that if you want to redo them, be sure to delete / move the existing files out. It will not overwrite files in /PLANET_MODELS/ or /Spectra/DATA/ . 
 
     The main part of the program that this is calling is Spectra/run_spectra.py
     This will run all the subprograms for regridding, interpolating, and finally running the post-processing
@@ -30,9 +32,7 @@ Spectral-Processing/run_entire_suite.py
         NLAT: The final number of layers the model will have, try 250 or 500
         opacity_files: Which set of opacity files you're using
 
-    The code is pretty good at grabbing all the needed data from the file name and the fort.7, however, its not perfect
-    Make sure that you check that the code is using what you want it to in the terminal output!
-    Especially the star data! This is the hardest to get, because its basically only going off the file name.
+    The code will grab all necessary information from the fort.7 . 
 
     Also, if you care about getting the cloud dependent wavelength properties, you do have to set that in run_spectra.py
     This is only for specific visualization stuff, not the general postprocessing
@@ -57,31 +57,12 @@ First, there are several folders:
 
 
 *************************************************
-************     FILE NAMEING       *************
+************     FILE NAMING       **************
 *************************************************
 
-One thing is that these files now expect a very specific format for the GCM names. This allows for super efficiency, but you have to be careful.
+The new version of the post processing grabs all necessary information from the fort.7 . This means that specific naming conventions for the GCM-OUTPUT subfolders are no longer necessary. 
 
-NORMAL PLANET NAME:
-PLANETNAME_CLOUDTYPE_CLOUDNUMBER_HAZETYPE_RADTRANROUTINE_[DENSE]
-
-- PLANETNAME      || GJ1214b for example
-- CLOUDTYPE       || NUCCLOUDS or ALLCLOUDS for example. If empty, then no clouds
-- CLOUDNUMBER     || The int number of clouds plus the word LAYERS. 25LAYERS for example
-- HAZETYPE        || SOOT, THOLIN, or SOOT2X. If empty, no hazes
-- RADTRANROUTINE  || Not used, but good to have for bookkeeping. PICKET or DOGRAY
-- [DENSE]         || Changes the tag MTLX. So any value between 0 and 1
-
-So you would name it something like GJ1214b_NUC_25LAYERS_SOOT_DENSE
-
-The code will automatically parse from this that the planet has nucleation limited clouds, 25 cloud layers, and soot hazes
-If you don't want any hazes make sure to put clear (or edit the run_spectra file)
-
-Use "ALL" for all clouds, "NUC" for nucleation, and don't include the word "CLOUDS" if you don't want clouds
-Use "SOOT" for soot hazes, "THOLIN" for tholin hazes, and "CLEAR" for no hazes.
-Use the keyword "DENSE" to change the MTLX to 1.0. It will assume 0.1 otherwise.
-
-Also be very careful if you put different metallities that the model can confuse metallicity and cloud layers.
+However, it is important that planets are titled differently to prevent overwriting data output files. 
 
 Most importantly, check that the data output that is printed to the terminal matches what you want!
 It will print out all the important characterists!
@@ -107,6 +88,9 @@ AS YOU ADD STUFF TO THESE SETS PLEASE UPDATE THIS README!!!!
 *************************************************
 ************          NOTES         *************
 *************************************************
+
+
+In /Spectra/ , there will be (6 * number of phases + 2) number of files created. This is normal and is required for running the phases in parallel. You can easily delete them by running Clean_suite.py (by typing 'python3 Clean_suite.py' in command line). There will also be many slurm files created. Sorry. 
 
 The code currently can NOT do more than one planet system at a time. This is because star radius and effective temp and
 stuff like that needs to be changed per run.

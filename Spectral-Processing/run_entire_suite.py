@@ -53,10 +53,12 @@ def runsbatch(phases, source_file_name, finished_gcm, step, dependency = 'none')
                 for job in dependency:
                     dependstring+= ':' + job
                 sbatch = 'sbatch'
-                afterok = f'-d afterok{dependstring}'
+                d = '-d'
+                afterok = f'afterok{dependstring}'
                 name = new_file_name
-                run = subprocess.run([sbatch, afterok, name], stdout = subprocess.PIPE)
+                run = subprocess.run([sbatch, d, afterok, name], stdout = subprocess.PIPE)
             job = run.stdout.decode('utf-8')
+            print(job)
             jobnum.append(str(job[20:-1]).strip())
             print("Running", new_file_name)
     return jobnum
@@ -71,7 +73,10 @@ def copyfiles(phases, step, finished_gcms):
                 line = 'phases = [' + str(phase[1]) + ']\n'
             if line.strip().startswith('planet_names'):
                 line = 'planet_names = ["' + str(finished_gcms) + '"]\n'
+            if line.strip().startswith('Planet_name'):
+                line = 'Planet_name = "'+ str(finished_gcms) + '"\n'
             sys.stdout.write(line)
+            
     print('copied phase files successfully')
     return None
 
