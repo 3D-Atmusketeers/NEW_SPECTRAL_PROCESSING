@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 from shutil import copyfile
 from sys import exit
 import os
@@ -9,19 +8,15 @@ import run_grid
 import altitude_regridding
 import add_clouds
 import convert_fort_files
+import time
 import re
 import shutil
 import setup_opac_versions
-from Clean_suite import automaticclean
-os.system('rm -f fortrantopythonfile.cpython-39-x86_64-linux-gnu.so')
-os.system('python -m numpy.f2py -c fortran_readfort7.f90 -m fortrantopythonfile')
-import grab_input_data
-fort7dict = grab_input_data.create_dict()
+#import Clean_suite
 
 # Phases in degrees, inclination in radians (sorry)
 # An inclination of 0 corresponds to edge on
-#phases = [0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0, 195.0, 210.0, 225.0, 240.0, 255.0, 270.0, 285.0, 300.0, 315.0]
-phases = [0.0]
+phases = [0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0, 195.0, 210.0, 225.0, 240.0, 255.0, 270.0, 285.0, 300.0, 315.0, 330.0. 345.0]
 #phases = [0.0]
 inclinations = [0.0]
 system_obliquity = 0
@@ -47,6 +42,25 @@ dopplers = [0]
 # If you only need to change the phase you can use this knob
 # It skips a lot of steps for the regridding
 ONLY_PHASE = True
+
+#this is automatically set to true if the current phase is the lowest phase run
+LOWEST_PHASE = False
+if LOWEST_PHASE:
+    os.system('rm -f fortrantopythonfile.cpython-39-x86_64-linux-gnu.so')
+    os.system('python -m numpy.f2py -c fortran_readfort7.f90 -m fortrantopythonfile')
+    import grab_input_data
+    fort7dict = grab_input_data.create_dict()
+else:
+    imported = False
+    while not imported:
+        try:
+            import grab_input_data
+            fort7dict = grab_input_data.create_dict()
+            imported = True
+        except:
+            print('stuck in numpy fortran loop')
+            time.sleep(10)
+
 
 # If you only have the fort files use this
 # Please don't only have the fort files
@@ -264,7 +278,6 @@ for q in range(len(planet_names)):
             for inc in inclinations:
                 phase = str(phase)
                 inc = str(inc)
-
                 input_paths.append('DATA/init_' + planet_name + '_phase_{}_inc_{}.txt'.format(phase, inc))
                 inclination_strs.append(inc)
                 phase_strs.append(phase)
@@ -291,7 +304,7 @@ for q in range(len(planet_names)):
             input_temp  = input_paths[i]
             
             # This will copy all the files that need to be changed over with different opac versions
-            setup_opac_versions.replace_files(opacity_files, MET_X_SOLAR)
+            setup_opac_versions.replace_files(opacity_files, MET_X_SOLAR, LOWEST_PHASE)
 
             # Copy the template for inputs
             try:
@@ -345,15 +358,19 @@ for q in range(len(planet_names)):
                 file.write(filedata)
             
             # Run Eliza's code
-            #os.system('make clean')
-            os.system('make rt_emission_aerosols.exe')
-
-            # Rename rt_emission_aerosols.exe to include planet_name, phase, doppler, and inclination
-            file_name = f"rt_emission_aerosols_{planet_name}_phase_{phase_strs[i]}.exe"
-            os.rename("rt_emission_aerosols.exe", file_name)
-
-            # Run the renamed executable
-            os.system(f"./{file_name}")
+            
+            finished = False
+            while not finished:
+                try:
+                    file_name = f"rt_emission_aerosols_{planet_name}_phase_{phase_strs[i]}.exe"
+                    os.rename("rt_emission_aerosols.exe", file_name)
+                    permission_command = 'chmod 755 ' + file_name
+                    os.system(permission_command)
+                    os.system(f"./{file_name}")
+                    finished = True
+                except:
+                    time.sleep(30)
+                    print('stuck at aerosol step')
         return None
 
 
@@ -404,4 +421,4 @@ for q in range(len(planet_names)):
 
 #uncomment this out if you would like the files to automatically delete the bonus files that are created
 
-#automaticclean(__file__)
+#Clean_suite.automaticclean(__file__)
