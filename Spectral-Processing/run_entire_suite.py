@@ -9,6 +9,7 @@ import glob
 import numpy as np
 
 phases = [0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0, 195.0, 210.0, 225.0, 240.0, 255.0, 270.0, 285.0, 300.0, 315.0, 330.0, 345.0]
+#phases = [0.0, 15.0]
 gcm_folder = 'GCM-OUTPUT'
 source_file_name = "Run_sbatch"
 
@@ -108,6 +109,7 @@ for j in range (len(finished_gcms)):
     nonrotatedcount = len(glob.glob(finished_gcms[j] + '*'))
     if nonrotatedcount !=4:
         STEP_ONE = True
+        print('SETTING STEP_ONE (ALTITUDE REGRIDDING) TO BE TRUE')
 
 os.chdir('..')
 os.chdir('Spectra/DATA')
@@ -116,9 +118,13 @@ for x in range (len(finished_gcms)):
     initfilecount = len(glob.glob('init_' + str(finished_gcms[x]) + '*'))
     if initfilecount != len(phases):
         STEP_TWO = True
+        print('SETTING STEP_TWO (INIT FILES) TO BE TRUE')
 
 os.chdir('..')
 os.chdir('..')
+
+step1jobnums = []
+step2jobnums = []
 
 for i in range(len(finished_gcms)):
     if STEP_ONE:
@@ -145,7 +151,8 @@ for i in range(len(finished_gcms)):
                 sys.stdout.write(line)
                 
         step1jobnum = runsbatch(phases, source_file_name, finished_gcms[i], step)
-
+        step1jobnums.append(step1jobnum)
+        
     if STEP_TWO:
         phases = reassign
         step = 'steptwo'
@@ -178,20 +185,23 @@ for i in range(len(finished_gcms)):
                     sys.stdout.write(line)
                     
         step2jobnum = runsbatch(phases, source_file_name, finished_gcms[i], step,dependency)
+        step2jobnums.append(step2jobnum)
 
-    if STEP_THREE:
-        phases = reassign
-        step = 'stepthree'
+if STEP_THREE:
+    phases = reassign
+    step = 'stepthree'
+    for i in range(len(finished_gcms)):
         copyfiles(phases, step, finished_gcms[i])
-        
-        if STEP_ONE:
-            dependency = step1jobnum
-        if STEP_TWO:
-            dependency = step2jobnum
-        else:
-            dependency = 'none'
-            
-        for j, phase in enumerate(phases):
+
+    for j, phase in enumerate(phases):
+        for i in range(len(finished_gcms)):
+
+            if STEP_TWO:
+                dependency = step2jobnums[i]
+            else:
+                dependency = 'none'
+                print('no dependency, running step 3 (calculations) immediately')
+
             for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + '_' + step + ".py"], inplace=True):
                 if line.strip().startswith('STEP_ONE'):
                     line = '    STEP_ONE = False\n'
@@ -204,7 +214,7 @@ for i in range(len(finished_gcms)):
                 if line.strip().startswith('STEP_THREE'):
                     line = '    STEP_THREE = True\n'
                 sys.stdout.write(line)
-                
+
             if phase == lowest_phase:
                 for line in fileinput.input(
                         ["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + '_' + step + ".py"],
@@ -212,13 +222,14 @@ for i in range(len(finished_gcms)):
                     if line.strip().startswith('LOWEST_PHASE'):
                         line = 'LOWEST_PHASE = True\n'
                     sys.stdout.write(line)
-            
+
             phaseslist = [phase]
             step3jobnum = runsbatch(phaseslist, source_file_name, finished_gcms[i], step, dependency)
-            
+
+
             executable = f"Spectra/rt_emission_aerosols_{finished_gcms[i]}_phase_{str(phase)}.exe"
-            
             while not os.path.exists(executable):
                 print('Waiting for previous phase to create the .exe file')
-                time.sleep(30)
+                print('Waiting on ', executable)
+                time.sleep(60)
 

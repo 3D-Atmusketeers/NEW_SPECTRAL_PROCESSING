@@ -68,13 +68,14 @@ else:
     imported = False
     while not imported:
         try:
-            os.chdir(planet_name + 'fortfiles')
+            directory_name = os.getcwd()
+            os.chdir(Planet_name + 'fortfiles')
             import grab_input_data
             fort7dict = grab_input_data.create_dict()
             imported = True
-            chdir(str(directory_name) + '/Spectra')
+            os.chdir(str(directory_name))
         except:
-            chdir(str(directory_name) + '/Spectra')
+            os.chdir(str(directory_name))
             print('stuck in numpy fortran loop')
             time.sleep(10)
 
@@ -376,18 +377,14 @@ for q in range(len(planet_names)):
             
             # Run Eliza's code
             
-            finished = False
-            while not finished:
-                try:
-                    file_name = f"rt_emission_aerosols_{planet_name}_phase_{phase_strs[i]}.exe"
-                    os.rename("rt_emission_aerosols.exe", file_name)
-                    permission_command = 'chmod 755 ' + file_name
-                    os.system(permission_command)
-                    os.system(f"./{file_name}")
-                    finished = True
-                except:
-                    time.sleep(30)
-                    print('stuck at aerosol step')
+                
+            os.system('make rt_emission_aerosols.exe')
+            file_name = f"rt_emission_aerosols_{planet_name}_phase_{phase_strs[i]}.exe"    
+            copy_command = 'cp rt_emission_aerosols.exe' + file_name
+            os.rename('rt_emission_aerosols.exe', file_name)
+            permission_command = 'chmod 755 ' + file_name
+            os.system(permission_command)
+            os.system(f"./{file_name}")
         return None
 
 
