@@ -168,8 +168,8 @@ spectra.plot_spectra_simple(planet_names, num_phases=4)
 spectra.plot_fp_phase_curves(planet_names,
                           planet_name_char_len,
                           num_phases=24,
-                          transmission_filter_name='MIRI',
-                          wav_subset=[5e-6, 12e-6])
+                          transmission_filter_name='None',
+                          wav_subset=[3.081060e-6, 4.010380e-6])
 
 #spectra.plot_fp_fs_phase_curves(planet_names,
 #                          planet_name_char_len,
