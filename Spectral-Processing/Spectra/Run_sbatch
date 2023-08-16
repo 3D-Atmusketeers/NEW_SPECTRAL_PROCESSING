@@ -21,10 +21,11 @@
 
 ####  Your e-mail address and when you want e-mail
 
-######SBATCH --mail-user=isaacmalsky@gmail.com
+######SBATCH --mail-user=ajwingat@umich.edu
 #####SBATCH --mail-type=BEGIN,END,FAIL
 
 module load gcc/10.3.0
 module load python3.9-anaconda
 
 python run_spectra.py
+

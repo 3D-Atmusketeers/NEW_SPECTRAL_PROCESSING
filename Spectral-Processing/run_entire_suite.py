@@ -4,6 +4,16 @@ import shutil
 import fileinput
 import contextlib
 import time
+import subprocess
+import glob
+import numpy as np
+
+phases = [0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0, 195.0, 210.0, 225.0, 240.0, 255.0, 270.0, 285.0, 300.0, 315.0, 330.0, 345.0]
+#phases = [0.0, 15.0]
+gcm_folder = 'GCM-OUTPUT'
+source_file_name = "Run_sbatch"
+
+lowest_phase = np.min(phases)
 
 @contextlib.contextmanager
 def change_directory(path):
@@ -15,10 +25,66 @@ def change_directory(path):
     finally:
         os.chdir(prev_dir)
 
+def runsbatch(phases, source_file_name, finished_gcm, step, dependency = 'none'):
+    """ The function that submits jobs """
+    jobnum = []
+    for phase in enumerate(phases):
+        with change_directory("../Spectral-Processing/Spectra/"):
+            new_file_name = "Run_sbatch_" + finished_gcm + "_" + str(phase[1]) + '_' + step
+            shutil.copy(source_file_name, new_file_name)
+            temp_file_name = f"{new_file_name}_temp"
+            with open(new_file_name, "r") as file, open(temp_file_name, "w") as temp_file:
+                for line in file:
+                    if line.startswith("#SBATCH --job-name=spectra"):
+                        stepname = step.replace('step','')
+                        print(stepname, 'stepname')
+                        line = f"#SBATCH --job-name={str(phase[1])}_{stepname}_{finished_gcm}\n"
+                    elif line.startswith("python run_spectra.py"):
+                        line = f"python run_spectra_{finished_gcm}_{str(phase[1])}_{step}.py\n"
+                    temp_file.write(line)
 
-print("MAKE SURE TO SET THE PHASES AND THE OPACITY SET IN RUN_SPECTRA.PY!!!")
+            shutil.move(temp_file_name, new_file_name)
+            
+            if dependency == 'none':
+                sbatch = 'sbatch'
+                name = new_file_name
+                run = subprocess.run([sbatch, name], stdout = subprocess.PIPE)
+            else:
+                dependstring = ''
+                for job in dependency:
+                    dependstring+= ':' + job
+                sbatch = 'sbatch'
+                d = '-d'
+                afterok = f'afterok{dependstring}'
+                name = new_file_name
+                run = subprocess.run([sbatch, d, afterok, name], stdout = subprocess.PIPE)
+            job = run.stdout.decode('utf-8')
+            print(job)
+            jobnum.append(str(job[20:-1]).strip())
+            print("Running", new_file_name)
+    return jobnum
+
+
+def copyfiles(phases, step, finished_gcms):
+    print('phases are ', phases)   
+    for phase in enumerate(phases):
+        shutil.copyfile("Spectra/run_spectra.py", "Spectra/run_spectra_" + finished_gcms + "_" + str(phase[1]) + '_' + step + ".py")
+        for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms + "_" + str(phase[1]) + '_' + step + ".py"], inplace=True):
+            if line.strip().startswith('phases'):
+                line = 'phases = [' + str(phase[1]) + ']\n'
+            if line.strip().startswith('planet_names'):
+                line = 'planet_names = ["' + str(finished_gcms) + '"]\n'
+            if line.strip().startswith('Planet_name'):
+                line = 'Planet_name = "'+ str(finished_gcms) + '"\n'
+            sys.stdout.write(line)
+            
+    print('copied phase files successfully')
+    return None
+
+
+print("MAKE SURE TO SET THE OPACITY SET IN RUN_SPECTRA.PY!!!")
 print("")
-print("This is an important file, and has the capability of generating a lot of data in the wrong places")
+print("This will run the entire post processing suite")
 print("")
 print("Put this folder in the same folder as the directory of GCMS that you want to be run.")
 print("This will copy Spectral-Processing folder several times, with one GCM in each folder and then run each of them")
@@ -29,133 +95,141 @@ print ("")
 
 # Get the names of all the folders that you want to run
 #gcm_folder = input("Enter the name of the directory with all the GCMS you want to run: ")
-gcm_folder = 'GCM-OUTPUT'
+
 finished_gcms = [name for name in os.listdir(gcm_folder) if os.path.isdir(os.path.join(gcm_folder, name))]
+reassign = phases.copy()
 
-phases = [0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0, 195.0, 210.0, 225.0, 240.0, 255.0, 270.0, 285.0, 300.0, 315.0, 330.0, 345.0]
-
+#please do not touch these, the code will automatically determine which steps are necessary
 STEP_ONE = False
-STEP_TWO = True
-STEP_THREE = False
+STEP_TWO = False
+STEP_THREE = True
 
-# Count the number of true statements
-true_count = sum([STEP_ONE, STEP_TWO, STEP_THREE])
+os.chdir('PLANET_MODELS')
+for j in range (len(finished_gcms)):
+    nonrotatedcount = len(glob.glob(finished_gcms[j] + '*'))
+    if nonrotatedcount !=4:
+        STEP_ONE = True
+        print('SETTING STEP_ONE (ALTITUDE REGRIDDING) TO BE TRUE')
 
-# Check if more than one statement is true
-if true_count > 1:
-    # Code to be executed if more than one statement is true
-    print("You can't have more than one step be true")
-    exit(0)
-else:
-    pass
+os.chdir('..')
+os.chdir('Spectra/DATA')
 
-# For the first step you're only generating the non-rotated stuff
-# So you don't need to have all the jobs send off for the different phases
-# If you do, they'll save over each other
-if (STEP_ONE == True):
-    phases = [0.0]
+for x in range (len(finished_gcms)):
+    initfilecount = len(glob.glob('init_' + str(finished_gcms[x]) + '*'))
+    if initfilecount != len(phases):
+        STEP_TWO = True
+        print('SETTING STEP_TWO (INIT FILES) TO BE TRUE')
 
-source_file_name = "Run_sbatch"
+os.chdir('..')
+os.chdir('..')
+
+step1jobnums = []
+step2jobnums = []
+
 for i in range(len(finished_gcms)):
-    for j, phase in enumerate(phases):
-        # copy the file run_spectra.py to a new file with the extension finished_gcms[i]
-        shutil.copyfile("Spectra/run_spectra.py", "Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + ".py")
+    if STEP_ONE:
+        phases = [0.0]
+        step = 'stepone'
+        copyfiles(phases, step, finished_gcms[i])
 
-        # Replace the planet name in the spectra folder with the correct one
-        for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + ".py"], inplace=True):
-            if line.strip().startswith('planet_names'):
-                line = 'planet_names = ["' + str(finished_gcms[i]) + '"]\n'
-            sys.stdout.write(line)
-
-        # Replace the phase in the spectra folder with the correct one
-        for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + ".py"], inplace=True):
-            if line.strip().startswith('phases'):
-                line = 'phases = [' + str(phase) + ']\n'
-            sys.stdout.write(line)
-        
-
-        if STEP_ONE == True:
-            # Replace the phase in the run_spectra file with the correct one
-            for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + ".py"], inplace=True):
+        for j, phase in enumerate(phases):    
+            for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + '_' + step + ".py"], inplace=True):
                 if line.strip().startswith('STEP_ONE'):
                     line = '    STEP_ONE = True\n'
                 sys.stdout.write(line)
-
-            for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + ".py"], inplace=True):
+            for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + '_' + step + ".py"], inplace=True):
                 if line.strip().startswith('STEP_TWO'):
                     line = '    STEP_TWO = False\n'
                 sys.stdout.write(line)
-
-
-            for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + ".py"], inplace=True):
+            for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + '_' + step + ".py"], inplace=True):
                 if line.strip().startswith('STEP_THREE'):
                     line = '    STEP_THREE = False\n'
                 sys.stdout.write(line)
-
-
+            for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + '_' + step + ".py"], inplace=True):
+                if line.strip().startswith('LOWEST_PHASE'):
+                    line = 'LOWEST_PHASE = True\n'
+                sys.stdout.write(line)
+                
+        step1jobnum = runsbatch(phases, source_file_name, finished_gcms[i], step)
+        step1jobnums.append(step1jobnum)
         
-        if STEP_TWO == True:
-            # Replace the phase in the run_spectra file with the correct one
-            for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + ".py"], inplace=True):
+    if STEP_TWO:
+        phases = reassign
+        step = 'steptwo'
+        copyfiles(phases, step, finished_gcms[i])
+        
+        if STEP_ONE:
+            dependency = step1jobnum
+        else:
+            dependency = 'none'
+            
+        for j, phase in enumerate(phases):
+            for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + '_' + step + ".py"], inplace=True):
                 if line.strip().startswith('STEP_ONE'):
                     line = '    STEP_ONE = False\n'
                 sys.stdout.write(line)
-
-            for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + ".py"], inplace=True):
+            for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + '_' + step + ".py"], inplace=True):
                 if line.strip().startswith('STEP_TWO'):
                     line = '    STEP_TWO = True\n'
                 sys.stdout.write(line)
-
-            for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + ".py"], inplace=True):
+            for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + '_' + step + ".py"], inplace=True):
                 if line.strip().startswith('STEP_THREE'):
                     line = '    STEP_THREE = False\n'
                 sys.stdout.write(line)
-        
+            if phase == lowest_phase:
+                for line in fileinput.input(
+                        ["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + '_' + step + ".py"],
+                        inplace=True):
+                    if line.strip().startswith('LOWEST_PHASE'):
+                        line = 'LOWEST_PHASE = True\n'
+                    sys.stdout.write(line)
+                    
+        step2jobnum = runsbatch(phases, source_file_name, finished_gcms[i], step,dependency)
+        step2jobnums.append(step2jobnum)
 
-        if STEP_THREE == True:
-            for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + ".py"], inplace=True):
+if STEP_THREE:
+    phases = reassign
+    step = 'stepthree'
+    for i in range(len(finished_gcms)):
+        copyfiles(phases, step, finished_gcms[i])
+
+    for j, phase in enumerate(phases):
+        for i in range(len(finished_gcms)):
+
+            if STEP_TWO:
+                dependency = step2jobnums[i]
+            else:
+                dependency = 'none'
+                print('no dependency, running step 3 (calculations) immediately')
+
+            for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + '_' + step + ".py"], inplace=True):
                 if line.strip().startswith('STEP_ONE'):
                     line = '    STEP_ONE = False\n'
                 sys.stdout.write(line)
-
-            for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + ".py"], inplace=True):
+            for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + '_' + step + ".py"], inplace=True):
                 if line.strip().startswith('STEP_TWO'):
                     line = '    STEP_TWO = False\n'
                 sys.stdout.write(line)
-
-
-            for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + ".py"], inplace=True):
+            for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + '_' + step + ".py"], inplace=True):
                 if line.strip().startswith('STEP_THREE'):
                     line = '    STEP_THREE = True\n'
-                sys.stdout.write(line)      
+                sys.stdout.write(line)
 
-        # Run the spectra for that folder
-        with change_directory("../Spectral-Processing/Spectra/"):
-            new_file_name = "Run_sbatch_" + finished_gcms[i] + "_" + str(phase)
-            shutil.copy(source_file_name, new_file_name)
-            temp_file_name = f"{new_file_name}_temp"
-            with open(new_file_name, "r") as file, open(temp_file_name, "w") as temp_file:
-                for line in file:
-                    if line.startswith("#SBATCH --job-name=spectra"):
-                        line = f"#SBATCH --job-name={finished_gcms[i]}_{str(phase)}\n"
-                    elif line.startswith("python run_spectra.py"):
-                        line = f"python run_spectra_{finished_gcms[i]}_{str(phase)}.py\n"
-                    temp_file.write(line)
+            if phase == lowest_phase:
+                for line in fileinput.input(
+                        ["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + '_' + step + ".py"],
+                        inplace=True):
+                    if line.strip().startswith('LOWEST_PHASE'):
+                        line = 'LOWEST_PHASE = True\n'
+                    sys.stdout.write(line)
 
-            shutil.move(temp_file_name, new_file_name)
-            sbatch_command = f"sbatch {new_file_name}"
-            os.system(sbatch_command)
-
-            print("Runnng", new_file_name)
+            phaseslist = [phase]
+            step3jobnum = runsbatch(phaseslist, source_file_name, finished_gcms[i], step, dependency)
 
 
-            #python_command = f"python run_spectra_{finished_gcms[i]}_{str(phase)}.py"
-            #os.system(python_command)
-        
-        if STEP_THREE == True:
-            # Wait until the file is created before proceeding to the next iteration
             executable = f"Spectra/rt_emission_aerosols_{finished_gcms[i]}_phase_{str(phase)}.exe"
-
             while not os.path.exists(executable):
-                print("You've gotta wait for the jobs to be executed in series unfortunately")
-                time.sleep(1)
+                print('Waiting for previous phase to create the .exe file')
+                print('Waiting on ', executable)
+                time.sleep(60)
+

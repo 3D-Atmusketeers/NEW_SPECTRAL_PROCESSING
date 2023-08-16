@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 from shutil import copyfile
 from sys import exit
 import os
@@ -9,14 +8,16 @@ import run_grid
 import altitude_regridding
 import add_clouds
 import convert_fort_files
+import time
 import re
 import shutil
-import grab_input_data
 import setup_opac_versions
+#import Clean_suite
 
 # Phases in degrees, inclination in radians (sorry)
 # An inclination of 0 corresponds to edge on
-phases = [0.0]
+phases = [0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0, 195.0, 210.0, 225.0, 240.0, 255.0, 270.0, 285.0, 300.0, 315.0, 330.0. 345.0]
+#phases = [0.0]
 inclinations = [0.0]
 system_obliquity = 0
 
@@ -38,9 +39,46 @@ NLON = 96
 # 3 is rotation only
 dopplers = [0]
 
+Planet_name = ''
+print('planet name ', Planet_name)
 # If you only need to change the phase you can use this knob
 # It skips a lot of steps for the regridding
 ONLY_PHASE = True
+
+#this is automatically set to true if the current phase is the lowest phase run
+LOWEST_PHASE = False
+if LOWEST_PHASE:
+    os.system('rm -rf ' + Planet_name + 'fortfiles')
+    os.mkdir(Planet_name + 'fortfiles')
+    os.chdir('..')
+    directory_name = os.getcwd()
+    os.chdir('GCM-OUTPUT')
+    print(directory_name)
+    os.chdir(Planet_name + '/Planet_Run')
+    os.system('cp fort.7 ' + str(directory_name) + '/Spectra/' + Planet_name + 'fortfiles')
+    os.chdir(str(directory_name) + '/Spectra')
+    os.system('cp fortran_readfort7.f90 ' + Planet_name + 'fortfiles')
+    os.chdir(Planet_name + 'fortfiles')
+    os.system('rm -f fortrantopythonfile.cpython-39-x86_64-linux-gnu.so')
+    os.system('python -m numpy.f2py -c fortran_readfort7.f90 -m fortrantopythonfile')
+    import grab_input_data
+    fort7dict = grab_input_data.create_dict()
+    os.chdir(str(directory_name) + '/Spectra/')
+else:
+    imported = False
+    while not imported:
+        try:
+            directory_name = os.getcwd()
+            os.chdir(Planet_name + 'fortfiles')
+            import grab_input_data
+            fort7dict = grab_input_data.create_dict()
+            imported = True
+            os.chdir(str(directory_name))
+        except:
+            os.chdir(str(directory_name))
+            print('stuck in numpy fortran loop')
+            time.sleep(10)
+
 
 # If you only have the fort files use this
 # Please don't only have the fort files
@@ -56,7 +94,7 @@ smoothing = True
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-soot_2xpi0-0clouds-100met"]
+planet_names = ["WASP18b_NUC_25LAYERS_SOOT_DENSE"]
 
 opacity_files = 'SET_1'
 
@@ -93,18 +131,18 @@ for q in range(len(planet_names)):
     runname     = planet_name + '/Planet_Run'
     path        = '../GCM-OUTPUT/'
 
-    aerosol_layers = int(grab_input_data.get_input_data(path, runname,"fort.7", "AERLAYERS"))
-    grav           = grab_input_data.get_input_data(path, runname, "fort.7","GA")
-    gasconst       = grab_input_data.get_input_data(path, runname, "fort.7","GASCON")
-    R_PLANET       = grab_input_data.get_input_data(path, runname, "fort.7","RADEA")
-    P_ROT          = (grab_input_data.get_input_data(path, runname, "fort.7","WW") / (2.0*np.pi)*(24*3600)) ** -1.0
-    oom            = grab_input_data.get_input_data(path, runname, "fort.7","OOM_IN")
-    MTLX           = grab_input_data.get_input_data(path, runname, "fort.7","MTLX")
+    aerosol_layers = int(fort7dict['AERLAYERS'])
+    grav           = fort7dict['GA']
+    gasconst       = fort7dict['GASCON']
+    R_PLANET       = fort7dict['RADEA']
+    P_ROT          = fort7dict['WW'] / (2.0*np.pi)*(24*3600) ** -1.0
+    oom            = fort7dict['OOM_IN']
+    MTLX           = fort7dict['MTLX']
 
     # Necessary for choosing the chem table!
-    MET_X_SOLAR    = 10.0 ** grab_input_data.get_input_data(path, runname, "fort.7","METALLICITY")
-    HAZES          = grab_input_data.get_input_data(path, runname, "fort.7","HAZES")
-    MOLEF          = grab_input_data.get_input_data(path, runname, "fort.7", "MOLEF")
+    MET_X_SOLAR    = 10.0 ** fort7dict['METALLICITY']
+    HAZES          = fort7dict['HAZES']
+    MOLEF          = fort7dict['MOLEF']
     
     # This is the path to the chemistry file
     # This assumes that 10x solar uses the 1x met chem tables, maybe a bad thing
@@ -138,16 +176,18 @@ for q in range(len(planet_names)):
         print("Error in choosing the chemistry file!")
 
     GAS_CONSTANT_R = 8.314462618
-    GASCON = grab_input_data.get_input_data(path, runname, "fort.7","GASCON")
+    GASCON = fort7dict['GASCON']
     MEAN_MOLECULAR_WEIGHT = np.round((GAS_CONSTANT_R/GASCON) * 1000, 4)
 
-    print ()
-    print ()
+    print ('\n')
+    print ('\n')
     print ("*************************************")
     print ("*************************************")
     print ("RUNNING: " + planet_name)
 
-    # THIS IS A PROBLEM BECAUSE SOOT IS NOT DEFINED IN fort.7
+    HAZE_TYPE = fort7dict['HAZETYPE']
+
+    '''
     if ("SOOT".lower() in planet_names[q].lower()):
         HAZE_TYPE = 'soot'
     elif ("THOLIN".lower() in planet_names[q].lower()):
@@ -157,11 +197,12 @@ for q in range(len(planet_names)):
     
     if ("2xpi0".lower() in planet_names[q].lower()):
         HAZE_TYPE = 'soot-2xpi0'
-
+    
     if (HAZE_TYPE == 'soot' or HAZE_TYPE == 'soot-2xpi0' or HAZE_TYPE == 'tholin' or HAZE_TYPE == 'sulfur'):
         HAZES = True
     else:
         HAZES = False
+    '''
 
     # Whether  there are clouds
     # 0 is no clouds, 1 is clouds
@@ -255,7 +296,6 @@ for q in range(len(planet_names)):
             for inc in inclinations:
                 phase = str(phase)
                 inc = str(inc)
-
                 input_paths.append('DATA/init_' + planet_name + '_phase_{}_inc_{}.txt'.format(phase, inc))
                 inclination_strs.append(inc)
                 phase_strs.append(phase)
@@ -282,7 +322,7 @@ for q in range(len(planet_names)):
             input_temp  = input_paths[i]
             
             # This will copy all the files that need to be changed over with different opac versions
-            setup_opac_versions.replace_files(opacity_files, MET_X_SOLAR)
+            setup_opac_versions.replace_files(opacity_files, MET_X_SOLAR, LOWEST_PHASE)
 
             # Copy the template for inputs
             try:
@@ -336,14 +376,14 @@ for q in range(len(planet_names)):
                 file.write(filedata)
             
             # Run Eliza's code
-            #os.system('make clean')
+            
+                
             os.system('make rt_emission_aerosols.exe')
-
-            # Rename rt_emission_aerosols.exe to include planet_name, phase, doppler, and inclination
-            file_name = f"rt_emission_aerosols_{planet_name}_phase_{phase_strs[i]}.exe"
-            os.rename("rt_emission_aerosols.exe", file_name)
-
-            # Run the renamed executable
+            file_name = f"rt_emission_aerosols_{planet_name}_phase_{phase_strs[i]}.exe"    
+            copy_command = 'cp rt_emission_aerosols.exe' + file_name
+            os.rename('rt_emission_aerosols.exe', file_name)
+            permission_command = 'chmod 755 ' + file_name
+            os.system(permission_command)
             os.system(f"./{file_name}")
         return None
 
@@ -392,3 +432,7 @@ for q in range(len(planet_names)):
             for W0_VAL in W0_VALS:
                 for doppler_val in dopplers:
                     run_exo(input_paths, inclination_strs, phase_strs, doppler_val)
+
+#uncomment this out if you would like the files to automatically delete the bonus files that are created
+
+#Clean_suite.automaticclean(__file__)
