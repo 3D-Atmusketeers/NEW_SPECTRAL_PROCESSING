@@ -32,19 +32,12 @@ plt.style.use('science.mplstyle')
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
 
-planet_names = ["HD189-PICKET", "HD189-PICKET-NUC-CLOUDS", "HD189-PICKET-NUC-CLOUDS-COMPACT",
-                "HD189-DOGRAY", "HD189-DOGRAY-NUC-CLOUDS", "HD189-DOGRAY-NUC-CLOUDS-COMPACT",
-                "HD209-PICKET", "HD209-PICKET-NUC-CLOUDS", "HD209-PICKET-NUC-CLOUDS-COMPACT",
-                "HD209-DOGRAY", "HD209-DOGRAY-NUC-CLOUDS", "HD209-DOGRAY-NUC-CLOUDS-COMPACT"]
-
-planet_names = ["HD189-PICKET_medres", "HD189-PICKET-NUC-CLOUDS_medres", "HD189-PICKET-NUC-CLOUDS-COMPACT_medres",
-                "HD189-DOGRAY_medres", "HD189-DOGRAY-NUC-CLOUDS_medres", "HD189-DOGRAY-NUC-CLOUDS-COMPACT_medres",
-                "HD209-PICKET_medres", "HD209-PICKET-NUC-CLOUDS_medres", "HD209-PICKET-NUC-CLOUDS-COMPACT_medres",
-                "HD209-DOGRAY_medres", "HD209-DOGRAY-NUC-CLOUDS_medres", "HD209-DOGRAY-NUC-CLOUDS-COMPACT"]
+planet_names = ["WASP-77Ab_NCLD_NMAG", "WASP-77Ab_NCLD_YMAG",
+                "WASP-77Ab_YCLD_NMAG", "WASP-77Ab_YCLD_YMAG"]
 
 
 # Set the opacity files to use
-opacity_files = 'SET_3'
+opacity_files = 'SET_1'
 if opacity_files == 'SET_1':
     cloud_wavelength = 5.0
 elif opacity_files == 'SET_2':
@@ -77,6 +70,8 @@ for planet_name in planet_names:
             planet_radii.append(0.9853199e+08) # HD 209
         elif "gj1214" in planet_name.lower():
             planet_radii.append(17469282.0)
+        elif "wasp-77" in planet_name.lower():
+            planet_radii.append(8.603e7)
         else:
             print("WARNING! fort.7 file not found for " + planet_name)
             exit(0)
@@ -143,37 +138,40 @@ else:
 #                            temp=600)
 
 
-#spectra.plot_planet_spectra_blackbody_comparison_hz(planet_names,black_body_temperatures=[400, 600, 800],num_phases=4)
+#spectra.plot_planet_spectra_blackbody_comparison_hz(planet_names,black_body_temperatures=[1000, 1500, 2000, 2500],num_phases=4)
 
 #spectra.plot_planet_spectra_blackbody_comparison_microns(planet_names,
 #                                                 black_body_temperatures=[1000, 2000],
 #                                                 num_phases=2)
 
+
+
 #spectra.plot_star_spectra_test(planet_names)
-#spectra.plot_filters(planet_names)
-spectra.plot_spectra_simple(planet_names, num_phases=4)
+spectra.plot_filters(planet_names, transmission_filter_name='MIRI')
+
+#spectra.plot_spectra_simple(planet_names, num_phases=4)
 
 # If resolution is set to 0, don't convolve at all
 
 #spectra.plot_fp_spectra(planet_names,num_phases=6,transmission_filter_name='None',wav_subset=[0, 100],resolution=0)
 
-#spectra.plot_fp_fs_spectra(planet_names,
-#                            planet_radii,
-#                            num_phases=24,
-#                            transmission_filter_name='MIRI',
-#                            wav_subset=[5e-6, 12e-6],
-#                            resolution=100)
+spectra.plot_fp_fs_spectra(planet_names,
+                            planet_radii,
+                            num_phases=4,
+                            transmission_filter_name='MIRI',
+                            wav_subset=[3.722490e-6, 5.221980e-6],
+                            resolution=1000)
 
 # If resolution is set to 0, don't convolve at all
-spectra.plot_fp_phase_curves(planet_names,
-                          planet_name_char_len,
-                          num_phases=24,
-                          transmission_filter_name='None',
-                          wav_subset=[3.081060e-6, 4.010380e-6])
-
-#spectra.plot_fp_fs_phase_curves(planet_names,
+#spectra.plot_fp_phase_curves(planet_names,
 #                          planet_name_char_len,
-#                          planet_radii,
 #                          num_phases=24,
-#                          transmission_filter_name='None',
-#                          wav_subset=[5e-6, 12e-6])
+#                          transmission_filter_name='SPITZER_3_6',
+#                          wav_subset=[3.081060e-6, 4.010380e-6])
+
+spectra.plot_fp_fs_phase_curves(planet_names,
+                          planet_name_char_len,
+                          planet_radii,
+                          num_phases=24,
+                          transmission_filter_name='MIRI',
+                          wav_subset=[3.722490e-6, 5.221980e-6])

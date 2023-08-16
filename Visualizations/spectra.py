@@ -66,27 +66,23 @@ def get_fp_fs(interp_function, star_radius, planet_spectra, planet_radius, star_
 
 
 def get_filter(which_filter):
-    #df_5 = {'wav': np.linspace(5e-6, 6e-6, 500), 'transmission': np.linspace(1, 1, 500)}
-
-    #filter_3_6 = pd.read_csv('DATA/filter_3.6.dat', delim_whitespace=True, skiprows=3, names=['wav', 'transmission'])
-    #filter_4_5 = pd.read_csv('DATA/filter_4.5.dat', delim_whitespace=True, skiprows=3, names=['wav', 'transmission'])
-    #filter_5_0 = pd.DataFrame(data=df_5)
-
-    # Put the filters in meters
-    #filter_3_6.wav = filter_3_6.wav / 1e6
-    #filter_4_5.wav = filter_4_5.wav / 1e6
-
-    # Interpolate the filters
-    #f_3_6 = interpolate.interp1d(filter_3_6.wav, filter_3_6.transmission)
-    #f_4_5 = interpolate.interp1d(filter_4_5.wav, filter_4_5.transmission)
-    #f_5_0 = interpolate.interp1d(filter_5_0.wav, filter_5_0.transmission)
-
     if which_filter == 'MIRI':
-        filter_5_12 = pd.read_csv('DATA/MIRI_BANDPASS.txt', delim_whitespace=True, skiprows=1, names=['wav', 'transmission'])
-        filter_5_12.wav = filter_5_12.wav / 1e6
-        f_5_12 = interpolate.interp1d(filter_5_12.wav, filter_5_12.transmission)
-        return filter_5_12, f_5_12
+        spectral_filter = pd.read_csv('DATA/MIRI_BANDPASS.txt', delim_whitespace=True, skiprows=1, names=['wav', 'transmission'])
+        spectral_filter.wav = spectral_filter.wav / 1e6
+        spectral_filter_function = interpolate.interp1d(spectral_filter.wav, spectral_filter.transmission)
+        return spectral_filter, spectral_filter_function
+    elif which_filter == 'SPITZER_3_6':
+        spectral_filter = pd.read_csv('DATA/filter_3_6.dat', delim_whitespace=True, skiprows=1, names=['wav', 'transmission'])
+        spectral_filter.wav = spectral_filter.wav / 1e6
+        spectral_filter_function = interpolate.interp1d(spectral_filter.wav, spectral_filter.transmission)
+        return spectral_filter, spectral_filter_function 
+    elif which_filter == 'SPITZER_4_5':
+        spectral_filter = pd.read_csv('DATA/filter_4_5.dat', delim_whitespace=True, skiprows=1, names=['wav', 'transmission'])
+        spectral_filter.wav = spectral_filter.wav / 1e6
+        spectral_filter_function = interpolate.interp1d(spectral_filter.wav, spectral_filter.transmission)
+        return spectral_filter, spectral_filter_function
     else:
+        print("No filter set!")
         return None, None
 
 
@@ -138,8 +134,27 @@ def get_star_spectra(planet_name):
         flux_Watt_m_2_microns = np.asarray(list(stellar_spectrum_1['flux_Watt/m^2/micron'])) * u.W / u.m**2 / u.um
         flux_si = flux_Watt_m_2_microns * u.sr
         star_spectra = pd.DataFrame(list(zip(wavelengths_meters.value, flux_si.value)), columns=['wavelength', 'flux'])
-
         star_radius = 1.42 * 6.957e8
+
+
+
+    elif ("wasp-77a".lower() in planet_name.lower()):
+        print("Using a wasp 77 a pheonix stellar spectra")
+        spectra_file = 'DATA/lte05600-4.50-0.0.PHOENIX-ACES-AGSS-COND-2011-HiRes.fits'
+        with fits.open(spectra_file) as hdul:
+            spectra = hdul[0].data * 1e-7
+        with fits.open('DATA/Phoenix_Wav.fits') as hdul:
+            # Get the wavelengths in microns
+            wavelengths = hdul[0].data * 1e-4
+
+        stellar_spectrum_1 = pd.DataFrame(list(zip(wavelengths, spectra)), columns=['wavelength', 'flux_Watt/m^2/micron'])
+        wavelengths_meters = np.asarray(list(stellar_spectrum_1.wavelength * 1e-6)) * u.m
+        flux_Watt_m_2_microns = np.asarray(list(stellar_spectrum_1['flux_Watt/m^2/micron'])) * u.W / u.m**2 / u.um
+        flux_si = flux_Watt_m_2_microns * u.sr
+        star_spectra = pd.DataFrame(list(zip(wavelengths_meters.value, flux_si.value)), columns=['wavelength', 'flux'])
+        star_radius = 0.910 * 6.957e8
+
+
     elif ("HD189".lower() in planet_name.lower()):
         print("Using a HD189 stellar spectrum")
 
@@ -322,7 +337,7 @@ def plot_planet_spectra_blackbody_comparison_hz(planet_names, black_body_tempera
                     planet_spectra.flux,
                     alpha=1.0,
                     color=my_colors(i / num_phases),
-                    linewidth=0.5,
+                    linewidth=2.0,
                     label="Planet Spectra at phase: " + str(np.round(rot_val * i / 360., 3)))
 
         # Plot the blackbody temperatures
@@ -344,9 +359,9 @@ def plot_planet_spectra_blackbody_comparison_hz(planet_names, black_body_tempera
             j = j + 1
 
         # Do some figure stuff
-        ax.set_ylim(1e-12, 1e-8)
+        ax.set_ylim(1e-14, 5e-8)
         ax.set_yscale('log')
-        ax.set_xlim(5, 20)
+        ax.set_xlim(0.5, 5)
         ax.legend(fontsize=12, loc=(0, 1.05), ncol=2, mode='expand', title_fontsize=16)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
         ax.set_ylabel(r'Flux (W/m$^2$Hz)')  # (W m$^{-2}$)
@@ -467,9 +482,9 @@ def plot_star_spectra_test(planet_names):
             alpha=1.0,
             color='black',
             linewidth=0.5)
-
+        
         # blackbody comparison
-        Teffs = [3250]
+        Teffs = [5600]
         for Teff in Teffs:
             bb = BlackBody(temperature=Teff * u.K)
             wav = np.linspace(0.1, 20.0, 1000) * u.um
@@ -487,10 +502,11 @@ def plot_star_spectra_test(planet_names):
                 label='Blackbody at ' +
                 str(Teff),
                 alpha=1.0,
+                color='red',
                 linewidth=1.5)
 
-        plt.ylim(1e4, 1e7)
-        plt.xlim(0.1, np.max(star_spectra.wavelength * 1e6))
+        plt.ylim(1e2, 1.2e8)
+        plt.xlim(0.1, 5)
         plt.yscale('log')
         plt.xlabel('Wavelengths (microns)')
         plt.ylabel(r'Flux (Watts/m$^2$/micron)')
@@ -500,10 +516,8 @@ def plot_star_spectra_test(planet_names):
     return None
 
 
-def plot_filters(planet_names):
-    filter_5_12, f_5_12 = get_filter(which_filter='MIRI')
-
-    
+def plot_filters(planet_names, transmission_filter_name):
+    spectral_filter, spectral_filter_function = get_filter(which_filter=transmission_filter_name)
 
     # Figure aesthetics
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12, 6))
@@ -528,29 +542,21 @@ def plot_filters(planet_names):
             'flux',
             'reflected'])
 
-    # Get only the spectra in the filter ranges we care about
-    #spectra_3_6  = spectra[(spectra['wavelength'] > np.amin(filter_3_6.wav)) & (spectra['wavelength'] < np.amax(filter_3_6.wav))]
-    #spectra_4_5  = spectra[(spectra['wavelength'] > np.amin(filter_4_5.wav)) & (spectra['wavelength'] < np.amax(filter_4_5.wav))]
-    spectra_5_12 = spectra[(spectra['wavelength'] > np.amin(filter_5_12.wav)) & (spectra['wavelength'] < np.amax(filter_5_12.wav))]
+    filtered_spectra = spectra[(spectra['wavelength'] > np.amin(spectral_filter.wav)) & (spectra['wavelength'] < np.amax(spectral_filter.wav))]
 
-
-    # Plot the interpolated transmission stuff and the original ones
-    # ax.plot(filter_3_6.wav, filter_3_6.transmission, color='#7e1e9c', linewidth=3, alpha=0.2, label="")
-    # ax.plot(filter_4_5.wav, filter_4_5.transmission, color='#15b01a', linewidth=3, alpha=0.2, label="Original")
-    ax.plot(filter_5_12.wav * 1e6, filter_5_12.transmission, color='red', linewidth=3, alpha=0.9, label="MIRI")
-
-    ax.plot(spectra_5_12.wavelength * 1e6, f_5_12(spectra_5_12.wavelength),
+    ax.plot(spectral_filter.wav * 1e6, spectral_filter.transmission, color='red', linewidth=3, alpha=0.9, label=transmission_filter_name)
+    ax.plot(filtered_spectra.wavelength * 1e6, spectral_filter_function(filtered_spectra.wavelength),
             color='black',
             linewidth=3,
             linestyle='dashed',
             label="Interpolated")
+    
 
     # Some more Figure stuff
     ax.set_xlabel(r"Wavelength ($\mu$m)")
     ax.set_ylabel('Transmittance')
-    ax.legend(loc='lower right', ncol=2, fontsize=14)
-    plt.savefig('../Figures/Filters.jpg', dpi=100, bbox_inches='tight')
-    plt.clf()
+    ax.legend(fontsize=14)
+    plt.savefig('../Figures/Filters_{}.jpg'.format(transmission_filter_name), dpi=100, bbox_inches='tight')
     return None
 
 
@@ -590,17 +596,14 @@ def plot_spectra_simple(planet_names, num_phases):
 
             ax.plot(planet_spectra.wavelength * 1e6,
                     planet_spectra.flux,
-                    #color=my_colors(i / num_phases),
+                    color=my_colors(i / num_phases),
                     linewidth=1,
                     label=str(np.round(rot_val * i / 360., 3)))
 
-
-
-
         # Do somet figure stuff
         #ax.set_xlim(min(planet_spectra.wavelength * 1e6), max(planet_spectra.wavelength * 1e6))
-        #ax.set_xlim(0.5, 12)
-        #ax.set_ylim(1e2,1e6)
+        ax.set_xlim(0.5, 5)
+        ax.set_ylim(1e1,5e6)
         ax.legend(fontsize=12, loc=(0, 1.03), ncol=5, mode='expand', title='Orbital Phase', title_fontsize=16)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
         ax.set_ylabel(r'Flux (W/m$^2$/micron)')
@@ -682,8 +685,6 @@ def plot_fp_fs_phase_curves(planet_names, planet_name_char_len, planet_radii, nu
         pd.DataFrame({'Phase': np.arange(0, 360, rot_val), 'Fp_Fs_pmm': fp_fs_ratio * 1e6}
                      ).to_csv('OUTPUT_DATA/Fp_Fs_{}_Phase_Curves.txt'.format(planet_name), sep=' ')
         
-        print(planet_name)
-
         if '30met' in planet_name.lower():
             linestyle_str='dashed'
         else:
@@ -703,7 +704,7 @@ def plot_fp_fs_phase_curves(planet_names, planet_name_char_len, planet_radii, nu
     ax.legend(fontsize=12, loc=(0, 1.03), ncol=2, mode='expand')
     ax.set_xlabel('Orbital Phase')
     ax.set_ylabel(r'F$_p$/F$_s$ (ppm)')
-    plt.savefig('../Figures/Fp_Fs_Phase_Curves.jpg', dpi=200, bbox_inches='tight')
+    plt.savefig('../Figures/Fp_Fs_Phase_Curves_{}.jpg'.format(transmission_filter_name), dpi=200, bbox_inches='tight')
     plt.clf()
     return None
 
@@ -780,7 +781,7 @@ def plot_fp_phase_curves(planet_names, planet_name_char_len, num_phases,
         phases = np.linspace(0, 345, num_phases) / 360
         ax.plot(phases, fp,
                 linestyle='solid',
-                #color=my_colors(k / len(planet_names)),
+                color=my_colors(k / len(planet_names)),
                 linewidth=2.0,
                 label=planet_name)
 
@@ -789,7 +790,7 @@ def plot_fp_phase_curves(planet_names, planet_name_char_len, num_phases,
     ax.legend(fontsize=12, loc=(0, 1.03), ncol=2, mode='expand')
     ax.set_xlabel('Orbital Phase')
     ax.set_ylabel(r'Planet Flux (W/m$^2$/micron)')
-    plt.savefig('../Figures/Fp_Phase_Curves.jpg', dpi=200, bbox_inches='tight')
+    plt.savefig('../Figures/Fp_Phase_Curves_{}.jpg'.format(transmission_filter_name), dpi=200, bbox_inches='tight')
     plt.clf()
     return None
 
@@ -862,7 +863,7 @@ def plot_fp_fs_spectra(planet_names, planet_radii, num_phases, transmission_filt
         ax.legend(fontsize=12, loc=(0, 1.03), ncol=5, mode='expand', title='Orbital Phase', title_fontsize=18)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
         ax.set_ylabel(r'F$_p$/F$_s$ (ppm)')  # (W m$^{-2}$)
-        plt.savefig('../Figures/Fp_Fs_Spectra_{}.jpg'.format(planet_name), dpi=200, bbox_inches='tight')
+        plt.savefig('../Figures/Fp_Fs_Spectra_{}_{}.jpg'.format(planet_name, transmission_filter_name), dpi=200, bbox_inches='tight')
 
     return None
 
@@ -935,7 +936,7 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
         ax.legend(fontsize=12, loc=(0, 1.03), ncol=6, mode='expand', title='Orbital Phase', title_fontsize=18)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
         ax.set_ylabel(r'F$_p$ (W/m$^2$/micron)')  # (W m$^{-2}$)
-        plt.savefig('../Figures/Fp_Spectra_{}.jpg'.format(planet_name), dpi=200, bbox_inches='tight')
+        plt.savefig('../Figures/Fp_Spectra_{}_{}.jpg'.format(planet_name, transmission_filter_name), dpi=200, bbox_inches='tight')
 
     return None
 
