@@ -683,7 +683,7 @@ def plot_fp_fs_phase_curves(planet_names, planet_name_char_len, planet_radii, nu
 
         # Save the data
         pd.DataFrame({'Phase': np.arange(0, 360, rot_val), 'Fp_Fs_pmm': fp_fs_ratio * 1e6}
-                     ).to_csv('OUTPUT_DATA/Fp_Fs_{}_Phase_Curves.txt'.format(planet_name), sep=' ')
+                     ).to_csv('OUTPUT_DATA/Fp_Fs_{}_{}_Phase_Curves.txt'.format(planet_name, transmission_filter_name), sep=' ')
         
         if '30met' in planet_name.lower():
             linestyle_str='dashed'
@@ -775,7 +775,7 @@ def plot_fp_phase_curves(planet_names, planet_name_char_len, num_phases,
 
         # Save the data
         pd.DataFrame({'Phase': np.arange(0, 360, rot_val), 'fp W/m2/micron': fp}
-                     ).to_csv('OUTPUT_DATA/Fp_{}_Phase_Curves.txt'.format(planet_name), sep=' ')
+                     ).to_csv('OUTPUT_DATA/Fp_{}_{}_Phase_Curves.txt'.format(planet_name,transmission_filter_name), sep=' ')
 
         # Plot the data
         phases = np.linspace(0, 345, num_phases) / 360
@@ -856,7 +856,7 @@ def plot_fp_fs_spectra(planet_names, planet_radii, num_phases, transmission_filt
                     label=str(np.round(rot_val * i / 360., 3)))
 
             pd.DataFrame({'Wavelength (microns)': planet_spectra.wavelength * 1e6, 'Fp_Fs_pmm': planet_spectra.flux}
-                         ).to_csv('OUTPUT_DATA/Fp_Fs_Spectra_{}_Spectra_{}.txt'.format(str(i * rot_val), planet_name), sep=' ')
+                         ).to_csv('OUTPUT_DATA/Fp_Fs_Spectra_{}_Spectra_{}_{}.txt'.format(str(i * rot_val), planet_name, transmission_filter_name), sep=' ')
 
         # Figure legend
         ax.set_xlim(min(planet_spectra.wavelength * 1e6), max(planet_spectra.wavelength * 1e6))
@@ -928,7 +928,7 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
                     label=str(np.round(rot_val * i / 360., 3)))
 
             pd.DataFrame({'Wavelength (microns)': planet_spectra.wavelength * 1e6, 'Planet_Flux_micron': flux}
-                         ).to_csv('OUTPUT_DATA/Fp_Spectra_{}_{}.txt'.format(str(i * rot_val), planet_name), sep=' ')
+                         ).to_csv('OUTPUT_DATA/Fp_Spectra_{}_{}_{}.txt'.format(str(i * rot_val), planet_name, transmission_filter_name), sep=' ')
 
         ax.set_xlim(min(planet_spectra.wavelength * 1e6), max(planet_spectra.wavelength * 1e6))
         #ax.set_yscale('log')

@@ -16,7 +16,7 @@ import setup_opac_versions
 
 # Phases in degrees, inclination in radians (sorry)
 # An inclination of 0 corresponds to edge on
-phases = [0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0, 195.0, 210.0, 225.0, 240.0, 255.0, 270.0, 285.0, 300.0, 315.0, 330.0. 345.0]
+phases = [0.0]
 #phases = [0.0]
 inclinations = [0.0]
 system_obliquity = 0
@@ -40,6 +40,7 @@ NLON = 96
 dopplers = [0]
 
 Planet_name = ''
+
 print('planet name ', Planet_name)
 # If you only need to change the phase you can use this knob
 # It skips a lot of steps for the regridding
@@ -434,5 +435,4 @@ for q in range(len(planet_names)):
                     run_exo(input_paths, inclination_strs, phase_strs, doppler_val)
 
 #uncomment this out if you would like the files to automatically delete the bonus files that are created
-
 #Clean_suite.automaticclean(__file__)

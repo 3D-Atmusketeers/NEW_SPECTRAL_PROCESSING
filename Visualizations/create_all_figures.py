@@ -147,7 +147,7 @@ else:
 
 
 #spectra.plot_star_spectra_test(planet_names)
-spectra.plot_filters(planet_names, transmission_filter_name='MIRI')
+#spectra.plot_filters(planet_names, transmission_filter_name='MIRI')
 
 #spectra.plot_spectra_simple(planet_names, num_phases=4)
 
@@ -155,12 +155,12 @@ spectra.plot_filters(planet_names, transmission_filter_name='MIRI')
 
 #spectra.plot_fp_spectra(planet_names,num_phases=6,transmission_filter_name='None',wav_subset=[0, 100],resolution=0)
 
-spectra.plot_fp_fs_spectra(planet_names,
-                            planet_radii,
-                            num_phases=4,
-                            transmission_filter_name='MIRI',
-                            wav_subset=[3.722490e-6, 5.221980e-6],
-                            resolution=1000)
+#spectra.plot_fp_fs_spectra(planet_names,
+#                            planet_radii,
+#                            num_phases=4,
+#                            transmission_filter_name='MIRI',
+#                            wav_subset=[3.722490e-6, 5.221980e-6],
+#                            resolution=1000)
 
 # If resolution is set to 0, don't convolve at all
 #spectra.plot_fp_phase_curves(planet_names,
@@ -173,5 +173,5 @@ spectra.plot_fp_fs_phase_curves(planet_names,
                           planet_name_char_len,
                           planet_radii,
                           num_phases=24,
-                          transmission_filter_name='MIRI',
-                          wav_subset=[3.722490e-6, 5.221980e-6])
+                          transmission_filter_name='None',
+                          wav_subset=[3.081060e-6, 4.010380e-6])
