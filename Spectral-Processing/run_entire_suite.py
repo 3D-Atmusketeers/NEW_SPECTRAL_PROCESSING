@@ -124,8 +124,6 @@ os.chdir('..')
 os.chdir('..')
 
 
-STEP_TWO = False
-
 step1jobnums = []
 step2jobnums = []
 
