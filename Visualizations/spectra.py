@@ -173,6 +173,25 @@ def get_star_spectra(planet_name):
         star_spectra = pd.DataFrame(list(zip(wavelengths_meters.value, flux_si.value)), columns=['wavelength', 'flux'])
 
         star_radius = 1.203 * 6.957e8
+
+    elif ("wasp121".lower() in planet_name.lower()):
+        print("Using a wasp121 stellar spectra")
+        spectra_file = 'DATA/lte06500-4.50-0.0.PHOENIX-ACES-AGSS-COND-2011-HiRes.fits'
+        with fits.open(spectra_file) as hdul:
+            spectra = hdul[0].data * 1e-7
+        with fits.open('DATA/Phoenix_Wav.fits') as hdul:
+            # Get the wavelengths in microns
+            wavelengths = hdul[0].data * 1e-4
+
+        stellar_spectrum_1 = pd.DataFrame(list(zip(wavelengths, spectra)), columns=['wavelength', 'flux_Watt/m^2/micron'])
+        wavelengths_meters = np.asarray(list(stellar_spectrum_1.wavelength * 1e-6)) * u.m
+        flux_Watt_m_2_microns = np.asarray(list(stellar_spectrum_1['flux_Watt/m^2/micron'])) * u.W / u.m**2 / u.um
+        flux_si = flux_Watt_m_2_microns * u.sr
+        star_spectra = pd.DataFrame(list(zip(wavelengths_meters.value, flux_si.value)), columns=['wavelength', 'flux'])
+
+        star_radius = 1.458 * 6.957e8
+
+
     else:
         print("Your stellar spectrum isn't properly set")
         print("Hardwire here for a blackbody")
@@ -588,23 +607,48 @@ def plot_spectra_simple(planet_names, num_phases):
             planet_spectra = planet_spectra.reset_index(drop=True)
 
 
+
+
+            # Replace the substring DOGRAY in planetnames with PICKET
+            planet_name2 = planet_name.replace("DOGRAY", "PICKET")
+            file_path2 = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name2 + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
+
+            # Load in the planet spectra
+            planet_spectra2 = pd.read_csv(file_path2.format(str(i * rot_val)), header=None,
+                                         delim_whitespace=True, names=['wavelength', 'flux', 'reflected'])
+            planet_spectra2.flux = planet_spectra2.flux * (3.0e8 / planet_spectra2.wavelength ** 2) / 1e6
+
+            # Reset the index
+            planet_spectra2 = planet_spectra2.reset_index(drop=True)    
+
             ax.plot(planet_spectra.wavelength * 1e6,
-                    planet_spectra.flux,
-                    #color=my_colors(i / num_phases),
-                    linewidth=1,
+                    planet_spectra.flux / planet_spectra2.flux,
+                    color=my_colors(i / num_phases),
+                    linewidth=1.5,
                     label=str(np.round(rot_val * i / 360., 3)))
+
+            
+            
+
+
+            #ax.plot(planet_spectra.wavelength * 1e6,
+            #        planet_spectra.flux,
+            #        color=my_colors(i / num_phases),
+            #        linewidth=1,
+            #        label=str(np.round(rot_val * i / 360., 3)))
 
 
 
 
         # Do somet figure stuff
         #ax.set_xlim(min(planet_spectra.wavelength * 1e6), max(planet_spectra.wavelength * 1e6))
-        #ax.set_xlim(0.5, 12)
-        #ax.set_ylim(1e2,1e6)
+        ax.set_xlim(2.308, 2.312)
+        ax.set_ylim(0.2,7)
+
         ax.legend(fontsize=12, loc=(0, 1.03), ncol=5, mode='expand', title='Orbital Phase', title_fontsize=16)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
         ax.set_ylabel(r'Flux (W/m$^2$/micron)')
-        ax.set_yscale('log')
+        #ax.set_yscale('log')
         plt.savefig('../Figures/Planet_Simple_Spectra_{}.jpg'.format(planet_name), dpi=200, bbox_inches='tight')
         plt.clf()
 

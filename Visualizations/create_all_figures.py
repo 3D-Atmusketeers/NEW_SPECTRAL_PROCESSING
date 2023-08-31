@@ -19,9 +19,8 @@ import aerosol_maps
 import aerosol_profiles
 import wind_maps
 import wind_isobars
-#import emission_maps
-
-#import basemap_hemispheric_projections
+import emission_maps
+import basemap_hemispheric_projections
 
 import cross_correlation
 
@@ -42,6 +41,12 @@ planet_names = ["HD189-PICKET_medres", "HD189-PICKET-NUC-CLOUDS_medres", "HD189-
                 "HD209-PICKET_medres", "HD209-PICKET-NUC-CLOUDS_medres", "HD209-PICKET-NUC-CLOUDS-COMPACT_medres",
                 "HD209-DOGRAY_medres", "HD209-DOGRAY-NUC-CLOUDS_medres", "HD209-DOGRAY-NUC-CLOUDS-COMPACT"]
 
+
+planet_names = ["HD189-DOGRAY_medres", "HD189-PICKET_medres", 
+                "HD189-DOGRAY-NUC-CLOUDS_medres", "HD189-PICKET-NUC-CLOUDS_medres"]
+
+planet_names = ["HD189-DOGRAY_hires", "HD189-DOGRAY-NUC-CLOUDS_hires",
+                "HD209-DOGRAY_hires", "HD209-DOGRAY-NUC-CLOUDS_hires",]
 
 # Set the opacity files to use
 opacity_files = 'SET_3'
@@ -109,7 +114,7 @@ else:
 # If the extra_pressure level is greater than 0, its plots it also
 # If it is 0, then it plots the IR photosphere pressure
 #aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes=False, extra_pressure_level_bar=0)
-#aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes = True, extra_pressure_level_bar = 80)
+#aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes = True, extra_pressure_level_bar = 1e-4)
 
 
 # Plot the ptc curves
@@ -125,7 +130,6 @@ else:
 
 # Plotting the emission maps
 #emission_maps.plot_emission_maps(planet_names, nlat, nlon, nlev)
-
 
 #basemap_hemispheric_projections.plot_observer_projection(planet_names, nlat, nlon,planet_radii, pressure_in_mbar=10)
                                                          
@@ -165,11 +169,11 @@ spectra.plot_spectra_simple(planet_names, num_phases=4)
 #                            resolution=100)
 
 # If resolution is set to 0, don't convolve at all
-spectra.plot_fp_phase_curves(planet_names,
-                          planet_name_char_len,
-                          num_phases=24,
-                          transmission_filter_name='None',
-                          wav_subset=[3.081060e-6, 4.010380e-6])
+#spectra.plot_fp_phase_curves(planet_names,
+#                          planet_name_char_len,
+#                          num_phases=24,
+#                          transmission_filter_name='None',
+#                          wav_subset=[3.081060e-6, 4.010380e-6])
 
 #spectra.plot_fp_fs_phase_curves(planet_names,
 #                          planet_name_char_len,
