@@ -123,6 +123,7 @@ for x in range (len(finished_gcms)):
 os.chdir('..')
 os.chdir('..')
 
+
 step1jobnums = []
 step2jobnums = []
 
