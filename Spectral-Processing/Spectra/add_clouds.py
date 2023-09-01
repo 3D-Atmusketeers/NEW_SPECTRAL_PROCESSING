@@ -10,8 +10,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
     column_names = ['lat' , 'lon', 'level' , 'altitude(m)',
                     'pressure(bars)', 'temp(k)',
                     'EW vel(m/s)','NS vel','vert vel']
-
-    df = pd.read_csv('../PLANET_MODELS/' + planet_name + '.txt', delim_whitespace=True, names=column_names)
+    df = pd.read_csv('../PLANET_MODELS/' + planet_name + '.txt', delim_whitespace=True, names=column_names, index_col=False)
 
     df['tau1'] = 0.
     df['g01']  = 0.
@@ -288,516 +287,76 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
     pressure_array_for_cloud_scattering_data_in_pascals = np.loadtxt('SCATTERING_DATA/pressure_array_for_cloud_scattering_data_in_pascals.txt')
 
     print ("Adding Clouds, no scattering params, this just fills in 0s unless MOLEF is specified")
-    if CLOUDS == 1:
-        max_cloud_level1 = 0
-        max_cloud_level2 = 0
-        max_cloud_level3 = 0
-        max_cloud_level4 = 0
-        max_cloud_level5 = 0
-        max_cloud_level6 = 0
-        max_cloud_level7 = 0
-        max_cloud_level8 = 0
-        max_cloud_level9 = 0
-        max_cloud_level10 = 0
-        max_cloud_level11 = 0
-        max_cloud_level12 = 0
-        max_cloud_level13 = 0
+    
+    ### EVERY LINE ABOVE THIS ONE HAS NOT BEEN EDITED BY THOMAS
+    
+    nlat, nlon, nlay = len(df.lat.unique()),len(df.lon.unique()),INITIAL_NTAU
+    
+    ### Defining all the same constants as in old version but as nlay-shaped arrays
+    pres = df.sort_values(by=['lat','lon','pressure(bars)'])['pressure(bars)'].values.reshape(nlat,nlon,nlay)[0][0]
+    layer_index = np.array([np.abs(input_pressure_array_cgs - pres[i]*1e6).argmin() for i in range(len(pres))])
+    particle_size = particle_size_vs_layer_array_in_meters[layer_index]
+    
+    delta_pres = np.array([(pres[i+1]-pres[i])/2 if i==0 else (pres[i]-pres[i-1]) for i in range(len(pres))])
+    dpg = 1e5/grav*delta_pres
+    
+    temp = df.sort_values(by=['lat','lon','pressure(bars)'])['temp(k)'].values.reshape(nlat,nlon,nlay)
+    size_loc = [np.abs(input_particle_size_array_in_meters  - particle_size[i]).argmin() for i in range(len(particle_size))]
 
-
-        for z in range(len(df)):
-            i = len(df) - z - 1
-            layer_index   = np.abs(input_pressure_array_cgs - df['pressure(bars)'][i]*1e6).argmin()
-            particle_size = particle_size_vs_layer_array_in_meters[layer_index]
-
-            if (i % INITIAL_NTAU == 0):
-                delta_pres = (df['pressure(bars)'][i+1]-df['pressure(bars)'][i]) / 2.
-            else:
-                delta_pres = (df['pressure(bars)'][i]-df['pressure(bars)'][i-1])
-
-            dpg = delta_pres * 1e5 / G
-            
-
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level1 = 0
-            CLOUD_INDEX = 1
-            cond_fact1 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df['tau1'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact1*MTLX*CORFACT[layer_index]
-            if (df['tau1'][i] > 0):
-                df['g01'][i]  = 1
-                df['pi01'][i] = 1
-            if (df['tau1'][i] > 1e-10):
-                max_cloud_level1   = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0, max_cloud_level1)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level1):
-                df['tau1'][i] = 0
-                df['g01'][i]  = 0
-                df['pi01'][i] = 0
-
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level2 = 0            
-            CLOUD_INDEX = 2
-            cond_fact2 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df['tau2'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact2*MTLX*CORFACT[layer_index]
-            if (df['tau2'][i] > 0):
-                df['g02'][i]  = 1
-                df['pi02'][i] = 1
-            if (df['tau2'][i] > 1e-10):
-                max_cloud_level2   = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0, max_cloud_level2)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level2):
-                df['tau2'][i] = 0
-                df['g02'][i]  = 0
-                df['pi02'][i] = 0
-
-
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level3 = 0
-            CLOUD_INDEX = 3
-            cond_fact3= (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df['tau3'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact3*MTLX*CORFACT[layer_index]
-            if (df['tau3'][i] > 0):
-                df['g03'][i]  = 1
-                df['pi03'][i] = 1
-            if (df['tau3'][i] > 1e-10):
-                max_cloud_level3   = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0, max_cloud_level3)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level3):
-                df['tau3'][i] = 0
-                df['g03'][i]  = 0
-                df['pi03'][i] = 0
-
-
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level4 = 0
-            CLOUD_INDEX = 4
-            cond_fact4 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df['tau4'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact4*MTLX*CORFACT[layer_index]
-            if (df['tau4'][i] > 0):
-                df['g04'][i]  = 1
-                df['pi04'][i] = 1
-            if (df['tau4'][i] > 1e-10):
-                max_cloud_level4   = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0, max_cloud_level4)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level4):
-                df['tau4'][i] = 0
-                df['g04'][i]  = 0
-                df['pi04'][i] = 0
-
-
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level5 = 0
-            CLOUD_INDEX = 5
-            cond_fact5 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df['tau5'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact5*MTLX*CORFACT[layer_index]
-            if (df['tau5'][i] > 0):
-                df['g05'][i]  = 1
-                df['pi05'][i] = 1
-            if (df['tau5'][i] > 1e-10):
-                max_cloud_level5   = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0, max_cloud_level5)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level5):
-                df['tau5'][i] = 0
-                df['g05'][i]  = 0
-                df['pi05'][i] = 0
-
-
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level6 = 0
-            CLOUD_INDEX = 6
-            cond_fact6 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df['tau6'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact6*MTLX*CORFACT[layer_index]
-            if (df['tau6'][i] > 0):
-                df['g06'][i]  = 1
-                df['pi06'][i] = 1
-            if (df['tau6'][i] > 1e-10):
-                max_cloud_level6   = max(INITIAL_NTAU - (z%INITIAL_NTAU) - aerosol_layers + 1, 0, max_cloud_level6)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level6):
-                df['tau6'][i] = 0
-                df['g06'][i]  = 0
-                df['pi06'][i] = 0
-
-
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level7 = 0            
-            CLOUD_INDEX = 7
-            cond_fact7 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df['tau7'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact7*MTLX*CORFACT[layer_index]
-            if (df['tau7'][i] > 0):
-                df['g07'][i]  = 1
-                df['pi07'][i] = 1
-            if (df['tau7'][i] > 1e-10):
-                max_cloud_level7 = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0.0, max_cloud_level7)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level7):
-                df['tau7'][i] = 0
-                df['g07'][i]  = 0
-                df['pi07'][i] = 0
-
-
-            
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level8 = 0
-            CLOUD_INDEX = 8
-            cond_fact8 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df['tau8'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact8*MTLX*CORFACT[layer_index]
-            if (df['tau8'][i] > 0):
-                df['g08'][i]  = 1
-                df['pi08'][i] = 1
-            if (df['tau8'][i] > 1e-10):
-                max_cloud_level8 = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0, max_cloud_level8)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level8):
-                df['tau8'][i] = 0
-                df['g08'][i]  = 0
-                df['pi08'][i] = 0
-
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level9 = 0
-            CLOUD_INDEX = 9
-            cond_fact9 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df['tau9'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact9*MTLX*CORFACT[layer_index]
-            if (df['tau9'][i] > 0):
-                df['g09'][i]  = 1
-                df['pi09'][i] = 1
-            if (df['tau9'][i] > 1e-10):
-                max_cloud_level9   = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0, max_cloud_level9)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level9):
-                df['tau9'][i] = 0
-                df['g09'][i]  = 0
-                df['pi09'][i] = 0
-
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level10 = 0
-            CLOUD_INDEX = 10
-            cond_fact10 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df['tau10'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact10*MTLX*CORFACT[layer_index]
-            if (df['tau10'][i] > 0):
-                df['g010'][i]  = 1
-                df['pi010'][i] = 1
-            if (df['tau10'][i] != 0):
-                max_cloud_level10   = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0, max_cloud_level10)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level10):
-                df['tau10'][i] = 0
-                df['g010'][i]  = 0
-                df['pi010'][i] = 0
-
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level11 = 0
-            CLOUD_INDEX = 11
-            cond_fact11 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df['tau11'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact11*MTLX*CORFACT[layer_index]
-            if (df['tau11'][i] > 0):
-                df['g011'][i]  = 1
-                df['pi011'][i] = 1
-            if (df['tau11'][i] > 1e-10):
-                max_cloud_level11   = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0, max_cloud_level11)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level11):
-                df['tau11'][i] = 0
-                df['g011'][i]  = 0
-                df['pi011'][i] = 0
-
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level12 = 0
-            CLOUD_INDEX = 12
-            cond_fact12 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df['tau12'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact12*MTLX*CORFACT[layer_index]
-            if (df['tau12'][i] > 0):
-                df['g012'][i]  = 1
-                df['pi012'][i] = 1
-            if (df['tau12'][i] > 1e-10):
-                max_cloud_level12   = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0, max_cloud_level12)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level12):
-                df['tau12'][i] = 0
-                df['g012'][i]  = 0
-                df['pi012'][i] = 0
-
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level13 = 0
-            CLOUD_INDEX = 13
-            cond_fact13 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df['tau13'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact13*MTLX*CORFACT[layer_index]
-            if (df['tau13'][i] > 0):
-                df['g013'][i]  = 1
-                df['pi013'][i] = 1
-            if (df['tau13'][i] > 1e-10):
-                max_cloud_level13   = max(INITIAL_NTAU - (z%INITIAL_NTAU) - aerosol_layers + 1, 0, max_cloud_level13)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level13):
-                df['tau13'][i] = 0
-                df['g013'][i]  = 0
-                df['pi013'][i] = 0
-    else:
-        pass
-
-    if HAZES == True:
-        df['tau_haze'] = 1.0
-        df['g0_haze']  = 1.0
-        df['pi0_haze'] = 1.0
-
+    haze_layer_index = [np.abs(haze_pressure_array_pascals - pres[i]*1e5).argmin() for i in range(len(pres))]
+    
+    CORFACT = np.array(CORFACT)[layer_index]
+    pressure_for_scattering_data_loc = [np.abs(pressure_array_for_cloud_scattering_data_in_pascals - pres[i]*1e5).argmin() for i in range(len(pres))]
+    df = df.sort_values(by=['lat','lon','pressure(bars)'])
+    
+    for cidx in range(13): # loop through species
+        tcond = Tconds[cidx][layer_index] # cond Ts for each layer
+        condfact = temp[:,:] <= tcond # everywhere below the cond curve
+#         condfact[:,:,0] = False # delete clouds from top layer
+        botlay = condfact.cumsum(axis=2).argmax(axis=2).ravel() # find index of cloud base
+        
+        ### mask out everything above the cloud top
+        laymaxmsk = np.array([],dtype=int)
+        for i in range(int(nlat*nlon)):
+            laymaxmsk = np.append(laymaxmsk, i*nlay + np.array(range(int(botlay[i]+1-aerosol_layers))))
+        np.put(condfact,laymaxmsk.astype(int),0.0)
+        
+        
+        ### Do the "if close to condensation curve, fraction condenses" calculation
+        partcld = np.where((condfact.ravel()) & (temp[:,:] > tcond-10).ravel())[0]
+        condfact = condfact.astype(float) # all the places with clouds are now 1, all others are 0
+        np.put(condfact,partcld,((tcond - temp[:,:])/10).ravel()[partcld])
+        
+        
+        ### Calculate the actual cloud properties
+        tau = dpg * MOLEF[cidx]*3./4./particle_size/DENSITY[cidx]*FMOLW[cidx]*condfact*MTLX*CORFACT
+        tau_wl_dep = tau * QE_OPPR[cidx][pressure_for_scattering_data_loc][:,wav_loc]
+        
+        ### Everywhere clouds exist (even partially), set scattering params
+        tau2 = tau.copy()
+        tau2[tau>0] = 1.0
+        g0 = tau2 * G0_OPPR[cidx][size_loc][:,wav_loc]
+        pi0 = tau2 * PI0_OPPR[cidx][size_loc][:,wav_loc]
+        
+        ### Save to dfs
+        df['tau'+str(cidx+1)] = tau.ravel()
+        df_copy['tau'+str(cidx+1)] = tau_wl_dep.ravel()
+        df_copy['g0'+str(cidx+1)] = g0.ravel()
+        df_copy['pi0'+str(cidx+1)] = pi0.ravel()
+        
+        #####################################
+        ### I THINK THIS PART WORKS RIGHT ###
+        #####################################
+        if HAZES == True:
+            df['tau_haze'] = (np.ones(np.shape(tau)) * delta_pres * QE_OPPR[13][haze_layer_index][:,wav_loc]).ravel()
+            df['g0_haze']  = (np.ones(np.shape(tau)) * G0_OPPR[13][haze_layer_index][:,wav_loc]).ravel()
+            df['pi0_haze'] = (np.ones(np.shape(tau)) * PI0_OPPR[13][haze_layer_index][:,wav_loc]).ravel()
+        ############################
+        ### THE REST SHOULD WORK ###
+        ############################
+        
     planet_file_with_clouds = '../PLANET_MODELS/' + planet_name + '_with_clouds.txt'
     np.savetxt(planet_file_with_clouds, df.values, fmt=' '.join(['%5.4f']*2 + ['%3d']*1 + ['%9.4E']*6 + ['%9.4E']*42 + ['\t']))
-
-    print ("Adding Clouds, with scattering params, this is just for the graphing stuff to have a copy")
-    print ("THE CLOUDS ARE BEING EVALUATED AT THIS WAVELENGTH index!!!!", str(wav_loc))
-    if CLOUDS == 1:
-        max_cloud_level1 = 0
-        max_cloud_level2 = 0
-        max_cloud_level3 = 0
-        max_cloud_level4 = 0
-        max_cloud_level5 = 0
-        max_cloud_level6 = 0
-        max_cloud_level7 = 0
-        max_cloud_level8 = 0
-        max_cloud_level9 = 0
-        max_cloud_level10 = 0
-        max_cloud_level11 = 0
-        max_cloud_level12 = 0
-        max_cloud_level13 = 0
-
-        for z in range(len(df_copy)):
-            i = len(df_copy) - z - 1
-            layer_index   = np.abs(input_pressure_array_cgs - df_copy['pressure(bars)'][i]*1e6).argmin()
-            particle_size = particle_size_vs_layer_array_in_meters[layer_index]
-            size_loc      = np.abs(input_particle_size_array_in_meters  - particle_size).argmin()
-
-            pressure_for_scattering_data_loc = np.abs(pressure_array_for_cloud_scattering_data_in_pascals - df_copy['pressure(bars)'][i]*1e5).argmin()
-
-
-            # This is in SI
-            if (i % INITIAL_NTAU == 0):
-                delta_pres = (df['pressure(bars)'][i+1]-df['pressure(bars)'][i]) / 2.
-            else:
-                delta_pres = (df['pressure(bars)'][i]-df['pressure(bars)'][i-1])
-
-            dpg = delta_pres * 1e5 / G
-
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level1 = 0
-            CLOUD_INDEX = 1
-            cond_fact1 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df_copy['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df_copy['tau1'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact1*MTLX*CORFACT[layer_index]*QE_OPPR[CLOUD_INDEX-1][pressure_for_scattering_data_loc][wav_loc]
-            if (df_copy['tau1'][i] > 0):
-                df_copy['g01'][i]  = G0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-                df_copy['pi01'][i] = PI0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-            if (df_copy['tau1'][i] != 0):
-                max_cloud_level1   = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0, max_cloud_level1)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level1):
-                df_copy['tau1'][i] = 0
-                df_copy['g01'][i]  = 0
-                df_copy['pi01'][i] = 0
-
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level2 = 0
-            CLOUD_INDEX = 2
-            cond_fact2 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df_copy['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df_copy['tau2'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact2*MTLX*CORFACT[layer_index]*QE_OPPR[CLOUD_INDEX-1][pressure_for_scattering_data_loc][wav_loc]
-            if (df_copy['tau2'][i] > 0):
-                df_copy['g02'][i]  = G0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-                df_copy['pi02'][i] = PI0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-            if (df_copy['tau2'][i] != 0):
-                max_cloud_level2   = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0, max_cloud_level2)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level2):
-                df_copy['tau2'][i] = 0
-                df_copy['g02'][i]  = 0
-                df_copy['pi02'][i] = 0
-
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level3 = 0
-            CLOUD_INDEX = 3
-            cond_fact3 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df_copy['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df_copy['tau3'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact3*MTLX*CORFACT[layer_index]*QE_OPPR[CLOUD_INDEX-1][pressure_for_scattering_data_loc][wav_loc]
-            if (df_copy['tau3'][i] > 0):
-                df_copy['g03'][i]  = G0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-                df_copy['pi03'][i] = PI0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-            if (df_copy['tau3'][i] != 0):
-                max_cloud_level3   = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0, max_cloud_level3)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level3):
-                df_copy['tau3'][i] = 0
-                df_copy['g03'][i]  = 0
-                df_copy['pi03'][i] = 0
-
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level4 = 0
-            CLOUD_INDEX = 4
-            cond_fact4 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df_copy['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df_copy['tau4'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact4*MTLX*CORFACT[layer_index]*QE_OPPR[CLOUD_INDEX-1][pressure_for_scattering_data_loc][wav_loc]
-            if (df_copy['tau4'][i] > 0):
-                df_copy['g04'][i]  = G0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-                df_copy['pi04'][i] = PI0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-            if (df_copy['tau4'][i] != 0):
-                max_cloud_level4   = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0, max_cloud_level4)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level4):
-                df_copy['tau4'][i] = 0
-                df_copy['g04'][i]  = 0
-                df_copy['pi04'][i] = 0
-
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level5 = 0
-            CLOUD_INDEX = 5
-            cond_fact5 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df_copy['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df_copy['tau5'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact5*MTLX*CORFACT[layer_index]*QE_OPPR[CLOUD_INDEX-1][pressure_for_scattering_data_loc][wav_loc]
-            if (df_copy['tau5'][i] > 0):
-                df_copy['g05'][i]  = G0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-                df_copy['pi05'][i] = PI0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-            if (df_copy['tau5'][i] != 0):
-                max_cloud_level5   = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0, max_cloud_level5)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level5):
-                df_copy['tau5'][i] = 0
-                df_copy['g05'][i]  = 0
-                df_copy['pi05'][i] = 0
-
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level6 = 0
-            CLOUD_INDEX = 6
-            cond_fact6 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df_copy['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df_copy['tau6'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact6*MTLX*CORFACT[layer_index]*QE_OPPR[CLOUD_INDEX-1][pressure_for_scattering_data_loc][wav_loc]
-            if (df_copy['tau6'][i] > 0):
-                df_copy['g06'][i]  = G0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-                df_copy['pi06'][i] = PI0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-            if (df_copy['tau6'][i] != 0):
-                max_cloud_level6   = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0, max_cloud_level6)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level6):
-                df_copy['tau6'][i] = 0
-                df_copy['g06'][i]  = 0
-                df_copy['pi06'][i] = 0
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level7 = 0
-            CLOUD_INDEX = 7
-            cond_fact7 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df_copy['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df_copy['tau7'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact7*MTLX*CORFACT[layer_index]*QE_OPPR[CLOUD_INDEX-1][pressure_for_scattering_data_loc][wav_loc]
-            if (df_copy['tau7'][i] > 0):
-                df_copy['g07'][i]  = G0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-                df_copy['pi07'][i] = PI0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-            if (df_copy['tau7'][i] > 1e-10):
-                max_cloud_level7 = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0.0, max_cloud_level7)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level7):
-                df_copy['tau7'][i] = 0
-                df_copy['g07'][i]  = 0
-                df_copy['pi07'][i] = 0
-
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level8 = 0
-            CLOUD_INDEX = 8
-            cond_fact8 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df_copy['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df_copy['tau8'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact8*MTLX*CORFACT[layer_index]*QE_OPPR[CLOUD_INDEX-1][pressure_for_scattering_data_loc][wav_loc]
-            if (df_copy['tau8'][i] > 0):
-                df_copy['g08'][i]  = G0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-                df_copy['pi08'][i] = PI0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-            if (df_copy['tau8'][i] != 0):
-                max_cloud_level8 = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0, max_cloud_level8)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level8):
-                df_copy['tau8'][i] = 0
-                df_copy['g08'][i]  = 0
-                df_copy['pi08'][i] = 0
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level9 = 0
-            CLOUD_INDEX = 9
-            cond_fact9 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df_copy['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df_copy['tau9'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact9*MTLX*CORFACT[layer_index]*QE_OPPR[CLOUD_INDEX-1][pressure_for_scattering_data_loc][wav_loc]
-            if (df_copy['tau9'][i] > 0):
-                df_copy['g09'][i]  = G0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-                df_copy['pi09'][i] = PI0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-            if (df_copy['tau9'][i] != 0):
-                max_cloud_level9   = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0, max_cloud_level9)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level9):
-                df_copy['tau9'][i] = 0
-                df_copy['g09'][i]  = 0
-                df_copy['pi09'][i] = 0
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level10 = 0
-            CLOUD_INDEX = 10
-            cond_fact10 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df_copy['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df_copy['tau10'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact10*MTLX*CORFACT[layer_index]*QE_OPPR[CLOUD_INDEX-1][pressure_for_scattering_data_loc][wav_loc]
-            if (df_copy['tau10'][i] > 0):
-                df_copy['g010'][i]  = G0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-                df_copy['pi010'][i] = PI0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-            if (df_copy['tau10'][i] != 0):
-                max_cloud_level10   = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0, max_cloud_level10)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level10):
-                df_copy['tau10'][i] = 0
-                df_copy['g010'][i]  = 0
-                df_copy['pi010'][i] = 0
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level11 = 0
-            CLOUD_INDEX = 11
-            cond_fact11 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df_copy['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df_copy['tau11'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact11*MTLX*CORFACT[layer_index]*QE_OPPR[CLOUD_INDEX-1][pressure_for_scattering_data_loc][wav_loc]
-            if (df_copy['tau11'][i] > 0):
-                df_copy['g011'][i]  = G0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-                df_copy['pi011'][i] = PI0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-            if (df_copy['tau11'][i] != 0):
-                max_cloud_level11   = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0, max_cloud_level11)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level11):
-                df_copy['tau11'][i] = 0
-                df_copy['g011'][i]  = 0
-                df_copy['pi011'][i] = 0
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level12 = 0
-            CLOUD_INDEX = 12
-            cond_fact12 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df_copy['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df_copy['tau12'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact12*MTLX*CORFACT[layer_index]*QE_OPPR[CLOUD_INDEX-1][pressure_for_scattering_data_loc][wav_loc]
-            if (df_copy['tau12'][i] > 0):
-                df_copy['g012'][i]  = G0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-                df_copy['pi012'][i] = PI0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-            if (df_copy['tau12'][i] != 0):
-                max_cloud_level12   = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0, max_cloud_level12)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level12):
-                df_copy['tau12'][i] = 0
-                df_copy['g012'][i]  = 0
-                df_copy['pi012'][i] = 0
-
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) == INITIAL_NTAU):
-                max_cloud_level13 = 0
-            CLOUD_INDEX = 13
-            cond_fact13 = (min(max((Tconds[CLOUD_INDEX-1][layer_index]-df_copy['temp(k)'][i]) / 10.0, 0.0), 1.0))
-            df_copy['tau13'][i] = dpg * MOLEF[CLOUD_INDEX-1]*3./4./particle_size/DENSITY[CLOUD_INDEX-1]*FMOLW[CLOUD_INDEX-1]*cond_fact13*MTLX*CORFACT[layer_index]*QE_OPPR[CLOUD_INDEX-1][pressure_for_scattering_data_loc][wav_loc]
-            if (df_copy['tau13'][i] > 0):
-                df_copy['g013'][i]  = G0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-                df_copy['pi013'][i] = PI0_OPPR[CLOUD_INDEX-1][size_loc][wav_loc]
-            if (df_copy['tau13'][i] != 0):
-                max_cloud_level13   = max(INITIAL_NTAU - (z%INITIAL_NTAU)  - aerosol_layers + 1, 0, max_cloud_level13)
-            if (INITIAL_NTAU - (z%INITIAL_NTAU) < max_cloud_level13):
-                df_copy['tau13'][i] = 0
-                df_copy['g013'][i]  = 0
-                df_copy['pi013'][i] = 0
-    else:
-        pass
-
-    if HAZES == True:
-        for z in range(len(df)):
-            i = len(df) - z - 1
-            layer_index   = np.abs(input_pressure_array_cgs - df['pressure(bars)'][i]*1e6).argmin()
-            haze_layer_index = np.abs(haze_pressure_array_pascals - df_copy['pressure(bars)'][i]*1e6).argmin() # Both of these are in PA
-
-            if (i % INITIAL_NTAU == 0):
-                delta_pres = (df['pressure(bars)'][i+1]-df['pressure(bars)'][i]) / 2.
-            else:
-                delta_pres = (df['pressure(bars)'][i]-df['pressure(bars)'][i-1])
-
-            df_copy['tau_haze'][i] = delta_pres * QE_OPPR[13][haze_layer_index][wav_loc]
-            df_copy['g0_haze'][i]  = G0_OPPR[13][haze_layer_index][wav_loc]
-            df_copy['pi0_haze'][i] = PI0_OPPR[13][haze_layer_index][wav_loc]
-    else:
-        pass
     
     planet_file_with_clouds = '../PLANET_MODELS/' + planet_name + '_with_clouds_and_wavelength_dependence.txt'
     np.savetxt(planet_file_with_clouds, df_copy.values, fmt=' '.join(['%5.4f']*2 + ['%3d']*1 + ['%9.4E']*6 + ['%9.4E']*42 + ['\t']))
-
-    return None

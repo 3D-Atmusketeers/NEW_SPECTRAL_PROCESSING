@@ -3,6 +3,9 @@ import pandas as pd
 import matplotlib.pyplot as plt 
 from mpl_toolkits.basemap import Basemap
 import matplotlib.colors as mcolors
+from numpy import ma
+from matplotlib import ticker, cm
+
 
 try:
     from inspect import cleandoc as dedent
@@ -17,11 +20,13 @@ def plot_emission_maps(planet_names, nlat, nlon, nlev):
 
         base = "../Spectral-Processing/FINISHED_SPECTRA/Spec_0_"
 
-        full_df = pd.read_csv(base + file + "_phase_0.0_inc_0.00.00.0000.00_emission_map.dat",
+        full_df = pd.read_csv(base + file + "_phase_180.0_inc_0.00.00.0000.00_emission_map.dat",
                         names=['tau_index', 'wavelength_m', 'lon', 'lat', 'pressure_pa'],
                         delim_whitespace=True)
 
         wavelengths = list(set(full_df["wavelength_m"]))
+
+        wavelengths = [1.897045e-06]
 
         # colormap
         cm_name = 'lapaz'
@@ -51,7 +56,9 @@ def plot_emission_maps(planet_names, nlat, nlon, nlev):
 
             # , locator=ticker.LogLocator()
             # This is in mbar, thats where the 1e2 comes from. 1e5 to Pa, 1e3 to mbar
-            emap = map.contourf(x, y, pressure/1e2, levels=100, cmap=my_colors)
+            emap = map.contourf(x, y, pressure/1e2,
+                                levels=np.linspace(10, 50, 100),
+                                cmap=my_colors)
 
             wav_str = str(np.round(wavelengths[i] * 1e6, 3))
             cb = map.colorbar(emap,
