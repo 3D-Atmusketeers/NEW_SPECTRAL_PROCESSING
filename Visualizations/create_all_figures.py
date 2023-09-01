@@ -28,6 +28,7 @@ import cross_correlation
 plt.style.use('science.mplstyle')
 
 
+
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
 
@@ -128,49 +129,52 @@ else:
 
 # Plot the spectra
 #planet_name = planet_names[0]
-#spectra.plot_blackbody_phase_curve(planet_name,
-#                            planet_radii,
-#                            num_phases=4,
-#                            transmission_filter_name='MIRI',
-#                            wav_subset=[5e-6, 12e-6],
-#                            resolution=100,
-#                            temp=600)
 
+######## ######## ######## ######## ######## ######## ######## ######## ######## #
+########      These are general plotting functions for testing            ########
+# ######## ######## ######## ######## ######## ######## ######## ######## ######## 
 
+#spectra.plot_blackbody_phase_curve(planet_name,planet_radii,num_phases=4,transmission_filter_name='MIRI',wav_subset=[5e-6, 12e-6],resolution=100,temp=600)
 #spectra.plot_planet_spectra_blackbody_comparison_hz(planet_names,black_body_temperatures=[1000, 1500, 2000, 2500],num_phases=4)
-
-#spectra.plot_planet_spectra_blackbody_comparison_microns(planet_names,
-#                                                 black_body_temperatures=[1000, 2000],
-#                                                 num_phases=2)
-
-
-
-#spectra.plot_star_spectra_test(planet_names)
-#spectra.plot_filters(planet_names, transmission_filter_name='MIRI')
-
+#spectra.plot_planet_spectra_blackbody_comparison_microns(planet_names,black_body_temperatures=[1000, 2000],num_phases=2)
+spectra.plot_star_spectra_test(planet_names)
 #spectra.plot_spectra_simple(planet_names, num_phases=4)
 
+
+
+for filter_name in ['None', 'SPITZER_3_6', 'SPITZER_4_5']:
+    if filter_name != 'None':
+        print()
+        print(filter_name)
+        spectra.plot_filters(planet_names, transmission_filter_name=filter_name)
+
+    spectra.plot_fp_spectra(planet_names,num_phases=4,
+                            transmission_filter_name=filter_name,
+                            wav_subset=[0, 100],
+                            resolution=0)
+
+    spectra.plot_fp_fs_spectra(planet_names,
+                                planet_radii,
+                                num_phases=4,
+                                transmission_filter_name=filter_name,
+                                wav_subset=[0,100],
+                                resolution=1000)
+    
+    spectra.plot_fp_phase_curves(planet_names,
+                            planet_name_char_len,
+                            num_phases=24,
+                            transmission_filter_name=filter_name,
+                            wav_subset=[0, 100])
+
+    spectra.plot_fp_fs_phase_curves(planet_names,
+                            planet_name_char_len,
+                            planet_radii,
+                            num_phases=24,
+                            transmission_filter_name=filter_name,
+                            wav_subset=[0, 100])
+
+# Notes
+# if the transmission filter name is set to 'None', then it will plot the full spectrum
+# unless you specify a wavelength subset
+# the options for filters are MIRI, SPITZER_3_6, SPITZER_4_5
 # If resolution is set to 0, don't convolve at all
-
-spectra.plot_fp_spectra(planet_names,num_phases=6,transmission_filter_name='None',wav_subset=[0, 100],resolution=0)
-
-#spectra.plot_fp_fs_spectra(planet_names,
-#                            planet_radii,
-#                            num_phases=4,
-#                            transmission_filter_name='MIRI',
-#                            wav_subset=[3.722490e-6, 5.221980e-6],
-#                            resolution=1000)
-
-# If resolution is set to 0, don't convolve at all
-spectra.plot_fp_phase_curves(planet_names,
-                          planet_name_char_len,
-                          num_phases=24,
-                          transmission_filter_name='SPITZER_3_6',
-                          wav_subset=[3.081060e-6, 4.010380e-6])
-
-#spectra.plot_fp_fs_phase_curves(planet_names,
-#                          planet_name_char_len,
-#                          planet_radii,
-#                          num_phases=24,
-#                          transmission_filter_name='MIRI',
-#                          wav_subset=[3.722490e-6, 5.221980e-6])
