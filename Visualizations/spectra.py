@@ -87,7 +87,7 @@ def get_filter(which_filter):
 
 
 def get_star_spectra(planet_name):
-    if ("GJ1214".lower() in planet_name.lower()):
+    if "gj1214" in planet_name.replace("_", "").replace("-", "").lower():
         print("Using a GJ1214 stellar spectrum")
         # Get the initial flux
         stellar_spectrum_1 = pd.read_csv(
@@ -104,7 +104,8 @@ def get_star_spectra(planet_name):
 
         star_radius = 0.215 * 6.957e8
 
-    elif ("peg51".lower() in planet_name.lower()):
+    #elif ("peg51".lower() in planet_name.lower()):
+    elif "peg51" in planet_name.replace("_", "").replace("-", "").lower():    
         print("Using a peg 51b stellar spectra")
         spectra_file = 'DATA/peg51_lte05800-4.50-0.0.PHOENIX-ACES-AGSS-COND-2011-HiRes.fits'
         with fits.open(spectra_file) as hdul:
@@ -120,7 +121,7 @@ def get_star_spectra(planet_name):
         star_spectra = pd.DataFrame(list(zip(wavelengths_meters.value, flux_si.value)), columns=['wavelength', 'flux'])
 
         star_radius = 1.237 * 6.957e8
-    elif ("Taub".lower() in planet_name.lower()):
+    elif "taub" in planet_name.replace("_", "").replace("-", "").lower():   
         print("Using a taub stellar spectra")
         spectra_file = 'DATA/taub_lte06400-4.50-0.0.PHOENIX-ACES-AGSS-COND-2011-HiRes.fits'
         with fits.open(spectra_file) as hdul:
@@ -138,7 +139,7 @@ def get_star_spectra(planet_name):
 
 
 
-    elif ("wasp-77a".lower() in planet_name.lower()):
+    elif "wasp77a" in planet_name.replace("_", "").replace("-", "").lower(): 
         print("Using a wasp 77 a pheonix stellar spectra")
         spectra_file = 'DATA/lte05600-4.50-0.0.PHOENIX-ACES-AGSS-COND-2011-HiRes.fits'
         with fits.open(spectra_file) as hdul:
@@ -155,7 +156,7 @@ def get_star_spectra(planet_name):
         star_radius = 0.910 * 6.957e8
 
 
-    elif ("HD189".lower() in planet_name.lower()):
+    elif "hd189" in planet_name.replace("_", "").replace("-", "").lower(): 
         print("Using a HD189 stellar spectrum")
 
         # Get the initial flux
@@ -171,7 +172,7 @@ def get_star_spectra(planet_name):
         star_spectra = pd.DataFrame(list(zip(wavelengths_meters.value, flux_si.value)), columns=['wavelength', 'flux'])
 
         star_radius = 0.805 * 6.957e8
-    elif ("HD209".lower() in planet_name.lower()):
+    elif "hd209" in planet_name.replace("_", "").replace("-", "").lower(): 
         print("Using a HD209 stellar spectrum")
 
         # Get the initial flux
@@ -189,7 +190,7 @@ def get_star_spectra(planet_name):
 
         star_radius = 1.203 * 6.957e8
 
-    elif ("wasp121".lower() in planet_name.lower() or "wasp-121".lower() in planet_name.lower()):
+    elif "wasp121" in planet_name.replace("_", "").replace("-", "").lower(): 
         print("Using a wasp121 stellar spectra")
         spectra_file = 'DATA/lte06500-4.50-0.0.PHOENIX-ACES-AGSS-COND-2011-HiRes.fits'
         with fits.open(spectra_file) as hdul:
@@ -205,8 +206,6 @@ def get_star_spectra(planet_name):
         star_spectra = pd.DataFrame(list(zip(wavelengths_meters.value, flux_si.value)), columns=['wavelength', 'flux'])
 
         star_radius = 1.458 * 6.957e8
-
-
     else:
         print("Your stellar spectrum isn't properly set")
         print("Hardwire here for a blackbody")
@@ -503,7 +502,7 @@ def plot_star_spectra_test(planet_names):
             linewidth=0.5)
         
         # blackbody comparison
-        Teffs = [5600]
+        Teffs = [6500]
         for Teff in Teffs:
             bb = BlackBody(temperature=Teff * u.K)
             wav = np.linspace(0.1, 20.0, 1000) * u.um
@@ -524,8 +523,8 @@ def plot_star_spectra_test(planet_names):
                 color='red',
                 linewidth=1.5)
 
-        plt.ylim(1e2, 1.2e8)
-        plt.xlim(0.1, 5)
+        plt.ylim(bottom=1e2)
+        plt.xlim(left=0.0)
         plt.yscale('log')
         plt.xlabel('Wavelengths (microns)')
         plt.ylabel(r'Flux (Watts/m$^2$/micron)')
@@ -569,14 +568,13 @@ def plot_filters(planet_names, transmission_filter_name):
             linewidth=3,
             linestyle='dashed',
             label="Interpolated")
-    
-
+        
     # Some more Figure stuff
     ax.set_xlabel(r"Wavelength ($\mu$m)")
     ax.set_ylabel('Transmittance')
     ax.legend(fontsize=14)
     plt.savefig('../Figures/Filters_{}.jpg'.format(transmission_filter_name), dpi=100, bbox_inches='tight')
-    return None
+    #return None
 
 
 def plot_spectra_simple(planet_names, num_phases):
@@ -671,6 +669,27 @@ def plot_fp_fs_phase_curves(planet_names, planet_name_char_len, planet_radii, nu
         # Get the star spectra
         star_spectra, star_radius = get_star_spectra(planet_name)
 
+        print('Setting the wavelength subset for the filter')
+
+        # Extract wavelengths for ease
+        start_star = list(star_spectra.wavelength)[0]
+        end_star = list(star_spectra.wavelength)[-1]
+
+        # Check against star_spectra and update wav_subset
+        if start_star > wav_subset[0]:
+            wav_subset[0] = start_star
+            print("Adjusted the lower bound of wavelength subset based on star_spectra")
+
+        if end_star < wav_subset[1]:
+            wav_subset[1] = end_star
+            print("Adjusted the upper bound of wavelength subset based on star_spectra")
+
+        # If condition is met, further adjust wav_subset by comparing against filt data
+        if transmission_filter_name.lower() not in ['none']:
+            start_filt, end_filt = list(filt.wav)[0], list(filt.wav)[-1]
+            wav_subset[0] = max(start_filt, wav_subset[0])
+            wav_subset[1] = min(end_filt, wav_subset[1])
+            
         for i in range(num_phases):
             # For reading in the file names
             rot_val = 360. / num_phases
@@ -755,6 +774,15 @@ def plot_fp_phase_curves(planet_names, planet_name_char_len, num_phases,
 
     # I currently only have MIRI coded in
     filt, interp_function = get_filter(which_filter=transmission_filter_name)
+
+    # Set the arrays for the integrated signals
+    # Based on the filter
+    print('Setting the wavelength subset for the filter')
+    if (transmission_filter_name != 'None' and transmission_filter_name != 'none'):
+        wav_subset[0] = list(filt.wav)[0]
+        wav_subset[1] = list(filt.wav)[-1]
+    else:
+        pass
 
     for k, planet_name in enumerate(planet_names):
         # Set the arrays for the integrated signals
@@ -847,6 +875,27 @@ def plot_fp_fs_spectra(planet_names, planet_radii, num_phases, transmission_filt
         # Get the star spectra
         star_spectra, star_radius = get_star_spectra(planet_name)
 
+        print('Setting the wavelength subset for the filter')
+
+        # Extract wavelengths for ease
+        start_star = list(star_spectra.wavelength)[0]
+        end_star = list(star_spectra.wavelength)[-1]
+
+        # Check against star_spectra and update wav_subset
+        if start_star > wav_subset[0]:
+            wav_subset[0] = start_star
+            print("Adjusted the lower bound of wavelength subset based on star_spectra")
+
+        if end_star < wav_subset[1]:
+            wav_subset[1] = end_star
+            print("Adjusted the upper bound of wavelength subset based on star_spectra")
+
+        # If condition is met, further adjust wav_subset by comparing against filt data
+        if transmission_filter_name.lower() not in ['none']:
+            start_filt, end_filt = list(filt.wav)[0], list(filt.wav)[-1]
+            wav_subset[0] = max(start_filt, wav_subset[0])
+            wav_subset[1] = min(end_filt, wav_subset[1])
+
         for i in range(num_phases):
             rot_val = 360. / num_phases
             phase_degrees = rot_val * i
@@ -910,6 +959,15 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
     # I currently only have MIRI coded in
     filt, interp_function = get_filter(which_filter=transmission_filter_name)
 
+    # Set the arrays for the integrated signals
+    # Based on the filter
+    print('Setting the wavelength subset for the filter')
+    if (transmission_filter_name != 'None' and transmission_filter_name != 'none'):
+        wav_subset[0] = list(filt.wav)[0]
+        wav_subset[1] = list(filt.wav)[-1]
+    else:
+        pass
+
     for k, planet_name in enumerate(planet_names):
         # Figure aesthetics
         fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12, 6), sharex=True, sharey=False)
@@ -965,6 +1023,7 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
 
         #ax.set_xlim(min(planet_spectra.wavelength * 1e6), max(planet_spectra.wavelength * 1e6))
         #ax.set_yscale('log')
+        #ax.set_xscale('log')
         #ax.set_ylim(0, 200000)
         ax.legend(fontsize=12, loc=(0, 1.03), ncol=6, mode='expand', title='Orbital Phase', title_fontsize=18)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
