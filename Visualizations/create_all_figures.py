@@ -31,15 +31,8 @@ plt.style.use('science.mplstyle')
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
 
-planet_names = ["WASP-77Ab_NCLD_NMAG", "WASP-77Ab_NCLD_YMAG",
-                "WASP-77Ab_YCLD_NMAG", "WASP-77Ab_YCLD_YMAG"]
-
-
-planet_names = ["HD189-DOGRAY_medres", "HD189-PICKET_medres", 
-                "HD189-DOGRAY-NUC-CLOUDS_medres", "HD189-PICKET-NUC-CLOUDS_medres"]
-
-planet_names = ["HD189-DOGRAY_hires", "HD189-DOGRAY-NUC-CLOUDS_hires",
-                "HD209-DOGRAY_hires", "HD209-DOGRAY-NUC-CLOUDS_hires",]
+planet_names = ["WASP-121b_YCLD_YMAG", "WASP-121b_YCLD_NMAG",
+                "WASP-121b_NCLD_YMAG", "WASP-121b_NCLD_NMAG"]
 
 # Set the opacity files to use
 opacity_files = 'SET_1'
@@ -77,6 +70,8 @@ for planet_name in planet_names:
             planet_radii.append(17469282.0)
         elif "wasp-77" in planet_name.lower():
             planet_radii.append(8.603e7)
+        elif "wasp-121" in planet_name.lower():
+            planet_radii.append(1.304e8)
         else:
             print("WARNING! fort.7 file not found for " + planet_name)
             exit(0)
@@ -151,31 +146,31 @@ else:
 
 
 #spectra.plot_star_spectra_test(planet_names)
-spectra.plot_filters(planet_names, transmission_filter_name='MIRI')
+#spectra.plot_filters(planet_names, transmission_filter_name='MIRI')
 
 #spectra.plot_spectra_simple(planet_names, num_phases=4)
 
 # If resolution is set to 0, don't convolve at all
 
-#spectra.plot_fp_spectra(planet_names,num_phases=6,transmission_filter_name='None',wav_subset=[0, 100],resolution=0)
+spectra.plot_fp_spectra(planet_names,num_phases=6,transmission_filter_name='None',wav_subset=[0, 100],resolution=0)
 
-spectra.plot_fp_fs_spectra(planet_names,
-                            planet_radii,
-                            num_phases=4,
-                            transmission_filter_name='MIRI',
-                            wav_subset=[3.722490e-6, 5.221980e-6],
-                            resolution=1000)
+#spectra.plot_fp_fs_spectra(planet_names,
+#                            planet_radii,
+#                            num_phases=4,
+#                            transmission_filter_name='MIRI',
+#                            wav_subset=[3.722490e-6, 5.221980e-6],
+#                            resolution=1000)
 
 # If resolution is set to 0, don't convolve at all
-#spectra.plot_fp_phase_curves(planet_names,
-#                          planet_name_char_len,
-#                          num_phases=24,
-#                          transmission_filter_name='SPITZER_3_6',
-#                          wav_subset=[3.081060e-6, 4.010380e-6])
-
-spectra.plot_fp_fs_phase_curves(planet_names,
+spectra.plot_fp_phase_curves(planet_names,
                           planet_name_char_len,
-                          planet_radii,
                           num_phases=24,
-                          transmission_filter_name='MIRI',
-                          wav_subset=[3.722490e-6, 5.221980e-6])
+                          transmission_filter_name='SPITZER_3_6',
+                          wav_subset=[3.081060e-6, 4.010380e-6])
+
+#spectra.plot_fp_fs_phase_curves(planet_names,
+#                          planet_name_char_len,
+#                          planet_radii,
+#                          num_phases=24,
+#                          transmission_filter_name='MIRI',
+#                          wav_subset=[3.722490e-6, 5.221980e-6])

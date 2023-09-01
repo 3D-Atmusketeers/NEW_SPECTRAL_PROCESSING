@@ -189,7 +189,7 @@ def get_star_spectra(planet_name):
 
         star_radius = 1.203 * 6.957e8
 
-    elif ("wasp121".lower() in planet_name.lower()):
+    elif ("wasp121".lower() in planet_name.lower() or "wasp-121".lower() in planet_name.lower()):
         print("Using a wasp121 stellar spectra")
         spectra_file = 'DATA/lte06500-4.50-0.0.PHOENIX-ACES-AGSS-COND-2011-HiRes.fits'
         with fits.open(spectra_file) as hdul:
@@ -963,9 +963,9 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
             pd.DataFrame({'Wavelength (microns)': planet_spectra.wavelength * 1e6, 'Planet_Flux_micron': flux}
                          ).to_csv('OUTPUT_DATA/Fp_Spectra_{}_{}.txt'.format(str(i * rot_val), planet_name), sep=' ')
 
-        ax.set_xlim(min(planet_spectra.wavelength * 1e6), max(planet_spectra.wavelength * 1e6))
+        #ax.set_xlim(min(planet_spectra.wavelength * 1e6), max(planet_spectra.wavelength * 1e6))
         #ax.set_yscale('log')
-        ax.set_ylim(0, 200000)
+        #ax.set_ylim(0, 200000)
         ax.legend(fontsize=12, loc=(0, 1.03), ncol=6, mode='expand', title='Orbital Phase', title_fontsize=18)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
         ax.set_ylabel(r'F$_p$ (W/m$^2$/micron)')  # (W m$^{-2}$)
