@@ -93,16 +93,22 @@ def plot_cross_correlations(planet_names, num_phases):
     fig, ax = plt.subplots(1, 1, figsize=(16.18, 10))
     plt.subplots_adjust(wspace=0.06, hspace=0)
 
-
-    final_doppler_shifts = doppler_shifts[planet_name] + [doppler_shifts[planet_name][0]]
+    colors = ['black', 'purple', 'green',
+              'black', 'purple', 'green']
+    
+    linestyle_strs = ['solid', 'solid', 'solid',
+                      'dashed', 'dashed', 'dashed']
+              
 
 
     for i, planet_name in enumerate(planet_names):
-        ax.plot(np.linspace(0, 1.0, len(phases) + 1), final_doppler_shifts,label=planet_name, linewidth=1.5)
+        final_doppler_shifts = doppler_shifts[planet_name] + [doppler_shifts[planet_name][0]]
+        ax.plot(np.linspace(0, 1.0, len(phases) + 1), final_doppler_shifts,label=planet_name)#,
+              #  linewidth=1.5, linestyle=linestyle_strs[i], color=colors[i])
     ax.axhline(y=0.0, color='black', linestyle='dotted', linewidth=1.5)
 
-    ax.legend()
-    #ax.set_ylim(-7.5, 7.5)
+    ax.legend(fontsize=12, loc=(0, 1.03), ncol=3, mode='expand', title_fontsize=18)
+    ax.set_ylim(-10, 10)
     ax.set_xlabel('Orbital Phase')
     ax.set_ylabel('Doppler Shift (km/s)')
     ax.set_xlim(0, 1.0)
