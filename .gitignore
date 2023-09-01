@@ -8,7 +8,7 @@ Figures/*
 !Figures/.gitkeep 
 
 # Ignore some stuff in Visualizations
-Visualizations/DATA/*
+Visualizations/DATA/
 Visualizations/OUTPUT_DATA/*
 Visualizations/ScientificColourMaps7/*
 
