@@ -59,7 +59,7 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
 
         # colormap
         cm_name = 'bamO'
-        cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
+        cm_file = np.loadtxt(f'ScientificColourMaps8/{cm_name}/{cm_name}.txt')
         cm_file = np.roll(cm_file, 140, axis=0)
         my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
 

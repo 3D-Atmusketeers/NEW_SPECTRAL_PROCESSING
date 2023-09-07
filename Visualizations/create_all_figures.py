@@ -32,8 +32,24 @@ plt.style.use('science.mplstyle')
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
 
-planet_names = ["WASP-121b_YCLD_YMAG", "WASP-121b_YCLD_NMAG",
-                "WASP-121b_NCLD_YMAG", "WASP-121b_NCLD_NMAG"]
+planet_names = ["GJ1214b-none-0clouds-100met","GJ1214b-soot-25clouds-1met",
+                "GJ1214b-soot-50clouds-30met","GJ1214b-none-0clouds-1met",
+                "GJ1214b-soot-25clouds-30met","GJ1214b-tholin-0clouds-100met",
+                "GJ1214b-none-0clouds-30met","GJ1214b-soot_2xpi0-0clouds-100met",
+                "GJ1214b-tholin-0clouds-1met","GJ1214b-none-25clouds-100met",
+                "GJ1214b-soot_2xpi0-0clouds-1met","GJ1214b-tholin-0clouds-30met",
+                "GJ1214b-none-25clouds-1met","GJ1214b-soot_2xpi0-0clouds-30met",
+                "GJ1214b-tholin-25clouds-100met","GJ1214b-none-25clouds-30met",
+                "GJ1214b-soot_2xpi0-25clouds-100met","GJ1214b-tholin-25clouds-1met",
+                "GJ1214b-none-50clouds-100met","GJ1214b-soot_2xpi0-25clouds-1met",
+                "GJ1214b-tholin-25clouds-30met","GJ1214b-none-50clouds-1met",
+                "GJ1214b-soot_2xpi0-25clouds-30met","GJ1214b-tholin-50clouds-100met",
+                "GJ1214b-none-50clouds-30met","GJ1214b-soot_2xpi0-50clouds-100met",
+                "GJ1214b-tholin-50clouds-1met","GJ1214b-soot-0clouds-100met",
+                "GJ1214b-soot_2xpi0-50clouds-1met","GJ1214b-tholin-50clouds-30met",
+                "GJ1214b-soot-0clouds-1met","GJ1214b-soot_2xpi0-50clouds-30met",
+                "GJ1214b-soot-0clouds-30met","GJ1214b-soot-50clouds-100met",
+                "GJ1214b-soot-25clouds-100met","GJ1214b-soot-50clouds-1met"]
 
 # Set the opacity files to use
 opacity_files = 'SET_1'
@@ -137,12 +153,12 @@ else:
 #spectra.plot_blackbody_phase_curve(planet_name,planet_radii,num_phases=4,transmission_filter_name='MIRI',wav_subset=[5e-6, 12e-6],resolution=100,temp=600)
 #spectra.plot_planet_spectra_blackbody_comparison_hz(planet_names,black_body_temperatures=[1000, 1500, 2000, 2500],num_phases=4)
 #spectra.plot_planet_spectra_blackbody_comparison_microns(planet_names,black_body_temperatures=[1000, 2000],num_phases=2)
-spectra.plot_star_spectra_test(planet_names)
+#spectra.plot_star_spectra_test(planet_names)
 #spectra.plot_spectra_simple(planet_names, num_phases=4)
 
 
 
-for filter_name in ['None', 'SPITZER_3_6', 'SPITZER_4_5']:
+for filter_name in ['MIRI']:
     if filter_name != 'None':
         print()
         print(filter_name)
@@ -151,14 +167,14 @@ for filter_name in ['None', 'SPITZER_3_6', 'SPITZER_4_5']:
     spectra.plot_fp_spectra(planet_names,num_phases=4,
                             transmission_filter_name=filter_name,
                             wav_subset=[0, 100],
-                            resolution=0)
+                            resolution=100)
 
     spectra.plot_fp_fs_spectra(planet_names,
                                 planet_radii,
                                 num_phases=4,
                                 transmission_filter_name=filter_name,
                                 wav_subset=[0,100],
-                                resolution=1000)
+                                resolution=100)
     
     spectra.plot_fp_phase_curves(planet_names,
                             planet_name_char_len,

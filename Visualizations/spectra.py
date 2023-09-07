@@ -319,7 +319,7 @@ def plot_planet_spectra_blackbody_comparison_hz(planet_names, black_body_tempera
     colors_bb = pl.cm.Greys(np.linspace(0, 1, len(black_body_temperatures) + 2))
 
     cm_name = 'batlow'
-    cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
+    cm_file = np.loadtxt(f'ScientificColourMaps8/{cm_name}/{cm_name}.txt')
     cm_file = np.roll(cm_file, 140, axis=0)
     my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
 
@@ -399,7 +399,7 @@ def plot_planet_spectra_blackbody_comparison_microns(planet_names, black_body_te
     colors_bb = pl.cm.Greys(np.linspace(0, 1, len(black_body_temperatures) + 2))
 
     cm_name = 'batlow'
-    cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
+    cm_file = np.loadtxt(f'ScientificColourMaps8/{cm_name}/{cm_name}.txt')
     cm_file = np.roll(cm_file, 140, axis=0)
     my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
 
@@ -579,7 +579,7 @@ def plot_filters(planet_names, transmission_filter_name):
 
 def plot_spectra_simple(planet_names, num_phases):
     cm_name = 'batlow'
-    cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
+    cm_file = np.loadtxt(f'ScientificColourMaps8/{cm_name}/{cm_name}.txt')
     cm_file = np.roll(cm_file, 140, axis=0)
     my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
 
@@ -652,7 +652,7 @@ def plot_fp_fs_phase_curves(planet_names, planet_name_char_len, planet_radii, nu
     plt.subplots_adjust(hspace=0.05, wspace=0.25)
 
     cm_name = 'batlow'
-    cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
+    cm_file = np.loadtxt(f'ScientificColourMaps8/{cm_name}/{cm_name}.txt')
     cm_file = np.roll(cm_file, 0, axis=0)
     my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
 
@@ -768,7 +768,7 @@ def plot_fp_phase_curves(planet_names, planet_name_char_len, num_phases,
     plt.subplots_adjust(hspace=0.05, wspace=0.25)
 
     cm_name = 'batlow'
-    cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
+    cm_file = np.loadtxt(f'ScientificColourMaps8/{cm_name}/{cm_name}.txt')
     cm_file = np.roll(cm_file, 140, axis=0)
     my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
 
@@ -858,7 +858,7 @@ def plot_fp_phase_curves(planet_names, planet_name_char_len, num_phases,
 
 def plot_fp_fs_spectra(planet_names, planet_radii, num_phases, transmission_filter_name, wav_subset, resolution):
     cm_name = 'batlow'
-    cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
+    cm_file = np.loadtxt(f'ScientificColourMaps8/{cm_name}/{cm_name}.txt')
     cm_file = np.roll(cm_file, 140, axis=0)
     my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
 
@@ -952,7 +952,7 @@ def plot_fp_fs_spectra(planet_names, planet_radii, num_phases, transmission_filt
 
 def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subset, resolution):
     cm_name = 'batlow'
-    cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
+    cm_file = np.loadtxt(f'ScientificColourMaps8/{cm_name}/{cm_name}.txt')
     cm_file = np.roll(cm_file, 140, axis=0)
     my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
 
@@ -1035,7 +1035,7 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
 
 def plot_blackbody_phase_curve(planet_name, planet_radii,num_phases,transmission_filter_name, wav_subset,resolution,temp):
     cm_name = 'batlow'
-    cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
+    cm_file = np.loadtxt(f'ScientificColourMaps8/{cm_name}/{cm_name}.txt')
     cm_file = np.roll(cm_file, 140, axis=0)
     my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
 
