@@ -30,7 +30,7 @@ def plot_emission_maps(planet_names, nlat, nlon, nlev):
 
         # colormap
         cm_name = 'lapaz'
-        cm_file = np.loadtxt(f'ScientificColourMaps7/' + cm_name + '/'+ cm_name +'.txt')
+        cm_file = np.loadtxt(f'ScientificColourMaps8/' + cm_name + '/'+ cm_name +'.txt')
         my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
 
         for i in range(len(wavelengths)):

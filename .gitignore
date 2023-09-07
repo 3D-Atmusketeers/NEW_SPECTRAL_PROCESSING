@@ -10,12 +10,12 @@ Figures/*
 # Ignore some stuff in Visualizations
 Visualizations/DATA/
 Visualizations/OUTPUT_DATA/*
-Visualizations/ScientificColourMaps7/*
+##Visualizations/ScientificColourMaps7/*
 
 # Keep the folders
 !Visualizations/DATA/.gitkeep 
 !Visualizations/OUTPUT_DATA/.gitkeep 
-!Visualizations/ScientificColourMaps7/.gitkeep 
+##!Visualizations/ScientificColourMaps7/.gitkeep 
 
 # Ignore some stuff in spectral processing
 Spectral-Processing/FINISHED_SPECTRA/*

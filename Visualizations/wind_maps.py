@@ -9,7 +9,7 @@ import sys
 def plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
     # temp colormap
     cm_name = 'cork'
-    cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
+    cm_file = np.loadtxt(f'ScientificColourMaps8/{cm_name}/{cm_name}.txt')
     cm_file = np.flip(cm_file, axis=0)
     my_colors = colors.LinearSegmentedColormap.from_list(cm_name, cm_file)
 
