@@ -68,12 +68,17 @@ def download_and_process_files(remote_user, remote_host, files):
     subprocess.run(close_cmd)
 
 files_to_download = [
+    "/nfs/turbo/lsa-erausche/Post-Processing-Data-Files/SET_1.zip",
+    "/nfs/turbo/lsa-erausche/Post-Processing-Data-Files/SET_2.zip",
     "/nfs/turbo/lsa-erausche/Post-Processing-Data-Files/SET_3.zip",
     "/nfs/turbo/lsa-erausche/Post-Processing-Data-Files/SCATTERING_DATA.zip"
 ]
 
+# Prompt for username
+remote_user = input("Please enter your username: ")
+
 download_and_process_files(
-    remote_user="imalsky",
+    remote_user=remote_user,
     remote_host="greatlakes.arc-ts.umich.edu",
     files=files_to_download
 )
