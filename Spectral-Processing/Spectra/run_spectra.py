@@ -79,7 +79,6 @@ else:
             print('stuck in numpy fortran loop')
             time.sleep(10)
 
-
 # If you only have the fort files use this
 # Please don't only have the fort files
 # It requires that the fort files are named according to something particular
@@ -135,7 +134,7 @@ for q in range(len(planet_names)):
     grav           = fort7dict['GA']
     gasconst       = fort7dict['GASCON']
     R_PLANET       = fort7dict['RADEA']
-    P_ROT          = fort7dict['WW'] / (2.0*np.pi)*(24*3600) ** -1.0
+    P_ROT          = ((fort7dict['WW'] / (2.0 * np.pi)) * (24 * 3600)) ** -1.0
     oom            = fort7dict['OOM_IN']
     MTLX           = fort7dict['MTLX']
 
@@ -251,7 +250,7 @@ for q in range(len(planet_names)):
     print("Number of OOM = ", oom)
     print("Gas Constant = ", gasconst)
     print("Planet Radius = ", R_PLANET)
-    print("Orbital Period = ", P_ROT)
+    print("Orbital Period (days) = ", P_ROT)
     print("MTLX = ", MTLX)
     print("There are hazes? ", HAZES)
     print(aerosol_layers, "cloud layers")
