@@ -14,7 +14,7 @@ import shutil
 import setup_opac_versions
 import subprocess
 import tempfile
-
+from filelock import FileLock
 import grab_input_data
 
 #import Clean_suite
@@ -22,7 +22,6 @@ import grab_input_data
 # Phases in degrees, inclination in radians (sorry)
 # An inclination of 0 corresponds to edge on
 phases = [0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0, 195.0, 210.0, 225.0, 240.0, 255.0, 270.0, 285.0, 300.0, 315.0, 330.0, 345.0]
-phases = [0.0]
 inclinations = [0.0]
 system_obliquity = 0
 
@@ -95,40 +94,44 @@ else:
 for q in range(len(planet_names)):
     planet_name = planet_names[q]
 
+    # Assuming planet_names and q are defined somewhere above this
+    planet_name_original = planet_names[q]
+
     # Get the current working directory
     current_directory = os.getcwd()
 
-    # Assume planet_name is defined elsewhere in your script
-    planet_name = "HD209-PICKET-NUC-CLOUDS"
+    # Formulate the directories and remove any potential single quotes from planet_name_original
+    sanitized_planet_name = planet_name_original.strip("'")
+    fortfiles_directory = os.path.join(current_directory, f"{sanitized_planet_name}fortfiles")
 
-    # Formulate the directories and remove any potential single quotes from planet_name
-    planet_name = planet_name.strip("'")
-    fortfiles_directory = os.path.join(current_directory, f"{planet_name}fortfiles")
+    # Create a lock file to prevent concurrent directory creation
+    lock = FileLock(fortfiles_directory + ".lock")
 
-    # Create the folder if not exists and also create fort7dict
-    if not os.path.exists(fortfiles_directory):
-        os.mkdir(fortfiles_directory)
+    with lock:
+        # Create the folder if not exists and also create fort7dict
+        if not os.path.exists(fortfiles_directory):
+            os.mkdir(fortfiles_directory)
 
-        # Change directory to GCM-OUTPUT
-        os.chdir(f'../GCM-OUTPUT/{planet_name}/Planet_Run')
+            # Change directory to GCM-OUTPUT
+            os.chdir(f'../GCM-OUTPUT/{sanitized_planet_name}/Planet_Run')
 
-        # Copy the fort.7 file
-        subprocess.run(['cp', 'fort.7', fortfiles_directory], check=True)
+            # Copy the fort.7 file
+            subprocess.run(['cp', 'fort.7', fortfiles_directory], check=True)
 
-        # Change directory back to Spectra
-        os.chdir(current_directory)
+            # Change directory back to Spectra
+            os.chdir(current_directory)
 
-        # Copy the fortran_readfort7.f90 file
-        subprocess.run(['cp', 'fortran_readfort7.f90', fortfiles_directory], check=True)
+            # Copy the fortran_readfort7.f90 file
+            subprocess.run(['cp', 'fortran_readfort7.f90', fortfiles_directory], check=True)
 
-        # Change directory to fortfiles_directory
-        os.chdir(fortfiles_directory)
+            # Change directory to fortfiles_directory
+            os.chdir(fortfiles_directory)
 
-        # Remove the existing compiled file
-        subprocess.run(['rm', '-f', 'fortrantopythonfile.cpython-39-x86_64-linux-gnu.so'], check=True)
+            # Remove the existing compiled file
+            subprocess.run(['rm', '-f', 'fortrantopythonfile.cpython-39-x86_64-linux-gnu.so'], check=True)
 
-        with open(os.devnull, 'w') as fp:
-            subprocess.run(['python', '-m', 'numpy.f2py', '-c', 'fortran_readfort7.f90', '-m', 'fortrantopythonfile'], stdout=fp, stderr=fp, check=True)
+            with open(os.devnull, 'w') as fp:
+                subprocess.run(['python', '-m', 'numpy.f2py', '-c', 'fortran_readfort7.f90', '-m', 'fortrantopythonfile'], stdout=fp, stderr=fp, check=True)
 
     # Import grab_input_data module and create fort7dict irrespective of the directory being newly created or pre-existing
     os.chdir(fortfiles_directory)
