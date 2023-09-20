@@ -13,8 +13,6 @@ phases = [0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 1
 gcm_folder = 'GCM-OUTPUT'
 source_file_name = "Run_sbatch"
 
-lowest_phase = np.min(phases)
-
 @contextlib.contextmanager
 def change_directory(path):
     """Context manager to temporarily change the working directory."""
@@ -147,8 +145,6 @@ for i in range(len(finished_gcms)):
                     line = '    STEP_THREE = False\n'
                 sys.stdout.write(line)
             for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + '_' + step + ".py"], inplace=True):
-                if line.strip().startswith('LOWEST_PHASE'):
-                    line = 'LOWEST_PHASE = True\n'
                 sys.stdout.write(line)
                 
         step1jobnum = runsbatch(phases, source_file_name, finished_gcms[i], step)
@@ -177,13 +173,6 @@ for i in range(len(finished_gcms)):
                 if line.strip().startswith('STEP_THREE'):
                     line = '    STEP_THREE = False\n'
                 sys.stdout.write(line)
-            if phase == lowest_phase:
-                for line in fileinput.input(
-                        ["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + '_' + step + ".py"],
-                        inplace=True):
-                    if line.strip().startswith('LOWEST_PHASE'):
-                        line = 'LOWEST_PHASE = True\n'
-                    sys.stdout.write(line)
                     
         step2jobnum = runsbatch(phases, source_file_name, finished_gcms[i], step,dependency)
         step2jobnums.append(step2jobnum)
@@ -215,14 +204,6 @@ if STEP_THREE:
                 if line.strip().startswith('STEP_THREE'):
                     line = '    STEP_THREE = True\n'
                 sys.stdout.write(line)
-
-            if phase == lowest_phase:
-                for line in fileinput.input(
-                        ["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + '_' + step + ".py"],
-                        inplace=True):
-                    if line.strip().startswith('LOWEST_PHASE'):
-                        line = 'LOWEST_PHASE = True\n'
-                    sys.stdout.write(line)
 
             phaseslist = [phase]
             step3jobnum = runsbatch(phaseslist, source_file_name, finished_gcms[i], step, dependency)

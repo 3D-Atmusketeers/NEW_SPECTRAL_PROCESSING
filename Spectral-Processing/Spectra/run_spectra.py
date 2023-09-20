@@ -12,12 +12,17 @@ import time
 import re
 import shutil
 import setup_opac_versions
+import subprocess
+import tempfile
+
+import grab_input_data
+
 #import Clean_suite
 
 # Phases in degrees, inclination in radians (sorry)
 # An inclination of 0 corresponds to edge on
-phases = [0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0, 195.0, 210.0, 225.0, 240.0, 255.0, 270.0, 285.0, 300.0, 315.0, 330.0. 345.0]
-#phases = [0.0]
+phases = [0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0, 195.0, 210.0, 225.0, 240.0, 255.0, 270.0, 285.0, 300.0, 315.0, 330.0, 345.0]
+phases = [0.0]
 inclinations = [0.0]
 system_obliquity = 0
 
@@ -39,45 +44,10 @@ NLON = 96
 # 3 is rotation only
 dopplers = [0]
 
-Planet_name = ''
-print('planet name ', Planet_name)
+
 # If you only need to change the phase you can use this knob
 # It skips a lot of steps for the regridding
 ONLY_PHASE = True
-
-#this is automatically set to true if the current phase is the lowest phase run
-LOWEST_PHASE = False
-if LOWEST_PHASE:
-    os.system('rm -rf ' + Planet_name + 'fortfiles')
-    os.mkdir(Planet_name + 'fortfiles')
-    os.chdir('..')
-    directory_name = os.getcwd()
-    os.chdir('GCM-OUTPUT')
-    print(directory_name)
-    os.chdir(Planet_name + '/Planet_Run')
-    os.system('cp fort.7 ' + str(directory_name) + '/Spectra/' + Planet_name + 'fortfiles')
-    os.chdir(str(directory_name) + '/Spectra')
-    os.system('cp fortran_readfort7.f90 ' + Planet_name + 'fortfiles')
-    os.chdir(Planet_name + 'fortfiles')
-    os.system('rm -f fortrantopythonfile.cpython-39-x86_64-linux-gnu.so')
-    os.system('python -m numpy.f2py -c fortran_readfort7.f90 -m fortrantopythonfile')
-    import grab_input_data
-    fort7dict = grab_input_data.create_dict()
-    os.chdir(str(directory_name) + '/Spectra/')
-else:
-    imported = False
-    while not imported:
-        try:
-            directory_name = os.getcwd()
-            os.chdir(Planet_name + 'fortfiles')
-            import grab_input_data
-            fort7dict = grab_input_data.create_dict()
-            imported = True
-            os.chdir(str(directory_name))
-        except:
-            os.chdir(str(directory_name))
-            print('stuck in numpy fortran loop')
-            time.sleep(10)
 
 # If you only have the fort files use this
 # Please don't only have the fort files
@@ -85,15 +55,13 @@ else:
 # In the correct directory
 USE_FORT_FILES = True
 
-
 # This is a polynomial fit of the GCM TP profiles in order to smooth it for the post processing
 # If false, just use the GCM TP profiles
 smoothing = True
 
-
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["WASP18b_NUC_25LAYERS_SOOT_DENSE"]
+planet_names = ["'HD209-PICKET-NUC-CLOUDS'"]
 
 opacity_files = 'SET_1'
 
@@ -126,6 +94,48 @@ else:
 
 for q in range(len(planet_names)):
     planet_name = planet_names[q]
+
+    # Get the current working directory
+    current_directory = os.getcwd()
+
+    # Assume planet_name is defined elsewhere in your script
+    planet_name = "HD209-PICKET-NUC-CLOUDS"
+
+    # Formulate the directories and remove any potential single quotes from planet_name
+    planet_name = planet_name.strip("'")
+    fortfiles_directory = os.path.join(current_directory, f"{planet_name}fortfiles")
+
+    # Create the folder if not exists and also create fort7dict
+    if not os.path.exists(fortfiles_directory):
+        os.mkdir(fortfiles_directory)
+
+        # Change directory to GCM-OUTPUT
+        os.chdir(f'../GCM-OUTPUT/{planet_name}/Planet_Run')
+
+        # Copy the fort.7 file
+        subprocess.run(['cp', 'fort.7', fortfiles_directory], check=True)
+
+        # Change directory back to Spectra
+        os.chdir(current_directory)
+
+        # Copy the fortran_readfort7.f90 file
+        subprocess.run(['cp', 'fortran_readfort7.f90', fortfiles_directory], check=True)
+
+        # Change directory to fortfiles_directory
+        os.chdir(fortfiles_directory)
+
+        # Remove the existing compiled file
+        subprocess.run(['rm', '-f', 'fortrantopythonfile.cpython-39-x86_64-linux-gnu.so'], check=True)
+
+        with open(os.devnull, 'w') as fp:
+            subprocess.run(['python', '-m', 'numpy.f2py', '-c', 'fortran_readfort7.f90', '-m', 'fortrantopythonfile'], stdout=fp, stderr=fp, check=True)
+
+    # Import grab_input_data module and create fort7dict irrespective of the directory being newly created or pre-existing
+    os.chdir(fortfiles_directory)
+    fort7dict = grab_input_data.create_dict()
+
+    # Change directory back to Spectra
+    os.chdir(current_directory)
 
     runname     = planet_name + '/Planet_Run'
     path        = '../GCM-OUTPUT/'
@@ -309,7 +319,7 @@ for q in range(len(planet_names)):
             input_temp  = input_paths[i]
             
             # This will copy all the files that need to be changed over with different opac versions
-            setup_opac_versions.replace_files(opacity_files, MET_X_SOLAR, LOWEST_PHASE)
+            setup_opac_versions.replace_files(opacity_files, MET_X_SOLAR)
 
             # Copy the template for inputs
             try:
@@ -381,9 +391,9 @@ for q in range(len(planet_names)):
     phase_strs = []
     
 
-    STEP_ONE = False
+    STEP_ONE = True
     STEP_TWO = False
-    STEP_THREE = True
+    STEP_THREE = False
 
     if STEP_ONE:
         # Convert the fort files to the correct format    
