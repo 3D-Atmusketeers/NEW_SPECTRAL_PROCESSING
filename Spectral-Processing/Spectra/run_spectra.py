@@ -186,22 +186,10 @@ for q in range(len(planet_names)):
 
     HAZE_TYPE = fort7dict['HAZETYPE']
 
-    '''
-    if ("SOOT".lower() in planet_names[q].lower()):
-        HAZE_TYPE = 'soot'
-    elif ("THOLIN".lower() in planet_names[q].lower()):
-        HAZE_TYPE = 'tholin'
-    else:
-        HAZE_TYPE = 'None'
-    
-    if ("2xpi0".lower() in planet_names[q].lower()):
-        HAZE_TYPE = 'soot-2xpi0'
-    
-    if (HAZE_TYPE == 'soot' or HAZE_TYPE == 'soot-2xpi0' or HAZE_TYPE == 'tholin' or HAZE_TYPE == 'sulfur'):
-        HAZES = True
-    else:
-        HAZES = False
-    '''
+    # Check if the substring 'soot_2xpi0' is in HAZE_TYPE
+    if 'soot_2xpi0' in HAZE_TYPE:
+        # Replace 'soot_2xpi0' with 'soot-2xpi0'
+        HAZE_TYPE = HAZE_TYPE.replace('soot_2xpi0', 'soot-2xpi0')
 
     # Whether  there are clouds
     # 0 is no clouds, 1 is clouds
