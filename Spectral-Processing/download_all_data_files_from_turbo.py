@@ -96,21 +96,20 @@ def download_and_process_files(remote_user, remote_host, files):
 
         if downloaded_file.endswith(".zip"):
             unpack_downloaded_file(downloaded_file)
-
             unpacked_dir = os.path.splitext(downloaded_file)[0]
 
             # Move the files to respective folders
-            if "SET_" in downloaded_file:
-                move_files(unpacked_dir, "Spectra/DATA")
-            elif "SCATTERING_DATA" in downloaded_file:
-                move_files(unpacked_dir, "Spectra/SCATTERING_DATA")
+            #if "SET_" in downloaded_file:
+            #    move_files(unpacked_dir, "Spectra/DATA")
+            #elif "SCATTERING_DATA" in downloaded_file:
+            #    move_files(unpacked_dir, "Spectra/SCATTERING_DATA")
 
     # Close the master connection
     close_cmd = ["ssh", "-O", "exit", "-o", f"ControlPath={control_path}", f"{remote_user}@{remote_host}"]
     subprocess.run(close_cmd)
 
     # Prompt to delete the downloaded zipped files
-    prompt_to_delete_files([os.path.basename(f) for f in files if f.endswith(".zip")])
+    #prompt_to_delete_files([os.path.basename(f) for f in files if f.endswith(".zip")])
 
 # List of files to download
 files_to_download = [

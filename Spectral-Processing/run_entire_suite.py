@@ -9,7 +9,7 @@ import glob
 import numpy as np
 
 phases = [0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0, 195.0, 210.0, 225.0, 240.0, 255.0, 270.0, 285.0, 300.0, 315.0, 330.0, 345.0]
-#phases = [0.0, 15.0]
+phases = [0.0]
 gcm_folder = 'GCM-OUTPUT'
 source_file_name = "Run_sbatch"
 
@@ -190,7 +190,7 @@ if STEP_THREE:
                 dependency = step2jobnums[i]
             else:
                 dependency = 'none'
-                print('no dependency, running step 3 (calculations) immediately')
+                print('no dependency, running step 3 (calculations) immediately for', finished_gcms[i])
 
             for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + '_' + step + ".py"], inplace=True):
                 if line.strip().startswith('STEP_ONE'):
@@ -214,4 +214,3 @@ if STEP_THREE:
                 print('Waiting for previous phase to create the .exe file')
                 print('Waiting on ', executable)
                 time.sleep(60)
-
