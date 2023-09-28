@@ -6,10 +6,14 @@ import contextlib
 import time
 import subprocess
 import glob
-import numpy as np
+from clean_spectra_directory import clean_spectra_directory
 
+# Clean the directory of any old files before doing anything else!
+print("cleaning spectra directory")
+clean_spectra_directory()
+
+# Set the phases that you want to run
 phases = [0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0, 195.0, 210.0, 225.0, 240.0, 255.0, 270.0, 285.0, 300.0, 315.0, 330.0, 345.0]
-phases = [0.0]
 gcm_folder = 'GCM-OUTPUT'
 source_file_name = "Run_sbatch"
 
