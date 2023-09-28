@@ -16,7 +16,10 @@ import subprocess
 import tempfile
 from filelock import FileLock
 import grab_input_data
-
+import fcntl
+import os
+from shutil import copyfile
+import sys
 #import Clean_suite
 
 # Phases in degrees, inclination in radians (sorry)
@@ -309,35 +312,38 @@ for q in range(len(planet_names)):
         """
         inputs_file = 'input.h'
         output_paths = []
-
+        
         # The output paths should be similar to the input paths
-        # Minus the .dat file extension and saved to OUT/
         for file_path in input_paths:
             output_paths.append('OUT/Spec_' + str(doppler_val) + '_' + file_path[10:-4])
-
+    
         # Each Run needs to have a specific input.h file
-        # With the correct input and output paths
         for i in range(len(input_paths)):
             output_temp = output_paths[i]
             input_temp  = input_paths[i]
-            
-            # This will copy all the files that need to be changed over with different opac versions
-            setup_opac_versions.replace_files(opacity_files, MET_X_SOLAR)
-
-            # Copy the template for inputs
-            try:
-                copyfile('template_inputs.h', inputs_file)
-            except IOError as e:
-                print("Unable to copy file. %s" % e)
-                exit(1)
-            except:
-                print("Unexpected error:", sys.exc_info())
-                exit(1)
-
-            # Read in the file
-            with open(inputs_file, 'r') as file :
-                filedata = file.read()
-
+                
+            lock_file_path = 'file_lock.lock'
+            with open(lock_file_path, 'a') as lock_file:  # Use 'a' mode
+                # Acquire the lock
+                fcntl.flock(lock_file, fcntl.LOCK_EX)
+                
+                # This will copy all the files that need to be changed over with different opac versions
+                setup_opac_versions.replace_files(opacity_files, MET_X_SOLAR)
+                
+                # Copy the template for inputs
+                try:
+                    copyfile('template_inputs.h', inputs_file)
+                except IOError as e:
+                    print("Unable to copy file. %s" % e)
+                    exit(1)
+                except:
+                    print("Unexpected error:", sys.exc_info())
+                    exit(1)
+    
+                # Read in the file
+                with open(inputs_file, 'r') as file :
+                    filedata = file.read()
+                
             # Replace the input and output paths
             filedata = filedata.replace("<<output_file>>", "\"" + output_temp + str(W0_VAL) + str(G0_VAL) + "\"")
             filedata = filedata.replace("<<input_file>>", "\"" + input_temp + "\"")
@@ -376,15 +382,15 @@ for q in range(len(planet_names)):
                 file.write(filedata)
             
             # Run Eliza's code
-            
-                
             os.system('make rt_emission_aerosols.exe')
             file_name = f"rt_emission_aerosols_{planet_name}_phase_{phase_strs[i]}.exe"    
-            copy_command = 'cp rt_emission_aerosols.exe' + file_name
             os.rename('rt_emission_aerosols.exe', file_name)
             permission_command = 'chmod 755 ' + file_name
             os.system(permission_command)
             os.system(f"./{file_name}")
+            
+            # Release the lock
+            fcntl.flock(lock_file, fcntl.LOCK_UN)
         return None
 
 
@@ -394,9 +400,9 @@ for q in range(len(planet_names)):
     phase_strs = []
     
 
-    STEP_ONE = True
+    STEP_ONE = False
     STEP_TWO = False
-    STEP_THREE = False
+    STEP_THREE = True
 
     if STEP_ONE:
         # Convert the fort files to the correct format    
