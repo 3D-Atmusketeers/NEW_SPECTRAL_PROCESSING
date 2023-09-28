@@ -40,3 +40,20 @@ Spectral-Processing/Spectra/OUT/*.lock
 Spectral-Processing/Spectra/rt_emission_aerosols_*
 Spectral-Processing/Spectra/Run_sbatch_*
 Spectral-Processing/Spectra/run_spectra_*
+
+# Ignore fortfiles pattern
+Spectral-Processing/*fortfiles*
+Spectral-Processing/*fortfiles/
+
+# Ignore lock pattern
+Spectral-Processing/*.lock
+
+# Ignore slurm pattern
+Spectral-Processing/slurm*.out
+
+# Ignore slurm pattern
+Spectral-Processing/Spectra/slurm*.out
+
+# Ignore anything in __pycache__
+Spectral-Processing/Spectra/__pycache__/
+Spectral-Processing/Spectra/__pycache__/*
