@@ -146,6 +146,10 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
     G0[J] = g0_array[J+kmin-1];
     TEMPS[J] = temperature_array[J+kmin-1];
 
+    //TEMPS[J] = 1000;
+    //W0[J] = 0;
+    //G0[J] = 0;
+
     DTAUS[J]   = dtau_array[J+kmin-1];
     TAULS[J]   = dtau_array[J+kmin-1];
     TAUCS[J+1] = TAUCS[J]+dtau_array[J+kmin-1];

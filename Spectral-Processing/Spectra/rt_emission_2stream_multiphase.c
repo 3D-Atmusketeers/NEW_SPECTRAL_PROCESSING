@@ -1601,12 +1601,16 @@ int RT_Emit_3D(double PHASE)
                     for(j=0; j<NTAU; j++)
                     {
                         intensity[l][m] += Planck(temperature_3d[l][m][j], atmos.lambda[i]) * exp(-tau_em[l][m][j]) * dtau_em[l][m][j];
-                        //printf("\'OLD\', %d, %le, %le, %le, \n", j, temperature_3d[l][m][j], tau_em[l][m][j],  intensity[l][m]);
+                        //intensity[l][m] += Planck(1000, atmos.lambda[i]) * exp(-tau_em[l][m][j]) * dtau_em[l][m][j];
+                        printf("\'OLD\', %d, %le, %le, %le, %le\n", j, temperature_3d[l][m][j], tau_em[l][m][j],  intensity[l][m], intensity_vals[0]);
                     }
+
+                    exit(0);
                 }
             }
         }
         */
+
 
 
         /*Calculate the total flux received by us*/
