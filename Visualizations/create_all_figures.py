@@ -32,24 +32,7 @@ plt.style.use('science.mplstyle')
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
 
-planet_names = ["GJ1214b-none-0clouds-100met","GJ1214b-soot-25clouds-1met",
-                "GJ1214b-soot-50clouds-30met","GJ1214b-none-0clouds-1met",
-                "GJ1214b-soot-25clouds-30met","GJ1214b-tholin-0clouds-100met",
-                "GJ1214b-none-0clouds-30met","GJ1214b-soot_2xpi0-0clouds-100met",
-                "GJ1214b-tholin-0clouds-1met","GJ1214b-none-25clouds-100met",
-                "GJ1214b-soot_2xpi0-0clouds-1met","GJ1214b-tholin-0clouds-30met",
-                "GJ1214b-none-25clouds-1met","GJ1214b-soot_2xpi0-0clouds-30met",
-                "GJ1214b-tholin-25clouds-100met","GJ1214b-none-25clouds-30met",
-                "GJ1214b-soot_2xpi0-25clouds-100met","GJ1214b-tholin-25clouds-1met",
-                "GJ1214b-none-50clouds-100met","GJ1214b-soot_2xpi0-25clouds-1met",
-                "GJ1214b-tholin-25clouds-30met","GJ1214b-none-50clouds-1met",
-                "GJ1214b-soot_2xpi0-25clouds-30met","GJ1214b-tholin-50clouds-100met",
-                "GJ1214b-none-50clouds-30met","GJ1214b-soot_2xpi0-50clouds-100met",
-                "GJ1214b-tholin-50clouds-1met","GJ1214b-soot-0clouds-100met",
-                "GJ1214b-soot_2xpi0-50clouds-1met","GJ1214b-tholin-50clouds-30met",
-                "GJ1214b-soot-0clouds-1met","GJ1214b-soot_2xpi0-50clouds-30met",
-                "GJ1214b-soot-0clouds-30met","GJ1214b-soot-50clouds-100met",
-                "GJ1214b-soot-25clouds-100met","GJ1214b-soot-50clouds-1met"]
+planet_names = ["HD209_PICKET_NUC_CLOUDS", "HD189_DOGRAY_NUC_CLOUDS"]
 
 # Set the opacity files to use
 opacity_files = 'SET_1'
@@ -121,7 +104,8 @@ else:
 # If the extra_pressure level is greater than 0, its plots it also
 # If it is 0, then it plots the IR photosphere pressure
 #aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes=False, extra_pressure_level_bar=0)
-#aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes = True, extra_pressure_level_bar = 1e-4)
+#aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes = True, extra_pressure_level_bar = 1e-1)
+#aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes = True, extra_pressure_level_bar = 1)
 
 
 # Plot the ptc curves
@@ -131,8 +115,8 @@ else:
 # Plot other planet characteristics
 #aerosol_maps.plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, cloud_wavelength)
 #aerosol_profiles.plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
-#wind_maps.plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
-#wind_isobars.plot_wind_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes=False, extra_pressure_level_bar=0.01)
+wind_maps.plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
+wind_isobars.plot_wind_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes=False, extra_pressure_level_bar=0.01)
 
 
 # Plotting the emission maps
@@ -157,7 +141,7 @@ else:
 #spectra.plot_spectra_simple(planet_names, num_phases=4)
 
 
-
+"""
 for filter_name in ['MIRI']:
     if filter_name != 'None':
         print()
@@ -188,7 +172,7 @@ for filter_name in ['MIRI']:
                             num_phases=24,
                             transmission_filter_name=filter_name,
                             wav_subset=[0, 100])
-
+"""
 # Notes
 # if the transmission filter name is set to 'None', then it will plot the full spectrum
 # unless you specify a wavelength subset

@@ -33,8 +33,10 @@ void Angles3d(double ds[], double theta[], double dtheta[], double lat);
 double Radius(double R_pl, double ds[]);
 double lint(double xa, double ya, double xb, double yb, double x);
 
+int num_tau_layers;
+
 // C HARADA -- update for 2stream //
-void two_stream(int NLAYER, int kmin, double *w0_array, double *g0_array, \
+void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, double *g0_array, \
                   const double *temperature_array, const double *tau_array, \
                   double NU, double NU_BIN, double incident_frac, double *dtau_array, double intensity_vals[]);
 
@@ -1527,7 +1529,9 @@ int RT_Emit_3D(double PHASE)
                         atmos.incident_frac[l][m][NTAU-10] = 0;
                     }
 
-                    two_stream(NTAU, kmin, pi0_tot[l][m], \
+                    num_tau_layers = NTAU;
+
+                    two_stream(num_tau_layers, NTAU - kmin - 1, kmin + 1, pi0_tot[l][m], \
                                asym_tot[l][m], temperature_3d[l][m], tau_em[l][m], \
                                CLIGHT / atmos.lambda[i], \
                                CLIGHT / atmos.lambda[i] - CLIGHT / atmos.lambda[i+1], \
@@ -1572,7 +1576,7 @@ int RT_Emit_3D(double PHASE)
                 }
             }
         }
-        
+
 
 
         /*
@@ -1603,7 +1607,7 @@ int RT_Emit_3D(double PHASE)
             }
         }
         */
-        
+
 
         /*Calculate the total flux received by us*/
         flux_pl[i] = 0.0;

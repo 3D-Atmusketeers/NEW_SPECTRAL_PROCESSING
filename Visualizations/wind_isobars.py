@@ -9,6 +9,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from matplotlib import ticker
+import matplotlib
+import matplotlib.colors as colors
 
 
 def plot_wind_isobars(
@@ -23,7 +25,7 @@ def plot_wind_isobars(
     print('Plotting weird wind isobars')
 
     # temp colormap
-    cm_name = 'lajolla'
+    cm_name = 'cork'
     cm_file = np.loadtxt(f'ScientificColourMaps8/{cm_name}/{cm_name}.txt')
     cm_file = np.flip(cm_file, axis=0)
     temperature_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
@@ -65,7 +67,6 @@ def plot_wind_isobars(
         gravity = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name, 'fort.7', 'GA')
         ir_absorbtion_coefficient = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/',
                                                                    planet_name, 'fort.7', 'ABSLW')
-
         ir_photosphere_pressure_bars = (2. / 3.) * (gravity / ir_absorbtion_coefficient) / 10000
         ir_photosphere_pressure_bars = np.round(ir_photosphere_pressure_bars, 3)
 
@@ -158,18 +159,24 @@ def plot_wind_isobars(
             my_levels = np.arange(600, 1600, 100)
         else:
             my_levels = np.arange(1000, 1800, 100)
-            
+
+        matplotlib_version = matplotlib.__version__.split('.')
+        if float(matplotlib_version[1]) < 2:
+            my_norm = colors.DivergingNorm(0)
+        else:
+            my_norm = colors.TwoSlopeNorm(0)
 
         temp_map = axes.contourf(lons,
-                                 lats, np.concatenate([EW_vels, EW_vels], axis=1), extend='both',
-                                 cmap=temperature_colors)
+                                 lats, np.concatenate([EW_vels, EW_vels], axis=1),
+                                 cmap=temperature_colors,
+                                 norm=my_norm)
         temp_cbar = fig.colorbar(
         temp_map,
         aspect=30,
         pad=0.015,
         orientation='horizontal')
             
-        temp_cbar.set_label('Temperature (K)', fontsize=26)
+        temp_cbar.set_label('E-W Wind Speed (m/s)', fontsize=26)
         
         axes.streamplot(test_x, test_y,
                                np.concatenate([EW_vels, EW_vels], axis=1),
