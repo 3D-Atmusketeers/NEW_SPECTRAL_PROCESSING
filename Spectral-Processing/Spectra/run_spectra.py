@@ -24,7 +24,7 @@ import sys
 
 # Phases in degrees, inclination in radians (sorry)
 # An inclination of 0 corresponds to edge on
-phases = [0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0, 195.0, 210.0, 225.0, 240.0, 255.0, 270.0, 285.0, 300.0, 315.0, 330.0, 345.0]
+phases = [180.0]
 inclinations = [0.0]
 system_obliquity = 0
 
@@ -63,9 +63,9 @@ smoothing = True
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["'HD209-PICKET-NUC-CLOUDS'"]
+planet_names = ["HD209_PICKET_NUC_CLOUDS"]
 
-opacity_files = 'SET_1'
+opacity_files = 'SET_3'
 
 # There are the different sets of opacity and EOS files
 # There are somethings that need to be changed in the template inputs file to make this happen

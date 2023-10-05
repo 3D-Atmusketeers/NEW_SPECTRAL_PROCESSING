@@ -69,4 +69,4 @@ def plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
         fig.text(0.5, 0.03, r"Latitude (degrees)", size=26,  ha='center')
         fig.text(0.0, 0.5, r"Pressure (bar)", size=26,  va='center', rotation='vertical')
 
-        plt.savefig('../Figures/wind_maps_{}.png'.format(planet_name), bbox_inches='tight', dpi=100)
+        plt.savefig('../Figures/Wind_maps_{}.png'.format(planet_name), bbox_inches='tight', dpi=100)
