@@ -28,6 +28,9 @@ Spectral-Processing/Spectra/OUT/*
 
 Spectral-Processing/Spectra/SCATTERING_DATA/*fortfiles
 Spectral-Processing/Spectra/OUT/*.lock
+Spectral-Processing/Spectra/*fortfiles
+Spectral-Processing/Spectra/*.lock
+
 
 # Keep the folders
 !Spectral-Processing/FINISHED_SPECTRA/.gitkeep

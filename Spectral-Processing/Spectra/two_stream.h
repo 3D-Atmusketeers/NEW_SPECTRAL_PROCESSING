@@ -172,7 +172,6 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
   //***************************************************************************************
 
 
-
   //**************************************************
   //*               Long Wave Solution               *
   //**************************************************
@@ -295,6 +294,7 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
 
   E[0] = -CM[0];
   E[2*NLAYER-1]  = 0;
+
   DS[2*NLAYER-1] = E[2*NLAYER-1] / B[2*NLAYER-1];
   AS[2*NLAYER-1] = A[2*NLAYER-1] / B[2*NLAYER-1];
 
@@ -316,16 +316,15 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
     Y[L] = DS[L] - AS[L] * Y[L-1];
   }
 
-
-
   //********************************************
   //*    Source Function Technique Solution    *
   //********************************************
-  for(J=1; J<NLAYER+1; J++)
+  for(J=0; J<NLAYER; J++)
   {
-    SOURCE_Y1[J-1] = Y[2*J-2];
-    SOURCE_Y2[J-1] = Y[2*J-1];
+    SOURCE_Y1[J] = Y[2*J];
+    SOURCE_Y2[J] = Y[2*J+1];
   }
+
 
   for(J=0; J<NLAYER; J++)
   {
@@ -352,7 +351,6 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
     SIGMA_2[J] = 2.0 * PI * B1[J];
   }
 
-
   INTENSITY_DOWN[0] = BB_TOP_OF_ATM * exp(-TAULS[0]) + \
                       SOURCE_J[0]/(LAMBDAS[0] + 1.0) * (1.0 - exp(-TAULS[0] * (LAMBDAS[0]+1.0) )) + \
                       SOURCE_K[0]/(LAMBDAS[0] - 1.0) * (exp(-TAULS[0]) - exp(-TAULS[0]*LAMBDAS[0])) + \
@@ -363,7 +361,7 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
   for(J=1; J<NLAYER; J++)
   {
     INTENSITY_DOWN[J] = INTENSITY_DOWN[J-1] * exp(-TAULS[J]) + \
-                    SOURCE_J[J]/(LAMBDAS[J] + 1.0) * (1.0 - exp(-TAULS[J] * (LAMBDAS[J]+1.0) )) + \
+                    SOURCE_J[J]/(LAMBDAS[J] + 1.0) * (1.0 - exp(-TAULS[J-1] * (LAMBDAS[J]+1.0) )) + \
                     SOURCE_K[J]/(LAMBDAS[J] - 1.0) * (exp(-TAULS[J]) - exp(-TAULS[J]*LAMBDAS[J])) + \
                     SIGMA_1[J] * (1.0 - exp(-TAULS[J])) + \
                     SIGMA_2[J] * (exp(-TAULS[J]) + TAULS[J] - 1.0);
@@ -377,15 +375,13 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
   {
     J = NLAYER - Z;
 
-    INTENSITY_UP[J] = INTENSITY_UP[J+1] * exp(-TAULS[J-1]) + \
-                      SOURCE_G[J] / (LAMBDAS[J]-1.0) * (exp(-TAULS[J-1])-exp(-TAULS[J-1] * (LAMBDAS[J]))) + \
-                      SOURCE_H[J] / (LAMBDAS[J]+1.0) * (1.0 - exp(-TAULS[J-1] * (LAMBDAS[J] + 1.0))) + \
+    INTENSITY_UP[J-1] = INTENSITY_UP[J] * exp(-TAULS[J]) + \
+                      SOURCE_G[J] / (LAMBDAS[J]-1.0) * (exp(-TAULS[J])-exp(-TAULS[J] * (LAMBDAS[J]))) + \
+                      SOURCE_H[J] / (LAMBDAS[J]+1.0) * (1.0 - exp(-TAULS[J] * (LAMBDAS[J] + 1.0))) + \
                       ALPHA_1[J] * (1.0 - exp(-TAULS[J-1])) + \
-                      ALPHA_2[J] * (1.0 - ((TAULS[J-1] + 1.0) * (exp(-TAULS[J-1]))));
+                      ALPHA_2[J] * (1.0 - ((TAULS[J] + 1.0) * (exp(-TAULS[J]))));
     HEMISPHERIC_SOURCE_FNC[J] = INTENSITY_UP[J];
   }
-
-
 
   //***************************************************************************************
   //***************************************************************************************
