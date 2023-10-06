@@ -355,6 +355,9 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
     SIGMA_2[J] = 2.0 * PI * B1[J];
   }
 
+  INTENSITY_UP[NLAYER-1] = 2.0 * BB_BOTTOM_OF_ATM * EMIS * PI;
+  //INTENSITY_DOWN[0] =  (1. - exp(-TAULS[0])) * BB_TOP_OF_ATM * 2. * PI;
+
   INTENSITY_DOWN[0] = BB_TOP_OF_ATM * exp(-TAULS[0]) + \
                       SOURCE_J[0]/(LAMBDAS[0] + 1.0) * (1.0 - exp(-TAULS[0] * (LAMBDAS[0]+1.0) )) + \
                       SOURCE_K[0]/(LAMBDAS[0] - 1.0) * (exp(-TAULS[0]) - exp(-TAULS[0]*LAMBDAS[0])) + \
@@ -362,28 +365,21 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
                       SIGMA_2[0] * (exp(-TAULS[0]) + TAULS[0] - 1.0);
 
   // Do the downward intensity first
-  for(J=1; J<NLAYER; J++)
+  for(J=0; J<NLAYER; J++)
   {
-    INTENSITY_DOWN[J] = INTENSITY_DOWN[J-1] * exp(-TAULS[J]) + \
-                    SOURCE_J[J]/(LAMBDAS[J] + 1.0) * (1.0 - exp(-TAULS[J-1] * (LAMBDAS[J]+1.0) )) + \
+    INTENSITY_DOWN[J+1] = INTENSITY_DOWN[J] * exp(-TAULS[J]) + \
+                    SOURCE_J[J]/(LAMBDAS[J] + 1.0) * (1.0 - exp(-TAULS[J] * (LAMBDAS[J]+1.0) )) + \
                     SOURCE_K[J]/(LAMBDAS[J] - 1.0) * (exp(-TAULS[J]) - exp(-TAULS[J]*LAMBDAS[J])) + \
                     SIGMA_1[J] * (1.0 - exp(-TAULS[J])) + \
                     SIGMA_2[J] * (exp(-TAULS[J]) + TAULS[J] - 1.0);
-  }
-
-  INTENSITY_UP[NLAYER-1] = 2.0 * BB_BOTTOM_OF_ATM * EMIS * PI;
 
 
-  // Calculate the upward intensity next
-  for(Z=1; Z<NLAYER + 1; Z++)
-  {
-    J = NLAYER - Z;
-
-    INTENSITY_UP[J-1] = INTENSITY_UP[J] * exp(-TAULS[J]) + \
-                      SOURCE_G[J] / (LAMBDAS[J]-1.0) * (exp(-TAULS[J])-exp(-TAULS[J] * (LAMBDAS[J]))) + \
-                      SOURCE_H[J] / (LAMBDAS[J]+1.0) * (1.0 - exp(-TAULS[J] * (LAMBDAS[J] + 1.0))) + \
-                      ALPHA_1[J] * (1.0 - exp(-TAULS[J-1])) + \
-                      ALPHA_2[J] * (1.0 - ((TAULS[J] + 1.0) * (exp(-TAULS[J]))));
+    Z = NLAYER - 1 - J;
+    INTENSITY_UP[Z] = INTENSITY_UP[Z+1] * exp(-TAULS[Z]) + \
+                      SOURCE_G[Z] / (LAMBDAS[Z]-1.0) * (exp(-TAULS[Z])-exp(-TAULS[Z] * (LAMBDAS[Z]))) + \
+                      SOURCE_H[Z] / (LAMBDAS[Z]+1.0) * (1.0 - exp(-TAULS[Z] * (LAMBDAS[Z] + 1.0))) + \
+                      ALPHA_1[Z] * (1.0 - exp(-TAULS[Z])) + \
+                      ALPHA_2[Z] * (1.0 - ((TAULS[Z] + 1.0) * (exp(-TAULS[Z]))));
     HEMISPHERIC_SOURCE_FNC[J] = INTENSITY_UP[J];
   }
 
