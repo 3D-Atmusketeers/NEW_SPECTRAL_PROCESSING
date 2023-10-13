@@ -165,11 +165,6 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
     TAUCS[J+1] = TAUCS[J]+dtau_array[J+kmin-1];
     TEMPS[J] = temperature_array[J+kmin-1];
 
-
-    W0[J] = 0;
-    G0[J] = 0;
-    TEMPS[J] = 1000;
-
     DIRECT_QUADRATURE[J]  = mu_0 * PI * FLUX_SURFACE_QUADRATURE * exp(-1.0 * (TAUCS[J] + TAULS[J]) / mu_0);
     DIRECT_HEMISPHERIC[J] = 0.0;
   }
