@@ -10,8 +10,8 @@ Defines input values and files for 3-D emission spectra
 /* I/O SETTINGS. */
 
 /* File names */
-#define OUTPUT_PREFIX "OUT/Spec_0_HD209_PICKET_NUC_CLOUDS_phase_180.0_inc_0.00.00.0"      /* output name */
-#define T_P_3D_FILE "DATA/init_HD209_PICKET_NUC_CLOUDS_phase_180.0_inc_0.0.txt"         /* input file */
+#define OUTPUT_PREFIX "OUT/Spec_0_HD209_PICKET_NUC_CLOUDS_phase_0.0_inc_0.00.00.0"      /* output name */
+#define T_P_3D_FILE "DATA/init_HD209_PICKET_NUC_CLOUDS_phase_0.0_inc_0.0.txt"         /* input file */
 
 /* Output settings */
 #define N_PHASE 1                          /* Number of phases [96 max; lon grid in increments of 3.75] */
@@ -34,7 +34,7 @@ Defines input values and files for 3-D emission spectra
 
 /* Planet parameters */
 #define INPUT_INCLINATION 0.0  /* Planet inclination in radians            */
-#define INPUT_PHASE 180.0              /* Planet inclination in degrees           */
+#define INPUT_PHASE 0.0              /* Planet inclination in degrees           */
 #define G 8.979999542236328                   /* Planet surface gravity                 */
 
 #define R_PLANET 98531992.0                 /* Planet radius at base of atmosphere      */
@@ -42,7 +42,7 @@ Defines input values and files for 3-D emission spectra
 #define STELLAR_TEMP 6091.0                // Stellar Blackbody temperature
 #define R_STAR 827883000.0                    /* Stellar radius                         */
 #define P_ROT  3.525001717240822                        /* Rotation period in days (= P_ORB for tidally locked planet)    */
-#define HAZE_TYPE ""
+#define HAZE_TYPE "None"
 #define HAZES 0
 
 #define R_VEL 0.0                          /* Radial Velocity                        */

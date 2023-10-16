@@ -24,7 +24,7 @@ import sys
 
 # Phases in degrees, inclination in radians (sorry)
 # An inclination of 0 corresponds to edge on
-phases = [180.0]
+phases = [0.0]
 inclinations = [0.0]
 system_obliquity = 0
 
@@ -201,6 +201,9 @@ for q in range(len(planet_names)):
     print ("RUNNING: " + planet_name)
 
     HAZE_TYPE = fort7dict['HAZETYPE']
+
+    if HAZE_TYPE == '':
+        HAZE_TYPE = 'None'
 
     # Check if the substring 'soot_2xpi0' is in HAZE_TYPE
     if 'soot_2xpi0' in HAZE_TYPE:
