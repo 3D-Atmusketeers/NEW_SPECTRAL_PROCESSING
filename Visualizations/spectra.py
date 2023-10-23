@@ -377,9 +377,9 @@ def plot_planet_spectra_blackbody_comparison_hz(planet_names, black_body_tempera
             j = j + 1
 
         # Do some figure stuff
-        ax.set_ylim(1e-14, 5e-8)
-        ax.set_yscale('log')
-        ax.set_xlim(0.5, 5)
+        #ax.set_ylim(1e-14, 5e-8)
+        #ax.set_yscale('log')
+        #ax.set_xlim(0.5, 5)
         ax.legend(fontsize=12, loc=(0, 1.05), ncol=2, mode='expand', title_fontsize=16)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
         ax.set_ylabel(r'Flux (W/m$^2$Hz)')  # (W m$^{-2}$)
@@ -473,10 +473,10 @@ def plot_planet_spectra_blackbody_comparison_microns(planet_names, black_body_te
             j = j + 1
 
         # Do some figure stuff
-        ax.set_ylim(1e3, 1e5)
-        #ax.set_ylim(0, 2000)
-        ax.set_xlim(5, 12)
-        ax.set_yscale('log')
+        #ax.set_ylim(1e3, 1e5)
+        ax.set_ylim(0, 1200)
+        ax.set_xlim(2, 15)
+        #ax.set_yscale('log')
         ax.legend(fontsize=12, loc=(0, 1.05), ncol=2, mode='expand', title_fontsize=16)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
         ax.set_ylabel(r'Flux (W/m$^2$micron)')  # (W m$^{-2}$)
@@ -1021,7 +1021,7 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
             pd.DataFrame({'Wavelength (microns)': planet_spectra.wavelength * 1e6, 'Planet_Flux_micron': flux}
                          ).to_csv('OUTPUT_DATA/Fp_Spectra_{}_{}.txt'.format(str(i * rot_val), planet_name), sep=' ')
 
-        #ax.set_xlim(min(planet_spectra.wavelength * 1e6), max(planet_spectra.wavelength * 1e6))
+        ax.set_xlim(min(planet_spectra.wavelength * 1e6), max(planet_spectra.wavelength * 1e6))
         #ax.set_yscale('log')
         #ax.set_xscale('log')
         #ax.set_ylim(0, 200000)

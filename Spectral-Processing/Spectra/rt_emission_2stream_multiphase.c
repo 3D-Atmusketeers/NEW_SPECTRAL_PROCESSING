@@ -104,6 +104,7 @@ int RT_Emit_3D(double PHASE)
     FILE *file;
     FILE *finished_output_file;
     FILE *emission_map_file;
+    //FILE *testing_file;
     double solid;
     double average, tau_sum, num_points;
     double u_vel, v_vel, w_vel, v_los, delta_lam, omega;
@@ -223,7 +224,6 @@ int RT_Emit_3D(double PHASE)
     static double haze_wav_gg[100][500];
     static double haze_wav_pi0[100][500];
     static double haze_wav_tau[100][500];
-
 
     // THIS IS A BAD HACK
     // In this case the tau values are all 0s, but it could be way better
@@ -1177,7 +1177,8 @@ int RT_Emit_3D(double PHASE)
         }
     }
     printf("solid %f\n", solid);
-    for(i=0; i<NLAMBDA; i++)
+    //for(i=0; i<NLAMBDA; i++)
+    for(i=5021; i<5025; i++)
     {
         // Get the points on the wavelength grids
         wavelength_microns = atmos.lambda[i] * 1e6;
@@ -1265,6 +1266,20 @@ int RT_Emit_3D(double PHASE)
                                                   opac.kappa[ii+1][h+1][g],
                                                   opac.kappa[ii+1][h+1][g+1],
                                                   temperature, pressure, atmos.lambda[i]+delta_lam);
+
+
+                                //Locate(500, wavelength_array_for_cloud_scattering_data_in_microns, wavelength_microns, &wavelength_index_clouds);
+                                //Locate(500, wavelength_array_for_haze_scattering_data_in_microns, wavelength_microns, &wavelength_index_hazes);
+                                //Locate(500, pressure_array_for_cloud_scattering_data_in_pascals, pressure, &pressure_index_clouds);
+                                //printf("%le %le %le %le\n", wavelength_array_for_cloud_scattering_data_in_microns[wavelength_index_clouds],
+                                //                            wavelength_array_for_cloud_scattering_data_in_microns[wavelength_index_clouds+1],
+                                //                            delta_lam * 1e6,
+                                //                            100 * (KCl_wav_qext[pressure_index_clouds][wavelength_index_clouds] - lint(wavelength_array_for_cloud_scattering_data_in_microns[wavelength_index_clouds],
+                                //                            KCl_wav_qext[pressure_index_clouds][wavelength_index_clouds],
+                                //                            wavelength_array_for_cloud_scattering_data_in_microns[wavelength_index_clouds+1],
+                                //                            KCl_wav_qext[pressure_index_clouds][wavelength_index_clouds+1],
+                                //                            wavelength_array_for_cloud_scattering_data_in_microns[wavelength_index_clouds]+delta_lam*1e6)) / KCl_wav_qext[pressure_index_clouds][wavelength_index_clouds]
+                                //                            );
                             }
                         }
 
@@ -1541,12 +1556,11 @@ int RT_Emit_3D(double PHASE)
                     intensity[l][m] = intensity_vals[0] + intensity_vals[1];
                     reflected_intensity[l][m] = intensity_vals[1];
 
-
                     //if (l == 36 && m == 24)
                     //{
-                    //    for (j = 0; j<NTAU; j++)
+                    //    for (j = kmin; j<NTAU; j++)
                     //    {
-                    //        printf("%d %.3e %.3e %.3e %.3e\n", j, temperature_3d[l][m][j], pressure_array[l][m][j], tau_em[l][m][j], dtau_em[l][m][j]);
+                    //        printf("%d %d %.3e %.3e %.3e %.3e\n", j, kmin, temperature_3d[l][m][j], pressure_array[l][m][j], tau_em[l][m][j], dtau_em[l][m][j]);
                     //    }
                     //    printf("\n\n");
                     //}
@@ -1639,5 +1653,6 @@ int RT_Emit_3D(double PHASE)
     }
     fclose(emission_map_file);
     fclose(finished_output_file);
+    //fclose(testing_file);
     return 0;
 }

@@ -26,7 +26,7 @@ def plot_aerosol_coverage_isobars(
     # temp colormap
     cm_name = 'lajolla'
     cm_file = np.loadtxt(f'ScientificColourMaps8/{cm_name}/{cm_name}.txt')
-    cm_file = np.flip(cm_file, axis=0)
+    #cm_file = np.flip(cm_file, axis=0)
     temperature_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
 
     # cloud colormap

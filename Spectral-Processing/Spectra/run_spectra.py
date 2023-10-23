@@ -63,9 +63,9 @@ smoothing = True
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["HD209_PICKET_NUC_CLOUDS"]
+planet_names = ["GJ1214b-none-0clouds-1met"]
 
-opacity_files = 'SET_3'
+opacity_files = 'SET_1'
 
 # There are the different sets of opacity and EOS files
 # There are somethings that need to be changed in the template inputs file to make this happen
@@ -384,16 +384,25 @@ for q in range(len(planet_names)):
             with open(inputs_file, 'w') as file:
                 file.write(filedata)
             
-            # Run Eliza's code
-            os.system('make rt_emission_aerosols.exe')
-            file_name = f"rt_emission_aerosols_{planet_name}_phase_{phase_strs[i]}.exe"    
-            os.rename('rt_emission_aerosols.exe', file_name)
-            permission_command = 'chmod 755 ' + file_name
-            os.system(permission_command)
-            os.system(f"./{file_name}")
-            
-            # Release the lock
-            fcntl.flock(lock_file, fcntl.LOCK_UN)
+            try:
+                # Run Eliza's code
+                subprocess.run('make rt_emission_aerosols.exe', shell=True, check=True)
+                file_name = f"rt_emission_aerosols_{planet_name}_phase_{phase_strs[i]}.exe"
+                os.rename('rt_emission_aerosols.exe', file_name)
+
+                permission_command = f'chmod 755 {file_name}'
+                subprocess.run(permission_command, shell=True, check=True)
+
+                execution_command = f"./{file_name}"
+                subprocess.run(execution_command, shell=True, check=True)
+
+            except subprocess.CalledProcessError as e:
+                # Throw an error
+                print(f"An error occurred while executing a subprocess: {e}")
+            finally:
+                # Release the lock
+                if lock_file and not lock_file.closed:
+                    fcntl.flock(lock_file, fcntl.LOCK_UN)
         return None
 
 
