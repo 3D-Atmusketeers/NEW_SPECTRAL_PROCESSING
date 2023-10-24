@@ -36,7 +36,6 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
 
         molef = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name, 'fort.7', 'MOLEF')
 
-
         clouds = False
         if any(i > 1e-20 for i in molef):
             clouds = True
@@ -44,6 +43,9 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
         nucleation_lim = False
         if any(i < 1e-20 for i in molef):
             nucleation_lim = True
+
+        if (AERLAYERS == 0):
+            clouds = False
 
         df = pd.read_csv(base + planet_name + '.txt', names=column_names, delim_whitespace=True)
         df.lon = df.lon.mask(df.lon >= 180.0, df.lon - 360.0)

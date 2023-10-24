@@ -32,7 +32,7 @@ plt.style.use('science.mplstyle')
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
 
-planet_names = ["GJ1214b-none-0clouds-1met"]
+planet_names = ["GJ1214b-soot-50clouds-100met"]
 
 # Set the opacity files to use
 opacity_files = 'SET_1'
@@ -114,7 +114,7 @@ else:
 
 # Plot other planet characteristics
 #aerosol_maps.plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, cloud_wavelength)
-#aerosol_profiles.plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
+aerosol_profiles.plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
 #wind_maps.plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
 #wind_isobars.plot_wind_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes=False, extra_pressure_level_bar=0.01)
 
@@ -136,7 +136,7 @@ else:
 
 #spectra.plot_blackbody_phase_curve(planet_name,planet_radii,num_phases=4,transmission_filter_name='MIRI',wav_subset=[5e-6, 12e-6],resolution=100,temp=600)
 #spectra.plot_planet_spectra_blackbody_comparison_hz(planet_names,black_body_temperatures=[553], num_phases=4)
-spectra.plot_planet_spectra_blackbody_comparison_microns(planet_names,black_body_temperatures=[553],num_phases=2)
+#spectra.plot_planet_spectra_blackbody_comparison_microns(planet_names,black_body_temperatures=[553],num_phases=2)
 #spectra.plot_star_spectra_test(planet_names)
 #spectra.plot_spectra_simple(planet_names, num_phases=4)
 
@@ -147,10 +147,10 @@ for filter_name in ['None']:
         print(filter_name)
         #spectra.plot_filters(planet_names, transmission_filter_name=filter_name)
 
-    spectra.plot_fp_spectra(planet_names,num_phases=1,
-                            transmission_filter_name=filter_name,
-                            wav_subset=[5e-6, 12e-6],
-                            resolution=100)
+    #spectra.plot_fp_spectra(planet_names,num_phases=1,
+    #                        transmission_filter_name=filter_name,
+    #                        wav_subset=[5e-6, 12e-6],
+    #                        resolution=100)
 
     #spectra.plot_fp_fs_spectra(planet_names,
     #                            planet_radii,
