@@ -182,7 +182,7 @@ for q in range(len(planet_names)):
             print("Error in choosing which metallicy the chemistry file should be")
             exit(0)
     elif (opacity_files == "SET_3"):
-        if (0.1  <= MET_X_SOLAR < 10.0):
+        if (0.5  <= MET_X_SOLAR < 2.0):
             chemistry_file_path = "DATA/SET_3/eos_solar_doppler.dat"
         else:
             print("Error in choosing which metallicy the chemistry file should be")
@@ -412,9 +412,9 @@ for q in range(len(planet_names)):
     phase_strs = []
     
 
-    STEP_ONE = True
-    STEP_TWO = True
-    STEP_THREE = False
+    STEP_ONE = False
+    STEP_TWO = False
+    STEP_THREE = True
 
     if STEP_ONE:
         # Convert the fort files to the correct format    

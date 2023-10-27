@@ -14,22 +14,23 @@ except ImportError:
     # as textwrap.dedent.
     from matplotlib.cbook import dedent
 
-def plot_emission_maps(planet_names, nlat, nlon, nlev):
+
+def plot_emission_maps(planet_names, nlat, nlon):
     for planet_name in planet_names:
         file = planet_name
 
         base = "../Spectral-Processing/FINISHED_SPECTRA/Spec_0_"
 
-        full_df = pd.read_csv(base + file + "_phase_180.0_inc_0.00.00.0000.00_emission_map.dat",
-                        names=['tau_index', 'wavelength_m', 'lon', 'lat', 'pressure_pa'],
+        full_df = pd.read_csv('/media/imalsky/Samsung_T5/NEW_SPECTRAL_PROCESSING/Spectral-Processing/Spectra/OUT/Spec_0_GJ1214b-soot-50clouds-100met_phase_0.0_inc_0.00.00.0000.00_emission_map.dat',
+                        names=['tau_index', 'wavelength_m', 'lon', 'lat', 'pressure_pa', 'temp', 'vlos'],
                         delim_whitespace=True)
+
 
         wavelengths = list(set(full_df["wavelength_m"]))
 
-        wavelengths = [1.897045e-06]
 
         # colormap
-        cm_name = 'lapaz'
+        cm_name = 'lajolla'
         cm_file = np.loadtxt(f'ScientificColourMaps8/' + cm_name + '/'+ cm_name +'.txt')
         my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
 
@@ -53,15 +54,27 @@ def plot_emission_maps(planet_names, nlat, nlon, nlev):
             x, y = map(lons, lats)
 
             pressure = np.reshape(list(df.pressure_pa), (nlat, nlon_vis))
+            temps    = np.reshape(list(df.temp), (nlat, nlon_vis))
+            vlos     = np.reshape(list(df.vlos), (nlat, nlon_vis))
 
             # , locator=ticker.LogLocator()
             # This is in mbar, thats where the 1e2 comes from. 1e5 to Pa, 1e3 to mbar
-            emap = map.contourf(x, y, pressure/1e2,
-                                levels=np.linspace(10, 50, 100),
+            #emap = map.contourf(x, y, pressure/1e2,
+            #                    levels=20,
+            #                    cmap=my_colors)
+
+            emap = map.contourf(x, y, temps,
+                                levels=100,
                                 cmap=my_colors)
+
+            map.contour(x, y, vlos, levels=[0], colors='white', linewidths=1.5, zorder=3)
+            map.contour(x, y, vlos, levels=[-2000, -1500, -1000, -500], colors='red', alpha=0.8, linewidths=1.5, linestyles='solid', zorder=3)
+            map.contour(x, y, vlos, levels=[500, 1000, 1500, 2000],  alpha=0.8, colors='navy', linewidths=1.5,zorder=5)
+
+
 
             wav_str = str(np.round(wavelengths[i] * 1e6, 3))
             cb = map.colorbar(emap,
                               location='bottom',
-                              label=r'$\tau$=2/3 Pressure at ' + wav_str + ' $\mu$m (mbar)')
+                              label=r'$\tau$=2/3 Temperature at ' + wav_str + ' $\mu$m')
             plt.savefig('../Figures/{}_emission_map_{}.png'.format(file, wav_str), bbox_inches='tight', dpi=200)

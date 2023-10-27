@@ -1198,7 +1198,7 @@ int RT_Emit_3D(double PHASE)
     }
     printf("solid %f\n", solid);
     for(i=0; i<NLAMBDA; i++)
-    //for(i=5021; i<5025; i++)
+    //for(i=2000; i<2001; i++)
     {
         // Get the points on the wavelength grids
         wavelength_microns = atmos.lambda[i] * 1e6;
