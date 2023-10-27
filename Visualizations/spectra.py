@@ -737,23 +737,32 @@ def plot_fp_fs_phase_curves(planet_names, planet_name_char_len, planet_radii, nu
         pd.DataFrame({'Phase': np.arange(0, 360, rot_val), 'Fp_Fs_pmm': fp_fs_ratio * 1e6}
                      ).to_csv('OUTPUT_DATA/Fp_Fs_{}_Phase_Curves.txt'.format(planet_name), sep=' ')
 
-        if '30met' in planet_name.lower():
+        if '1met' in planet_name.lower():
             linestyle_str='dashed'
-        else:
+        elif '100met' in planet_name.lower():
             linestyle_str='solid'
+        else:
+            linestyle_str='dotted'
+
+
+        if k % 3 == 0:
+            color_str='#70A5FF'
+        elif k % 3 == 1:
+            color_str='#832071'
+        else:
+            color_str='#E58B9D'
 
         # Plot the data
         phases = np.linspace(0, 345, num_phases) / 360
         ax.plot(phases, fp_fs_ratio * 1e6,
-                #linestyle='solid',
-                #color=my_colors(k / len(planet_names)),
+                color=color_str,
                 linestyle=linestyle_str,
                 linewidth=2,
                 label=planet_name)
 
     # Figure legend stuff
     ax.set_xlim(min(phases), max(phases))
-    ax.legend(fontsize=12, loc=(0, 1.03), ncol=2, mode='expand')
+    ax.legend(fontsize=11, loc=(0, 1.03), ncol=3, mode='expand')
     ax.set_xlabel('Orbital Phase')
     ax.set_ylabel(r'F$_p$/F$_s$ (ppm)')
     plt.savefig('../Figures/Fp_Fs_Phase_Curves_{}.jpg'.format(transmission_filter_name), dpi=200, bbox_inches='tight')
@@ -1015,16 +1024,26 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
             ax.plot(planet_spectra.wavelength * 1e6,
                     flux,
                     color=my_colors(i / num_phases),
-                    linewidth=1.0,
+                    linewidth=2.0,
                     label=str(np.round(rot_val * i / 360., 3)))
 
             pd.DataFrame({'Wavelength (microns)': planet_spectra.wavelength * 1e6, 'Planet_Flux_micron': flux}
                          ).to_csv('OUTPUT_DATA/Fp_Spectra_{}_{}.txt'.format(str(i * rot_val), planet_name), sep=' ')
 
-        ax.set_xlim(min(planet_spectra.wavelength * 1e6), max(planet_spectra.wavelength * 1e6))
-        #ax.set_yscale('log')
-        #ax.set_xscale('log')
-        #ax.set_ylim(0, 200000)
+
+
+        df = pd.read_excel('/home/imalsky/Desktop/41586_2023_6159_MOESM2_ESM.xlsx',
+                           skiprows=3,
+                           names=["Wavelength","Fp_day","Up 1-sigma","Low 1-sigma","Fp_night","Up 1-sigma","Low 1-sigma"])
+
+        #ax.errorbar(df['Wavelength'], df['Fp_day'], yerr=[df['Low 1-sigma'], df['Up 1-sigma']],
+        #     fmt='o-', label='Fp_day', capsize=5)
+        #ax.errorbar(df['Wavelength'], df['Fp_night'], yerr=[df['Low 1-sigma.1'], df['Up 1-sigma.1']],
+        #     fmt='o-', label='Fp_night', capsize=5)
+
+        ax.set_ylim(0, 1200)
+        ax.set_xlim(5, 12)
+
         ax.legend(fontsize=12, loc=(0, 1.03), ncol=6, mode='expand', title='Orbital Phase', title_fontsize=18)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
         ax.set_ylabel(r'F$_p$ (W/m$^2$/micron)')  # (W m$^{-2}$)
