@@ -212,6 +212,8 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
         axes.xaxis.set_ticks_position('bottom')
         axes.xaxis.set_label_position('bottom')
 
+        #axes.xaxis.set_minor_locator(MultipleLocator(5))
+
         # tp labels
         axes.set_ylabel('Pressure (bars)', fontsize=24)
 
