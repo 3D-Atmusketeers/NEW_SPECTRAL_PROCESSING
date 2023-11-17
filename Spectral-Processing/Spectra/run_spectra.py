@@ -63,20 +63,9 @@ smoothing = True
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-soot-50clouds-100met"]
+planet_names = ["GJ1214b-none-50clouds-100met", "GJ1214b-soot-50clouds-100met"]
 
 opacity_files = 'SET_1'
-
-# There are the different sets of opacity and EOS files
-# There are somethings that need to be changed in the template inputs file to make this happen
-# If you change the underlying data files these might need to be changed
-#if any(substring in planet_names[0].upper() for substring in ["GJ1214"]):
-#    opacity_files = 'SET_1'
-#elif any(substring in planet_names[0].upper() for substring in ["HD209", "HD189"]):
-#    opacity_files = 'SET_3'
-#else:
-#    print("Something is going wrong with how the opacity files are being chosen")
-#    exit(0)
 
 # Set the wavelength to evaluate the clouds at for plotting!
 # This could be put in a better place I think
@@ -95,6 +84,7 @@ else:
     exit(0)
 
 for q in range(len(planet_names)):
+    print()
     planet_name = planet_names[q]
 
     # Assuming planet_names and q are defined somewhere above this
@@ -103,62 +93,28 @@ for q in range(len(planet_names)):
     # Get the current working directory
     current_directory = os.getcwd()
 
-    # Formulate the directories and remove any potential single quotes from planet_name_original
-    sanitized_planet_name = planet_name_original.strip("'")
-    fortfiles_directory = os.path.join(current_directory, f"{sanitized_planet_name}fortfiles")
-
-    # Create a lock file to prevent concurrent directory creation
-    lock = FileLock(fortfiles_directory + ".lock")
-
-    with lock:
-        # Create the folder if not exists and also create fort7dict
-        if not os.path.exists(fortfiles_directory):
-            os.mkdir(fortfiles_directory)
-
-            # Change directory to GCM-OUTPUT
-            os.chdir(f'../GCM-OUTPUT/{sanitized_planet_name}/Planet_Run')
-
-            # Copy the fort.7 file
-            subprocess.run(['cp', 'fort.7', fortfiles_directory], check=True)
-
-            # Change directory back to Spectra
-            os.chdir(current_directory)
-
-            # Copy the fortran_readfort7.f90 file
-            subprocess.run(['cp', 'fortran_readfort7.f90', fortfiles_directory], check=True)
-
-            # Change directory to fortfiles_directory
-            os.chdir(fortfiles_directory)
-
-            # Remove the existing compiled file
-            subprocess.run(['rm', '-f', 'fortrantopythonfile.cpython-39-x86_64-linux-gnu.so'], check=True)
-
-            with open(os.devnull, 'w') as fp:
-                subprocess.run(['python', '-m', 'numpy.f2py', '-c', 'fortran_readfort7.f90', '-m', 'fortrantopythonfile'], stdout=fp, stderr=fp, check=True)
-
-    # Import grab_input_data module and create fort7dict irrespective of the directory being newly created or pre-existing
-    os.chdir(fortfiles_directory)
-    fort7dict = grab_input_data.create_dict()
-
-    # Change directory back to Spectra
-    os.chdir(current_directory)
-
     runname     = planet_name + '/Planet_Run'
     path        = '../GCM-OUTPUT/'
 
-    aerosol_layers = int(fort7dict['AERLAYERS'])
-    grav           = fort7dict['GA']
-    gasconst       = fort7dict['GASCON']
-    R_PLANET       = fort7dict['RADEA']
-    P_ROT          = ((fort7dict['WW'] / (2.0 * np.pi)) * (24 * 3600)) ** -1.0
-    oom            = fort7dict['OOM_IN']
-    MTLX           = fort7dict['MTLX']
+    aerosol_layers = int(grab_input_data.get_input_data(path, runname,"fort.7", "AERLAYERS"))
+    grav           = grab_input_data.get_input_data(path, runname, "fort.7","GA")
+    gasconst       = grab_input_data.get_input_data(path, runname, "fort.7","GASCON")
+    R_PLANET       = grab_input_data.get_input_data(path, runname, "fort.7","RADEA")
+    P_ROT          = (grab_input_data.get_input_data(path, runname, "fort.7","WW") / (2.0*np.pi)*(24*3600)) ** -1.0
+    oom            = grab_input_data.get_input_data(path, runname, "fort.7","OOM_IN")
+    MTLX           = grab_input_data.get_input_data(path, runname, "fort.7","MTLX")
+    MET_X_SOLAR    = 10.0 ** grab_input_data.get_input_data(path, runname, "fort.7","METALLICITY")
+    HAZES = grab_input_data.get_input_data(path, runname, "fort.7", "HAZES")[0] == 'T'
+    MOLEF          = grab_input_data.get_input_data(path, runname, "fort.7","MOLEF")
 
-    # Necessary for choosing the chem table!
-    MET_X_SOLAR    = 10.0 ** fort7dict['METALLICITY']
-    HAZES          = fort7dict['HAZES']
-    MOLEF          = fort7dict['MOLEF']
-    
+    HAZE_TYPE      = grab_input_data.get_input_data(path, runname, "fort.7","HAZETYPE")
+    if HAZE_TYPE == []:
+        HAZE_TYPE = 'None'
+    HAZE_TYPE = HAZE_TYPE.lower()
+
+    GAS_CONSTANT_R = 8.314462618
+    MEAN_MOLECULAR_WEIGHT = np.round((GAS_CONSTANT_R/gasconst) * 1000, 4)
+
     # This is the path to the chemistry file
     # This assumes that 10x solar uses the 1x met chem tables, maybe a bad thing
     if (opacity_files == "SET_1"):
@@ -174,7 +130,7 @@ for q in range(len(planet_names)):
             chemistry_file_path = "DATA/SET_1/ordered_3000x_solar_metallicity_chem.dat"
         else:
             print("Error in choosing which metallicy the chemistry file should be")
-    
+
     elif (opacity_files == "SET_2"):
         if (0.1  <= MET_X_SOLAR < 10.0):
             chemistry_file_path = "DATA/SET_2/eos_solar_doppler.dat"
@@ -190,20 +146,11 @@ for q in range(len(planet_names)):
     else:
         print("Error in choosing the chemistry file!")
 
-    GAS_CONSTANT_R = 8.314462618
-    GASCON = fort7dict['GASCON']
-    MEAN_MOLECULAR_WEIGHT = np.round((GAS_CONSTANT_R/GASCON) * 1000, 4)
-
-    print ('\n')
-    print ('\n')
     print ("*************************************")
     print ("*************************************")
     print ("RUNNING: " + planet_name)
 
-    HAZE_TYPE = fort7dict['HAZETYPE']
 
-    if HAZE_TYPE == '':
-        HAZE_TYPE = 'None'
 
     # Check if the substring 'soot_2xpi0' is in HAZE_TYPE
     if 'soot_2xpi0' in HAZE_TYPE:
@@ -244,11 +191,6 @@ for q in range(len(planet_names)):
     STELLAR_TEMP = float(grab_input_data.read_planet_and_star_params(planet_name, "T* (K)"))
     R_STAR       = float(grab_input_data.read_planet_and_star_params(planet_name, "R* (R_sun)")) * 695700000
 
-    #star_name    = 'WASP 43b'
-    #ORB_SEP      = 0.01526 * 1.496e11
-    #STELLAR_TEMP = 4286
-    #R_STAR       = 0.6747 * 695700000
-
     print("Planet characteristics")
     print("These are the cloud types in order, and the corresponding amounts")
     print ("KCl, ZnS, Na2S, MnS, Cr, SiO2, Mg2SiO4, VO, Ni, Fe, Ca2SiO4, CaTiO3, Al2O3")
@@ -285,8 +227,6 @@ for q in range(len(planet_names)):
 
     print ("*************************************")
     print ("*************************************")
-
-    print ("")
     print ("")
 
     # This is specifically for the regridding
@@ -315,24 +255,24 @@ for q in range(len(planet_names)):
         """
         inputs_file = 'input.h'
         output_paths = []
-        
+
         # The output paths should be similar to the input paths
         for file_path in input_paths:
             output_paths.append('OUT/Spec_' + str(doppler_val) + '_' + file_path[10:-4])
-    
+
         # Each Run needs to have a specific input.h file
         for i in range(len(input_paths)):
             output_temp = output_paths[i]
             input_temp  = input_paths[i]
-                
+
             lock_file_path = 'file_lock.lock'
             with open(lock_file_path, 'a') as lock_file:  # Use 'a' mode
                 # Acquire the lock
                 fcntl.flock(lock_file, fcntl.LOCK_EX)
-                
+
                 # This will copy all the files that need to be changed over with different opac versions
                 setup_opac_versions.replace_files(opacity_files, MET_X_SOLAR)
-                
+
                 # Copy the template for inputs
                 try:
                     copyfile('template_inputs.h', inputs_file)
@@ -342,11 +282,11 @@ for q in range(len(planet_names)):
                 except:
                     print("Unexpected error:", sys.exc_info())
                     exit(1)
-    
+
                 # Read in the file
                 with open(inputs_file, 'r') as file :
                     filedata = file.read()
-                
+
             # Replace the input and output paths
             filedata = filedata.replace("<<output_file>>", "\"" + output_temp + str(W0_VAL) + str(G0_VAL) + "\"")
             filedata = filedata.replace("<<input_file>>", "\"" + input_temp + "\"")
@@ -383,7 +323,7 @@ for q in range(len(planet_names)):
             # Write the file out again
             with open(inputs_file, 'w') as file:
                 file.write(filedata)
-            
+
             try:
                 # Run Eliza's code
                 subprocess.run('make rt_emission_aerosols.exe', shell=True, check=True)
@@ -410,37 +350,37 @@ for q in range(len(planet_names)):
     output_paths = []
     inclination_strs = []
     phase_strs = []
-    
 
-    STEP_ONE = False
-    STEP_TWO = False
+
+    STEP_ONE = True
+    STEP_TWO = True
     STEP_THREE = True
 
     if STEP_ONE:
-        # Convert the fort files to the correct format    
+        # Convert the fort files to the correct format
         if USE_FORT_FILES == True:
             convert_fort_files.convert_to_correct_format(path, runname, planet_name, INITIAL_NTAU, surfp, oom, tgr, grav, gasconst)
             print ("Converted the fort files to the new format")
         else:
             pass
-        
+
         add_clouds.add_clouds_to_gcm_output(path, runname, planet_name,
                                             grav, MTLX, CLOUDS, MOLEF,
                                             aerosol_layers, INITIAL_NTAU,
                                             gasconst, HAZE_TYPE, HAZES, wav_loc, MET_X_SOLAR)
 
-        
+
         # Regrid the file to constant altitude and the correct number of layers
         altitude_regridding.regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, INITIAL_NTAU, NLON, NTAU, HAZES, max_pressure_bar, smoothing)
 
         print ("Regridded the planet to constant altitude")
-    if STEP_TWO:     
+    if STEP_TWO:
         # If you already have the Final planet file creates you can commend out run_grid and double planet file
         run_grid.run_all_grid(planet_name, phases, inclinations, system_obliquity, NTAU, NLAT, NLON, grid_lat_min, grid_lat_max, grid_lon_min, grid_lon_max, ONLY_PHASE)
     if STEP_THREE:
         # Get all the files that you want to run
         input_paths, inclination_strs, phase_strs = get_run_lists(phases, inclinations)
-        
+
         # If you want to manually set these values you can leave them here
         # Normally they will not affect it, unless you manually set them in two_stream.h
         W0_VALS = [0.0]
@@ -450,6 +390,9 @@ for q in range(len(planet_names)):
             for W0_VAL in W0_VALS:
                 for doppler_val in dopplers:
                     run_exo(input_paths, inclination_strs, phase_strs, doppler_val)
+
+
+    print('Finished running', planet_name)
 
 #uncomment this out if you would like the files to automatically delete the bonus files that are created
 

@@ -21,13 +21,14 @@ def plot_emission_maps(planet_names, nlat, nlon):
 
         base = "../Spectral-Processing/FINISHED_SPECTRA/Spec_0_"
 
-        full_df = pd.read_csv('/media/imalsky/Samsung_T5/NEW_SPECTRAL_PROCESSING/Spectral-Processing/Spectra/OUT/Spec_0_GJ1214b-soot-50clouds-100met_phase_0.0_inc_0.00.00.0000.00_emission_map.dat',
+        full_df = pd.read_csv(base + file + "_phase_0.0_inc_0.00.00.0000.00_emission_map.dat",
                         names=['tau_index', 'wavelength_m', 'lon', 'lat', 'pressure_pa', 'temp', 'vlos'],
                         delim_whitespace=True)
 
-
         wavelengths = list(set(full_df["wavelength_m"]))
 
+        print(full_df)
+        exit(0)
 
         # colormap
         cm_name = 'lajolla'
@@ -36,7 +37,7 @@ def plot_emission_maps(planet_names, nlat, nlon):
 
         for i in range(len(wavelengths)):
             plt.clf()
-            fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10,10))
+            fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(15,15))
             plt.subplots_adjust(wspace=0.2, hspace=0.02)
 
             df = full_df[full_df["wavelength_m"] == wavelengths[i]]
@@ -64,17 +65,18 @@ def plot_emission_maps(planet_names, nlat, nlon):
             #                    cmap=my_colors)
 
             emap = map.contourf(x, y, temps,
-                                levels=100,
+                                levels=6,
                                 cmap=my_colors)
 
-            map.contour(x, y, vlos, levels=[0], colors='white', linewidths=1.5, zorder=3)
-            map.contour(x, y, vlos, levels=[-2000, -1500, -1000, -500], colors='red', alpha=0.8, linewidths=1.5, linestyles='solid', zorder=3)
-            map.contour(x, y, vlos, levels=[500, 1000, 1500, 2000],  alpha=0.8, colors='navy', linewidths=1.5,zorder=5)
-
-
+            map.contour(x, y, vlos, levels=[0], colors='white', linewidths=2.0, zorder=3)
+            map.contour(x, y, vlos, levels=[-2000, -1500, -1000, -500], colors='red', alpha=1.0, linewidths=2.0, linestyles='solid', zorder=3)
+            map.contour(x, y, vlos, levels=[500, 1000, 1500, 2000],  alpha=1.0, colors='#2c6fbb', linewidths=2.0,zorder=5)
 
             wav_str = str(np.round(wavelengths[i] * 1e6, 3))
             cb = map.colorbar(emap,
                               location='bottom',
                               label=r'$\tau$=2/3 Temperature at ' + wav_str + ' $\mu$m')
-            plt.savefig('../Figures/{}_emission_map_{}.png'.format(file, wav_str), bbox_inches='tight', dpi=200)
+
+            cb.ax.minorticks_on()
+
+            plt.savefig('../Figures/{}_temperature_emission_map_{}.png'.format(file, wav_str), bbox_inches='tight', dpi=200)
