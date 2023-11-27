@@ -61,7 +61,7 @@ void TotalOpac() {
 
   double **opac_CIA_H2H2, **opac_CIA_H2He, **opac_CIA_H2H, **opac_CIA_H2CH4, **opac_CIA_CH4Ar,
          **opac_CIA_CH4CH4, **opac_CIA_CO2CO2, **opac_CIA_HeH, **opac_CIA_N2CH4, **opac_CIA_N2H2,
-         **opac_CIA_N2N2, **opac_CIA_O2CO2, **opac_CIA_O2N2, **opac_CIA_O2O2;
+         **opac_CIA_N2N2, **opac_CIA_O2CO2, **opac_CIA_O2N2, **opac_CIA_O2O2, **opac_CIA_Hel;
   double *t_CIA, *lambda_CIA, **opac_CIA;
   int i, j, k, a, b, dum;
   char filename[65];
@@ -103,6 +103,7 @@ void TotalOpac() {
   opac_CIA_O2CO2 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
   opac_CIA_O2N2 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
   opac_CIA_O2O2 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_Hel = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
 
   
   t_CIA = dvector(0, 18);
@@ -504,7 +505,7 @@ void TotalOpac() {
   /* Fill in collision-induced opacities */
 
 
-  f1 = fopen("DATA/SET_1/opacCIA_lotemp_isaac_v2.dat", "r");
+  f1 = fopen("DATA/SET_1/opacCIA_low_temp.dat", "r");
   if(f1 == NULL){
     printf("\n totalopac.c:\nError opening CIA file: -- No such file or directory\n\n");
   }
@@ -519,7 +520,7 @@ void TotalOpac() {
   for (k=0; k<NTEMP; k++){
     fscanf(f1, "%le", &opacCIA.T[k]);
     for (i=0; i<NLAMBDA; i++){
-      fscanf(f1, "%le %le %le %le %le %le %le %le %le %le %le %le %le %le %le", &atmos.lambda[i],
+      fscanf(f1, "%le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le", &atmos.lambda[i],
                                                                                 &opac_CIA_H2H2[k][i],
                                                                                 &opac_CIA_H2He[k][i],
                                                                                 &opac_CIA_H2H[k][i],
@@ -533,7 +534,8 @@ void TotalOpac() {
                                                                                 &opac_CIA_N2N2[k][i],
                                                                                 &opac_CIA_O2CO2[k][i],
                                                                                 &opac_CIA_O2N2[k][i],
-                                                                                &opac_CIA_O2O2[k][i]);
+                                                                                &opac_CIA_O2O2[k][i],
+                                                                                &opac_CIA_Hel[k][i]);
     }
   }
   printf("CIA: %e   %e\n", atmos.lambda[NLAMBDA-1], opac_CIA_H2H2[NTEMP-1][NLAMBDA-1]);
@@ -614,11 +616,14 @@ void TotalOpac() {
         chem.O2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
         chem.N2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
 
-
-
       opacCIA.kappa[i][j][k] += opac_CIA_O2O2[k][i] *
         chem.O2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
         chem.O2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
+
+
+      opacCIA.kappa[i][j][k] += opac_CIA_Hel[k][i] *
+	       chem.H[j][k] * chem.P[j] / (KBOLTZMANN * chem.T[k]) *  
+	       chem.el[j][k] * chem.P[j] / (KBOLTZMANN * chem.T[k]);
       }
     }
   }
@@ -749,6 +754,7 @@ void TotalOpac() {
   free_dmatrix(opac_CIA_O2CO2, 0, NTEMP-1, 0, NLAMBDA-1);
   free_dmatrix(opac_CIA_O2N2, 0, NTEMP-1, 0, NLAMBDA-1);
   free_dmatrix(opac_CIA_O2O2, 0, NTEMP-1, 0, NLAMBDA-1);
+  free_dmatrix(opac_CIA_Hel, 0, NTEMP-1, 0, NLAMBDA-1);
 
 }
 

@@ -74,4 +74,4 @@ def plot_emission_maps(planet_names, nlat, nlon):
             cb.ax.minorticks_on()
 
 
-            plt.savefig('../Figures/{}_emission_map_{}.png'.format(file, wav_str), bbox_inches='tight', dpi=200)
+            plt.savefig('../Figures/{}_pressure_emission_map_{}.png'.format(file, wav_str), bbox_inches='tight', dpi=200)
