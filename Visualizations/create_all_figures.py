@@ -35,14 +35,13 @@ plt.style.use('science.mplstyle')
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
 
 
-planet_names = ["GJ1214b-soot-0clouds-1met",
-                "GJ1214b-soot-25clouds-1met",
+planet_names = ["GJ1214b-none-0clouds-1met",
+                "GJ1214b-none-50clouds-1met",
+                "GJ1214b-none-0clouds-100met",
+                "GJ1214b-none-50clouds-100met",
+                "GJ1214b-soot-0clouds-1met",
                 "GJ1214b-soot-50clouds-1met",
-                "GJ1214b-soot-0clouds-30met",
-                "GJ1214b-soot-25clouds-30met",
-                "GJ1214b-soot-50clouds-30met",
                 "GJ1214b-soot-0clouds-100met",
-                "GJ1214b-soot-25clouds-100met",
                 "GJ1214b-soot-50clouds-100met"]
 
 
@@ -56,7 +55,7 @@ planet_names = ["GJ1214b-soot-0clouds-1met",
 #                "GJ1214b-none-25clouds-100met",
 #                "GJ1214b-none-50clouds-100met"]
 
-planet_names = ["GJ1214b-none-0clouds-100met", "GJ1214b-none-50clouds-100met", "GJ1214b-soot-0clouds-100met"]
+#planet_names = ["GJ1214b-none-0clouds-100met", "GJ1214b-none-50clouds-100met", "GJ1214b-soot-0clouds-100met"]
 
 
 
@@ -149,7 +148,7 @@ else:
 #emission_maps_pressure.plot_emission_maps(planet_names, nlat, nlon)
 #emission_maps_temperature.plot_emission_maps(planet_names, nlat, nlon)
 
-basemap_hemispheric_projections.plot_observer_projection(planet_names, nlat, nlon,planet_radii, pressure_in_mbar=10)
+#basemap_hemispheric_projections.plot_observer_projection(planet_names, nlat, nlon,planet_radii, pressure_in_mbar=10)
                                                          
 #cross_correlation.plot_cross_correlations(planet_names, num_phases=24)
                                             
@@ -168,16 +167,16 @@ basemap_hemispheric_projections.plot_observer_projection(planet_names, nlat, nlo
 #spectra.plot_spectra_simple(planet_names, num_phases=4)
 
 
-#for filter_name in ['MIRI']:
-#    if filter_name != 'None':
-#        print()
-#        print(filter_name)
+for filter_name in ['None']:
+    if filter_name != 'None':
+        print()
+        print(filter_name)
         #spectra.plot_filters(planet_names, transmission_filter_name=filter_name)
 
-    #spectra.plot_fp_spectra(planet_names,num_phases=2,
-    #                        transmission_filter_name=filter_name,
-    #                        wav_subset=[5e-6, 12e-6],
-    #                        resolution=100)
+    spectra.plot_fp_spectra(planet_names,num_phases=4,
+                            transmission_filter_name=filter_name,
+                            wav_subset=[5e-6, 12e-6],
+                            resolution=100)
 
     #spectra.plot_fp_fs_spectra(planet_names,
     #                            planet_radii,

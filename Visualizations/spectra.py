@@ -3,6 +3,7 @@
 
 import pandas as pd
 
+import re
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import matplotlib.pylab as pl
@@ -943,13 +944,15 @@ def plot_fp_fs_spectra(planet_names, planet_radii, num_phases, transmission_filt
             ax.plot(planet_spectra.wavelength * 1e6,
                     fp_fs_ratio * 1e6,
                     color=my_colors(i / num_phases),
-                    linewidth=1.5,
+                    linewidth=2,
                     label=str(np.round(rot_val * i / 360., 3)))
 
             pd.DataFrame({'Wavelength (microns)': planet_spectra.wavelength * 1e6, 'Fp_Fs_pmm': planet_spectra.flux}
                          ).to_csv('OUTPUT_DATA/Fp_Fs_Spectra_{}_Spectra_{}.txt'.format(str(i * rot_val), planet_name), sep=' ')
 
         # Figure legend
+        ax.set_ylim(1, 1399)
+        ax.minorticks_on()  # This enables minor ticks
         ax.set_xlim(min(planet_spectra.wavelength * 1e6), max(planet_spectra.wavelength * 1e6))
         ax.legend(fontsize=12, loc=(0, 1.03), ncol=5, mode='expand', title='Orbital Phase', title_fontsize=18)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
@@ -1036,14 +1039,14 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
                            skiprows=3,
                            names=["Wavelength","Fp_day","Up 1-sigma","Low 1-sigma","Fp_night","Up 1-sigma","Low 1-sigma"])
 
-        #ax.errorbar(df['Wavelength'], df['Fp_day'], yerr=[df['Low 1-sigma'], df['Up 1-sigma']],
-        #     fmt='o-', label='Fp_day', capsize=5)
-        #ax.errorbar(df['Wavelength'], df['Fp_night'], yerr=[df['Low 1-sigma.1'], df['Up 1-sigma.1']],
-        #     fmt='o-', label='Fp_night', capsize=5)
+        ax.errorbar(df['Wavelength'], df['Fp_day'], yerr=[df['Low 1-sigma'], df['Up 1-sigma']],
+             fmt='o-', label='Fp_day', capsize=2, linewidth=2)
+        ax.errorbar(df['Wavelength'], df['Fp_night'], yerr=[df['Low 1-sigma.1'], df['Up 1-sigma.1']],
+             fmt='o-', label='Fp_night', capsize=2, linewidth=2)
 
-        ax.set_ylim(0, 1200)
         ax.set_xlim(5, 12)
-
+        ax.set_ylim(1, 1399)
+        ax.minorticks_on()  # This enables minor ticks
         ax.legend(fontsize=12, loc=(0, 1.03), ncol=6, mode='expand', title='Orbital Phase', title_fontsize=18)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
         ax.set_ylabel(r'F$_p$ (W/m$^2$/micron)')  # (W m$^{-2}$)
