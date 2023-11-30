@@ -139,7 +139,7 @@ for q in range(len(planet_names)):
             exit(0)
     elif (opacity_files == "SET_3"):
         if (0.5  <= MET_X_SOLAR < 2.0):
-            chemistry_file_path = "DATA/SET_3/eos_solar_doppler.dat"
+            chemistry_file_path = "DATA/SET_3/eos_solar_doppler_with_el.dat"
         else:
             print("Error in choosing which metallicy the chemistry file should be")
             exit(0)
@@ -395,5 +395,4 @@ for q in range(len(planet_names)):
     print('Finished running', planet_name)
 
 #uncomment this out if you would like the files to automatically delete the bonus files that are created
-
 #Clean_suite.automaticclean(__file__)

@@ -7,8 +7,8 @@ Last modified: October 20, 2009
 #include <stdlib.h>
 
 #include "input.h"
-#include "opac.h"
-
+#include "opac.h" 
+ 
 /* --- Global variables ------------------------------------------ */
 
 extern struct Chem chem;
@@ -21,38 +21,17 @@ extern struct Chem chem;
 
 /* ------- begin ------------ ReadChemTable.c -------------------- */
 
+void ReadChemTable() {
 
-int ReadChemLine(FILE *f1, int i, int j, int k, double **chem_array) {
-    /* Reads a chemistry line. keeps a running tally k of how many
-    columns have been read in already. Also takes care of reading into
-    the map_abund array. */
-    fscanf(f1,"%le", &chem_array[i][j]);
-    if (ABUND_TRACK_IND <= 1) {
-        printf("\nMapping temperature/pressure doesn't make sense here!\n");
-        exit(1);
-    }
-    if (k == ABUND_TRACK_IND) {
-        chem.map_abund[i][j] = chem_array[i][j];
-    }
-
-    k = k + 1;
-    return k;
-}
-
-void ReadChemTable()
-  {
-  int i, j, k;
-  char dum[1000];
+  int i, j;
+  char dum[8];
 
   FILE *f1;
+
   /* Allocate memory for Chem structure */
 
   chem.T = malloc(NTEMP*sizeof(double));
   chem.P = malloc(NPRESSURE*sizeof(double));
-
-  chem.total = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.total[i] = malloc(NTEMP*sizeof(double));
 
   chem.total = malloc(NPRESSURE*sizeof(double));
   for(i=0; i<NPRESSURE; i++)
@@ -116,11 +95,7 @@ void ReadChemTable()
 
   chem.el = malloc(NPRESSURE*sizeof(double));
   for(i=0; i<NPRESSURE; i++)
-    chem.el[i] = malloc(NTEMP*sizeof(double));
-
-  chem.map_abund = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.map_abund[i] = malloc(NTEMP*sizeof(double));
+    chem.Hel[i] = malloc(NTEMP*sizeof(double));
 
   /* Read in chemistry table */
 
@@ -130,70 +105,70 @@ void ReadChemTable()
       exit(1);
     }
 
-  for (i=0; i<CHEM_FILE_NCOLS; i++) {
+  for (i=0; i<16; i++)
     fscanf(f1,"%s", dum);
-  }
+  
 
-  for (i=NPRESSURE-1; i>=0; i--)
-    {
+  for (i=NPRESSURE-1; i>=0; i--) {
     fscanf(f1,"%le", &chem.P[i]);
-    for (j=NTEMP-1; j>=0; j--)
-      {
+    for (j=NTEMP-1; j>=0; j--) {
       fscanf(f1,"%le", &chem.T[j]);
-      k = 1;
-      k = ReadChemLine(f1, i, j, k, chem.total);
-      k = ReadChemLine(f1, i, j, k, chem.H2);
-      k = ReadChemLine(f1, i, j, k, chem.H);
-      k = ReadChemLine(f1, i, j, k, chem.He);
-      k = ReadChemLine(f1, i, j, k, chem.H2O);
-      k = ReadChemLine(f1, i, j, k, chem.CH4);
-      k = ReadChemLine(f1, i, j, k, chem.CO);
-      k = ReadChemLine(f1, i, j, k, chem.CO2);
-      k = ReadChemLine(f1, i, j, k, chem.O);
-      k = ReadChemLine(f1, i, j, k, chem.C);
-      k = ReadChemLine(f1, i, j, k, chem.N);
-      k = ReadChemLine(f1, i, j, k, chem.NH3);
-      k = ReadChemLine(f1, i, j, k, chem.N2);
-      k = ReadChemLine(f1, i, j, k, chem.O2);
-      k = ReadChemLine(f1, i, j, k, chem.O3);
-      k = ReadChemLine(f1, i, j, k, chem.el);
-      }
+      fscanf(f1,"%le", &chem.total[i][j]);
+      fscanf(f1,"%le", &chem.C[i][j]);
+      fscanf(f1,"%le", &chem.CH4[i][j]);
+      fscanf(f1,"%le", &chem.CO[i][j]);
+      fscanf(f1,"%le", &chem.CO2[i][j]);
+      fscanf(f1,"%le", &chem.H[i][j]);
+      fscanf(f1,"%le", &chem.H2[i][j]);
+      fscanf(f1,"%le", &chem.H2O[i][j]);
+      fscanf(f1,"%le", &chem.He[i][j]);
+      fscanf(f1,"%le", &chem.N[i][j]);
+      fscanf(f1,"%le", &chem.N2[i][j]);
+      fscanf(f1,"%le", &chem.NH3[i][j]);
+      fscanf(f1,"%le", &chem.O[i][j]);
+      fscanf(f1,"%le", &chem.O2[i][j]);
+      fscanf(f1,"%le", &chem.O3[i][j]);
+      fscanf(f1,"%le", &chem.Hel[i][j]);
+    }
   }
-
-  printf("Read in chemtable\n");
+  
   fclose(f1);
-  printf("Chemistry: \nP_0\t%e \nT_0\t%e \ntotal00 \t%e \ntotal11 \t%e \nH2 \t%e \nH \t%e \nHe \t%e \nH2O \t%e \nCH4 \t%e \nCO \t%e \nCO2 \t%e \n",
-	 chem.P[0], chem.T[0], chem.total[0][0], chem.total[1][1],chem.H2[0][0], chem.H[0][0],
-	 chem.He[0][0], chem.H2O[0][0], chem.CH4[0][0],chem.CO[0][0], chem.CO2[0][0]);
+  printf("Chemistry: \nP_0\t%e \nT_0\t%e \ntotal\t%e \nH2\t%e \nH\t%e \nHe\t%e \nH2O\t%e \nCH4\t%e \nCO\t%e \nCO2\t%e \nO\t%e \nC\t%e \nN\t%e \nNH3\t%e \nN2\t%e \nO2\t%e \nO3\t%e \nHel\t%e\n", 
+	 chem.P[0], chem.T[0], chem.total[0][0], chem.H2[0][0], chem.H[0][0], 
+	 chem.He[0][0], chem.H2O[0][0], chem.CH4[0][0], chem.CO[0][0], 
+	 chem.CO2[0][0], chem.O[0][0], chem.C[0][0], chem.N[0][0], 
+	 chem.NH3[0][0], chem.N2[0][0], chem.O2[0][0], chem.O3[0][0], chem.Hel[0][0]);
+
+
   return;
 
 }
+
 /* ------- end -------------- ReadChemTable.c -------------------- */
 
 /* ------- start ------------ FreeChemTable.c -------------------- */
 
-/* Added: free Fe, Fe+ */
 void FreeChemTable()
 {
+ 
   free(chem.P);
   free(chem.T);
   free(chem.total);
   free(chem.H2);
-  free(chem.H);
-  free(chem.He);
   free(chem.H2O);
   free(chem.CH4);
   free(chem.CO);
   free(chem.CO2);
+  free(chem.H);
   free(chem.O);
+  free(chem.O2);
+  free(chem.O3);
+  free(chem.Hel);
   free(chem.C);
   free(chem.N);
   free(chem.NH3);
   free(chem.N2);
-  free(chem.O2);
-  free(chem.O3);
-  free(chem.el);
-  free(chem.map_abund);
+  free(chem.He);
 }
 
 /* ------- end -------------- FreeChemTable.c -------------------- */
