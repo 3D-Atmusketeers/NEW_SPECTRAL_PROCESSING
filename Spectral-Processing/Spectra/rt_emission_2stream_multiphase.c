@@ -4,6 +4,8 @@
 #include <math.h>
 #include <stdlib.h>
 
+//#include <omp.h>
+
 #include "input.h"
 #include "opac.h"
 #include "atmos.h"
@@ -106,7 +108,7 @@ int RT_Emit_3D(double PHASE)
     FILE *emission_map_file;
     //FILE *testing_file;
     double solid;
-    double average, tau_sum, num_points;
+    double tau_sum, num_points;
     double u_vel, v_vel, w_vel, v_los, delta_lam, omega;
     double weight_1, weight_2, weight_3, weight_4, weight_5, weight_6, weight_7;
     double weight_8, weight_9, weight_10, weight_11, weight_12, weight_13, weight_haze;
@@ -1197,8 +1199,23 @@ int RT_Emit_3D(double PHASE)
         }
     }
     printf("solid %f\n", solid);
+    /*
+    #pragma omp parallel for num_threads(4) private(i, j, kmin, l, m, intensity_vals, tau_sum, tau_index, incident_frac, \
+                                    wavelength_microns, wavelength_index_clouds, wavelength_index_hazes, \
+                                    pressure_index_clouds, pressure_index_hazes, temperature, pressure, \
+                                    kappa_nu, delta_pressure_bar, aero_kappa_pre_qext_interp_1, aero_kappa_pre_qext_interp_2, \
+                                    aero_kappa_pre_qext_interp_3, aero_kappa_pre_qext_interp_4, aero_kappa_pre_qext_interp_5, \
+                                    aero_kappa_pre_qext_interp_6, aero_kappa_pre_qext_interp_7, aero_kappa_pre_qext_interp_8, \
+                                    aero_kappa_pre_qext_interp_9, aero_kappa_pre_qext_interp_10, aero_kappa_pre_qext_interp_11, \
+                                    aero_kappa_pre_qext_interp_12, aero_kappa_pre_qext_interp_13, \
+                                    aero_kappa_pre_tau_haze_interp, aero_kappa_1, aero_kappa_2, aero_kappa_3, aero_kappa_4, aero_kappa_5, \
+                                    aero_kappa_6, aero_kappa_7, aero_kappa_8, aero_kappa_9, aero_kappa_10, aero_kappa_11, aero_kappa_12, \
+                                    aero_kappa_13, aero_kappa_haze, total_cloud_and_haze_kappa, \
+                                    weight_1, weight_2, weight_3, weight_4, weight_5, weight_6, weight_7, \
+                                    weight_8, weight_9, weight_10, weight_11, weight_12, weight_13, weight_haze, \
+                                    u_vel, v_vel, w_vel, v_los, delta_lam, o, c, g, h, ii)
+    */
     for(i=0; i<NLAMBDA; i++)
-    //for(i=2000; i<2001; i++)
     {
         // Get the points on the wavelength grids
         wavelength_microns = atmos.lambda[i] * 1e6;
@@ -1244,7 +1261,6 @@ int RT_Emit_3D(double PHASE)
                         }
 
                         if(atmos.T_3d[o][c][j] < 201.0 || atmos.T_3d[o][c+1][j] < 201.0 || atmos.T_3d[o+1][c][j] < 201.0 || atmos.T_3d[o+1][c+1][j] < 201.0)
-                        //if(atmos.T_3d[o][c][j] < 201.0 || atmos.T_3d[o][c+1][j] < 201.0)
                         {
                             temperature = 0.0;
                         }
@@ -1288,19 +1304,6 @@ int RT_Emit_3D(double PHASE)
                                                   opac.kappa[ii+1][h+1][g+1],
                                                   temperature, pressure, atmos.lambda[i]+delta_lam);
 
-
-                                //Locate(500, wavelength_array_for_cloud_scattering_data_in_microns, wavelength_microns, &wavelength_index_clouds);
-                                //Locate(500, wavelength_array_for_haze_scattering_data_in_microns, wavelength_microns, &wavelength_index_hazes);
-                                //Locate(500, pressure_array_for_cloud_scattering_data_in_pascals, pressure, &pressure_index_clouds);
-                                //printf("%le %le %le %le\n", wavelength_array_for_cloud_scattering_data_in_microns[wavelength_index_clouds],
-                                //                            wavelength_array_for_cloud_scattering_data_in_microns[wavelength_index_clouds+1],
-                                //                            delta_lam * 1e6,
-                                //                            100 * (KCl_wav_qext[pressure_index_clouds][wavelength_index_clouds] - lint(wavelength_array_for_cloud_scattering_data_in_microns[wavelength_index_clouds],
-                                //                            KCl_wav_qext[pressure_index_clouds][wavelength_index_clouds],
-                                //                            wavelength_array_for_cloud_scattering_data_in_microns[wavelength_index_clouds+1],
-                                //                            KCl_wav_qext[pressure_index_clouds][wavelength_index_clouds+1],
-                                //                            wavelength_array_for_cloud_scattering_data_in_microns[wavelength_index_clouds]+delta_lam*1e6)) / KCl_wav_qext[pressure_index_clouds][wavelength_index_clouds]
-                                //                            );
                             }
                         }
 
@@ -1542,7 +1545,6 @@ int RT_Emit_3D(double PHASE)
 
         
         //Calculate the intensity of emergent rays at each latitude and longitude
-        average = 0.0;
         for(l=0; l<NLAT; l++)
         {
             for(m=0; m<NLON; m++)
