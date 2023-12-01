@@ -343,9 +343,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
         df_copy['g0'+str(cidx+1)] = g0.ravel()
         df_copy['pi0'+str(cidx+1)] = pi0.ravel()
         
-        #####################################
-        ### I THINK THIS PART WORKS RIGHT ###
-        #####################################
+
     if HAZES == True:
         df['tau_haze'] = 1.0
         df['g0_haze']  = 1.0
