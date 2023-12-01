@@ -50,6 +50,7 @@ Defines input values and files for 3-D emission spectra
                                            /* FORMAT=2 -> large opacity table        */
 
 #define ABUND_TRACK_IND 2 /* if test visualize, the index of the mapped species in the EOS file */
+#define CHEM_FILE_NCOLS 23
 
 /* Opacities for spectra */
 #define CHEM_FILE   <<CHEMISTRY_FILE>>

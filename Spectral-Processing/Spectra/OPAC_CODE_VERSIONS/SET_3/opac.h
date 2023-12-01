@@ -21,9 +21,10 @@ struct Opac {
 
 struct Chem {
   double **total, **H2, **H, **He, **H2O, **CH4, **CO, **CO2, **O, **C, **N,
-    **NH3, **N2, **Na, **Naxx, **K, **Kxx, **O2, **O3, **rho_k_T, **mu;
+    **NH3, **N2, **Na, **Naxx, **K, **Kxx, **O2, **O3, **el, **map_abund, **rho_k_T, **mu;
   double *P, *T;
 };
+
 
 /* --- Associated function prototypes ------------------------------- */
 

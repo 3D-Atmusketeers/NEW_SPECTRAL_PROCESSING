@@ -133,7 +133,7 @@ void ReadChemTable()
   for (i=0; i<CHEM_FILE_NCOLS; i++) {
     fscanf(f1,"%s", dum);
   }
-
+  // C C1H4 C1O1 C1O2 H H2 H2O1 He N N2 H3N1 O O2 O3 e-
   for (i=NPRESSURE-1; i>=0; i--)
     {
     fscanf(f1,"%le", &chem.P[i]);
@@ -142,18 +142,18 @@ void ReadChemTable()
       fscanf(f1,"%le", &chem.T[j]);
       k = 1;
       k = ReadChemLine(f1, i, j, k, chem.total);
-      k = ReadChemLine(f1, i, j, k, chem.H2);
-      k = ReadChemLine(f1, i, j, k, chem.H);
-      k = ReadChemLine(f1, i, j, k, chem.He);
-      k = ReadChemLine(f1, i, j, k, chem.H2O);
+      k = ReadChemLine(f1, i, j, k, chem.C);
       k = ReadChemLine(f1, i, j, k, chem.CH4);
       k = ReadChemLine(f1, i, j, k, chem.CO);
       k = ReadChemLine(f1, i, j, k, chem.CO2);
-      k = ReadChemLine(f1, i, j, k, chem.O);
-      k = ReadChemLine(f1, i, j, k, chem.C);
+      k = ReadChemLine(f1, i, j, k, chem.H);
+      k = ReadChemLine(f1, i, j, k, chem.H2);
+      k = ReadChemLine(f1, i, j, k, chem.H2O);
+      k = ReadChemLine(f1, i, j, k, chem.He);
       k = ReadChemLine(f1, i, j, k, chem.N);
-      k = ReadChemLine(f1, i, j, k, chem.NH3);
       k = ReadChemLine(f1, i, j, k, chem.N2);
+      k = ReadChemLine(f1, i, j, k, chem.NH3);
+      k = ReadChemLine(f1, i, j, k, chem.O);
       k = ReadChemLine(f1, i, j, k, chem.O2);
       k = ReadChemLine(f1, i, j, k, chem.O3);
       k = ReadChemLine(f1, i, j, k, chem.el);
@@ -162,9 +162,8 @@ void ReadChemTable()
 
   printf("Read in chemtable\n");
   fclose(f1);
-  printf("Chemistry: \nP_0\t%e \nT_0\t%e \ntotal00 \t%e \ntotal11 \t%e \nH2 \t%e \nH \t%e \nHe \t%e \nH2O \t%e \nCH4 \t%e \nCO \t%e \nCO2 \t%e \n",
-	 chem.P[0], chem.T[0], chem.total[0][0], chem.total[1][1],chem.H2[0][0], chem.H[0][0],
-	 chem.He[0][0], chem.H2O[0][0], chem.CH4[0][0],chem.CO[0][0], chem.CO2[0][0]);
+  printf("Chemistry: \nP_0\t%e \nT_0\t%e \ntotal00 \t%e \nC\t%e \nCH4\t%e \nCO\t%e \n",
+	 chem.P[0], chem.T[0], chem.total[0][0], chem.C[0][0], chem.CH4[0][0], chem.CO[0][0]);
   return;
 
 }

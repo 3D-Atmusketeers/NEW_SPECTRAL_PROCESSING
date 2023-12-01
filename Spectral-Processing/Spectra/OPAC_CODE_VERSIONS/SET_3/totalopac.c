@@ -321,13 +321,7 @@ void TotalOpac() {
       opacCIA.kappa[i][j] = calloc(NTEMP, sizeof(double));
     }
   }
-  
 
-
-
-
-
-  
   for (i=0; i<NLAMBDA; i++){
     for (j=0; j<NPRESSURE; j++){
       for (k=0; k<NTEMP; k++){

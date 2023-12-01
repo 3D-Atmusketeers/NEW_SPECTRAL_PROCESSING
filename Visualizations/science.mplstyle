@@ -3,9 +3,10 @@ figure.figsize: 12,8
 figure.dpi : 100
 
 lines.linewidth : 3.0
-axes.linewidth: 1.8
-font.size : 22
-axes.labelsize : 22
+axes.linewidth: 1.5
+axes.titlesize : 16
+font.size : 16
+axes.labelsize : 16
 xtick.direction : in 
 ytick.direction : in
 xtick.top : True
@@ -13,13 +14,13 @@ ytick.right : True
 
 xtick.major.size:    10    # major tick size in points
 xtick.minor.size:    5       # minor tick size in points
-xtick.major.width:   1.8     # major tick width in points
-xtick.minor.width:   1.2     # minor tick width in points
+xtick.major.width:   1.5     # major tick width in points
+xtick.minor.width:   1.0     # minor tick width in points
 
 ytick.major.size:    10     # major tick size in points
 ytick.minor.size:    5       # minor tick size in points
-ytick.major.width:   1.8     # major tick width in points
-ytick.minor.width:   1.2     # minor tick width in points
+ytick.major.width:   1.5     # major tick width in points
+ytick.minor.width:   1.0     # minor tick width in points
 
 xtick.major.pad : 6
 xtick.minor.pad : 6
@@ -35,7 +36,6 @@ legend.frameon : False
 
 #axes.edgecolor : "333333"   # Color of the figure axis.
 #axes.edgecolor : "red"   # Color of the figure axis.
-
 
 savefig.bbox : tight
 savefig.dpi : 100

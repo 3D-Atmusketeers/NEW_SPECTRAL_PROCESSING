@@ -502,7 +502,7 @@ void TotalOpac() {
     fscanf(f1, "%le", &opacCIA.T[k]);
     for (i=0; i<NLAMBDA; i++){
       fscanf(f1, "%le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le", &atmos.lambda[i],
-                                                                                    &opac_CIA_Hel[k][i]
+                                                                                    &opac_CIA_Hel[k][i],
                                                                                     &opac_CIA_H2H2[k][i],
                                                                                     &opac_CIA_H2He[k][i],
                                                                                     &opac_CIA_H2H[k][i],
@@ -516,8 +516,7 @@ void TotalOpac() {
                                                                                     &opac_CIA_N2N2[k][i],
                                                                                     &opac_CIA_O2CO2[k][i],
                                                                                     &opac_CIA_O2N2[k][i],
-                                                                                    &opac_CIA_O2O2[k][i],
-);
+                                                                                    &opac_CIA_O2O2[k][i]);
     }
   }
   printf("CIA: %e   %e\n", atmos.lambda[NLAMBDA-1], opac_CIA_H2H2[NTEMP-1][NLAMBDA-1]);
