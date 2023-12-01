@@ -153,7 +153,7 @@ void ReadChemTable()
   for (i=0; i<CHEM_FILE_NCOLS; i++) {
     fscanf(f1,"%s", dum);
   }
-
+  //e- H H2 He C2H2 C1H4 C1O1 C1O2 H2O1 H2S1 C1H1N1_1 K Na H3N1 H3P1 O1Ti1 O1V1 Fe1H1 Ar N2 O2
   for (i=NPRESSURE-1; i>=0; i--)
     {
     fscanf(f1,"%le", &chem.P[i]);

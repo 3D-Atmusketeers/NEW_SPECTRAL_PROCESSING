@@ -28,6 +28,8 @@ import cross_correlation
 
 import scienceplots
 plt.style.use('science.mplstyle')
+#plt.style.use('astrophysics.mplstyle')
+
 #plt.style.use(['science','nature'])
 
 
@@ -43,7 +45,7 @@ planet_names = ["GJ1214b-none-0clouds-1met",
                 "GJ1214b-soot-50clouds-1met",
                 "GJ1214b-soot-0clouds-100met",
                 "GJ1214b-soot-50clouds-100met"]
-
+planet_names = ["GJ1214b-none-0clouds-1met"]
 
 #planet_names = ["GJ1214b-none-0clouds-1met",
 #                "GJ1214b-none-25clouds-1met",
