@@ -8,8 +8,11 @@ import subprocess
 import glob
 import numpy as np
 
+#phases in degrees, inclinations in radians (sorry, alex still hasn't fixed this)
 phases = [0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0, 195.0, 210.0, 225.0, 240.0, 255.0, 270.0, 285.0, 300.0, 315.0, 330.0, 345.0]
 #phases = [0.0, 15.0]
+# An inclination of 0 corresponds to edge on
+inclinations = [0.0]
 gcm_folder = 'GCM-OUTPUT'
 source_file_name = "Run_sbatch"
 
@@ -65,17 +68,20 @@ def runsbatch(phases, source_file_name, finished_gcm, step, dependency = 'none')
     return jobnum
 
 
-def copyfiles(phases, step, finished_gcms):
+def copyfiles(phases, inclinations, step, finished_gcms):
     print('phases are ', phases)   
     for phase in enumerate(phases):
         shutil.copyfile("Spectra/run_spectra.py", "Spectra/run_spectra_" + finished_gcms + "_" + str(phase[1]) + '_' + step + ".py")
         for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms + "_" + str(phase[1]) + '_' + step + ".py"], inplace=True):
             if line.strip().startswith('phases'):
                 line = 'phases = [' + str(phase[1]) + ']\n'
+            if line.strip().startswith('inclinations'):
+                line = 'inclinations = ' + str(inclinations) + '\n'
             if line.strip().startswith('planet_names'):
                 line = 'planet_names = ["' + str(finished_gcms) + '"]\n'
             if line.strip().startswith('Planet_name'):
                 line = 'Planet_name = "'+ str(finished_gcms) + '"\n'
+
             sys.stdout.write(line)
             
     print('copied phase files successfully')
@@ -131,7 +137,7 @@ for i in range(len(finished_gcms)):
     if STEP_ONE:
         phases = [0.0]
         step = 'stepone'
-        copyfiles(phases, step, finished_gcms[i])
+        copyfiles(phases,inclinations, step, finished_gcms[i])
 
         for j, phase in enumerate(phases):    
             for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + '_' + step + ".py"], inplace=True):
@@ -157,7 +163,7 @@ for i in range(len(finished_gcms)):
     if STEP_TWO:
         phases = reassign
         step = 'steptwo'
-        copyfiles(phases, step, finished_gcms[i])
+        copyfiles(phases, inclinations, step, finished_gcms[i])
         
         if STEP_ONE:
             dependency = step1jobnum
@@ -192,7 +198,7 @@ if STEP_THREE:
     phases = reassign
     step = 'stepthree'
     for i in range(len(finished_gcms)):
-        copyfiles(phases, step, finished_gcms[i])
+        copyfiles(phases, inclinations, step, finished_gcms[i])
 
     for j, phase in enumerate(phases):
         for i in range(len(finished_gcms)):
