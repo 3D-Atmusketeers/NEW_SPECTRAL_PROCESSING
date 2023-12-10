@@ -8,14 +8,15 @@ Figures/*
 !Figures/.gitkeep 
 
 # Ignore some stuff in Visualizations
-Visualizations/DATA/
+#Visualizations/DATA/
+Visualizations/DATA/*.fits
 Visualizations/OUTPUT_DATA/*
-Visualizations/ScientificColourMaps7/*
+##Visualizations/ScientificColourMaps7/*
 
 # Keep the folders
 !Visualizations/DATA/.gitkeep 
 !Visualizations/OUTPUT_DATA/.gitkeep 
-!Visualizations/ScientificColourMaps7/.gitkeep 
+##!Visualizations/ScientificColourMaps7/.gitkeep 
 
 # Ignore some stuff in spectral processing
 Spectral-Processing/FINISHED_SPECTRA/*
@@ -24,6 +25,12 @@ Spectral-Processing/PLANET_MODELS/*
 Spectral-Processing/Spectra/DATA/*
 Spectral-Processing/Spectra/SCATTERING_DATA/*
 Spectral-Processing/Spectra/OUT/*
+
+Spectral-Processing/Spectra/SCATTERING_DATA/*fortfiles
+Spectral-Processing/Spectra/OUT/*.lock
+Spectral-Processing/Spectra/*fortfiles
+Spectral-Processing/Spectra/*.lock
+
 
 # Keep the folders
 !Spectral-Processing/FINISHED_SPECTRA/.gitkeep
@@ -37,3 +44,20 @@ Spectral-Processing/Spectra/OUT/*
 Spectral-Processing/Spectra/rt_emission_aerosols_*
 Spectral-Processing/Spectra/Run_sbatch_*
 Spectral-Processing/Spectra/run_spectra_*
+
+# Ignore fortfiles pattern
+Spectral-Processing/*fortfiles*
+Spectral-Processing/*fortfiles/
+
+# Ignore lock pattern
+Spectral-Processing/*.lock
+
+# Ignore slurm pattern
+Spectral-Processing/slurm*.out
+
+# Ignore slurm pattern
+Spectral-Processing/Spectra/slurm*.out
+
+# Ignore anything in __pycache__
+Spectral-Processing/Spectra/__pycache__/
+Spectral-Processing/Spectra/__pycache__/*

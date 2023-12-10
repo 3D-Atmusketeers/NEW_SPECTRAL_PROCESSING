@@ -1,31 +1,34 @@
-import re
 import os
 import shutil
-import time
+import fcntl
 
-def replace_files(opacity_files, MET_X_SOLAR, lowest_phase = False):
-    if os.path.exists("opac.h"):
-        os.remove("opac.h")
-    shutil.copy('OPAC_CODE_VERSIONS/' + opacity_files + '/opac.h', "opac.h")
+def replace_files(opacity_files, MET_X_SOLAR):
+    # Create a lock file. This can be any file, but it's just used to handle the locking mechanism.
+    lock_file_path = f'file_lock_{opacity_files}.lock'
+    with open(lock_file_path, 'w') as lock_file:
+        # Acquire the lock
+        fcntl.flock(lock_file, fcntl.LOCK_EX)
 
-    if os.path.exists("input.h"):
-        os.remove("input.h")
-    shutil.copy('OPAC_CODE_VERSIONS/' + opacity_files + '/input.h', "input.h")
+        # Perform the copy operations
+        files_to_replace = [
+            "opac.h", "input.h", "readchemtable.c", 
+            "readopactable.c", "template_inputs.h", "totalopac.c"
+        ]
+        for file_name in files_to_replace:
+            dst_path = os.path.join('.', file_name)
+            if os.path.exists(dst_path):
+                os.remove(dst_path)
+                
+            print("replacing", file_name, "in", dst_path)
+            src_path = os.path.join('OPAC_CODE_VERSIONS', opacity_files, file_name)
+            
+            if not os.path.exists(src_path):
+                print(f"Error: {src_path} does not exist!")
+                continue
 
-    if os.path.exists("readchemtable.c"):
-        os.remove("readchemtable.c")
-    shutil.copy('OPAC_CODE_VERSIONS/' + opacity_files + '/readchemtable.c', "readchemtable.c")
+            shutil.copy(src_path, dst_path)
 
-    if os.path.exists("readopactable.c"):
-        os.remove("readopactable.c")
-    shutil.copy('OPAC_CODE_VERSIONS/' + opacity_files + '/readopactable.c', "readopactable.c")
-
-    if os.path.exists("template_inputs.h"):
-        os.remove("template_inputs.h")
-    shutil.copy('OPAC_CODE_VERSIONS/' + opacity_files + '/template_inputs.h', "template_inputs.h")
-
-    if os.path.exists("totalopac.c"):
-        os.remove("totalopac.c")
-    shutil.copy('OPAC_CODE_VERSIONS/' + opacity_files + '/totalopac.c', "totalopac.c")
+        # Release the lock
+        fcntl.flock(lock_file, fcntl.LOCK_UN)
 
     return None

@@ -61,29 +61,10 @@ void TotalOpac() {
 
   double **opac_CIA_H2H2, **opac_CIA_H2He, **opac_CIA_H2H, **opac_CIA_H2CH4, **opac_CIA_CH4Ar,
          **opac_CIA_CH4CH4, **opac_CIA_CO2CO2, **opac_CIA_HeH, **opac_CIA_N2CH4, **opac_CIA_N2H2,
-         **opac_CIA_N2N2, **opac_CIA_O2CO2, **opac_CIA_O2N2, **opac_CIA_O2O2;
+         **opac_CIA_N2N2, **opac_CIA_O2CO2, **opac_CIA_O2N2, **opac_CIA_O2O2, **opac_CIA_Hel;
   double *t_CIA, *lambda_CIA, **opac_CIA;
   int i, j, k, a, b, dum;
   char filename[65];
-
-  double m_H2 = 2.0158;
-  double m_H = 1.0079;
-  double m_He = 4.002602;
-  double m_H2O = 18.0152;
-  double m_CH4 = 16.0423;
-  double m_CO = 28.010;
-  double m_CO2 = 44.010;
-  double m_O = 15.9994;
-  double m_C = 12.0107;
-  double m_N = 14.0067;
-  double m_NH3 = 17.031;
-  double m_N2 = 28.0134;
-  double m_Na = 22.988977;
-  double m_Naxx  = 39.997;
-  double m_K = 39.0983;
-  double m_Kxx = 56.1056;
-  double m_O2 = 31.9988;
-  double m_O3 = 47.9982;
 
   FILE *f1;
 
@@ -103,6 +84,7 @@ void TotalOpac() {
   opac_CIA_O2CO2 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
   opac_CIA_O2N2 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
   opac_CIA_O2O2 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_Hel = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
 
   
   t_CIA = dvector(0, 18);
@@ -504,7 +486,7 @@ void TotalOpac() {
   /* Fill in collision-induced opacities */
 
 
-  f1 = fopen("DATA/SET_1/opacCIA_lotemp_isaac_v2.dat", "r");
+  f1 = fopen("DATA/SET_1/opacCIA_low_temp.dat", "r");
   if(f1 == NULL){
     printf("\n totalopac.c:\nError opening CIA file: -- No such file or directory\n\n");
   }
@@ -519,21 +501,22 @@ void TotalOpac() {
   for (k=0; k<NTEMP; k++){
     fscanf(f1, "%le", &opacCIA.T[k]);
     for (i=0; i<NLAMBDA; i++){
-      fscanf(f1, "%le %le %le %le %le %le %le %le %le %le %le %le %le %le %le", &atmos.lambda[i],
-                                                                                &opac_CIA_H2H2[k][i],
-                                                                                &opac_CIA_H2He[k][i],
-                                                                                &opac_CIA_H2H[k][i],
-                                                                                &opac_CIA_H2CH4[k][i],
-                                                                                &opac_CIA_CH4Ar[k][i],
-                                                                                &opac_CIA_CH4CH4[k][i],
-                                                                                &opac_CIA_CO2CO2[k][i],
-                                                                                &opac_CIA_HeH[k][i],
-                                                                                &opac_CIA_N2CH4[k][i],
-                                                                                &opac_CIA_N2H2[k][i],
-                                                                                &opac_CIA_N2N2[k][i],
-                                                                                &opac_CIA_O2CO2[k][i],
-                                                                                &opac_CIA_O2N2[k][i],
-                                                                                &opac_CIA_O2O2[k][i]);
+      fscanf(f1, "%le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le", &atmos.lambda[i],
+                                                                                    &opac_CIA_Hel[k][i],
+                                                                                    &opac_CIA_H2H2[k][i],
+                                                                                    &opac_CIA_H2He[k][i],
+                                                                                    &opac_CIA_H2H[k][i],
+                                                                                    &opac_CIA_H2CH4[k][i],
+                                                                                    &opac_CIA_CH4Ar[k][i],
+                                                                                    &opac_CIA_CH4CH4[k][i],
+                                                                                    &opac_CIA_CO2CO2[k][i],
+                                                                                    &opac_CIA_HeH[k][i],
+                                                                                    &opac_CIA_N2CH4[k][i],
+                                                                                    &opac_CIA_N2H2[k][i],
+                                                                                    &opac_CIA_N2N2[k][i],
+                                                                                    &opac_CIA_O2CO2[k][i],
+                                                                                    &opac_CIA_O2N2[k][i],
+                                                                                    &opac_CIA_O2O2[k][i]);
     }
   }
   printf("CIA: %e   %e\n", atmos.lambda[NLAMBDA-1], opac_CIA_H2H2[NTEMP-1][NLAMBDA-1]);
@@ -614,11 +597,14 @@ void TotalOpac() {
         chem.O2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
         chem.N2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
 
-
-
       opacCIA.kappa[i][j][k] += opac_CIA_O2O2[k][i] *
         chem.O2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
         chem.O2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
+
+
+      opacCIA.kappa[i][j][k] += opac_CIA_Hel[k][i] *
+	       chem.H[j][k] * chem.P[j] / (KBOLTZMANN * chem.T[k]) *  
+	       chem.el[j][k] * chem.P[j] / (KBOLTZMANN * chem.T[k]);
       }
     }
   }
@@ -749,6 +735,7 @@ void TotalOpac() {
   free_dmatrix(opac_CIA_O2CO2, 0, NTEMP-1, 0, NLAMBDA-1);
   free_dmatrix(opac_CIA_O2N2, 0, NTEMP-1, 0, NLAMBDA-1);
   free_dmatrix(opac_CIA_O2O2, 0, NTEMP-1, 0, NLAMBDA-1);
+  free_dmatrix(opac_CIA_Hel, 0, NTEMP-1, 0, NLAMBDA-1);
 
 }
 

@@ -14,8 +14,8 @@
 #SBATCH --mem=7g
 #SBATCH --time=36:00:00
 
-#SBATCH --account=erausche1
-#SBATCH --partition=standard
+###SBATCH --account=erausche1
+####SBATCH --partition=standard
 
 #### #### ####  These are the least frequently changing options
 

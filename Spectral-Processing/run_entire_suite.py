@@ -6,17 +6,19 @@ import contextlib
 import time
 import subprocess
 import glob
-import numpy as np
+from clean_spectra_directory import clean_spectra_directory
+
+print("cleaning spectra directory")
+clean_spectra_directory()
 
 #phases in degrees, inclinations in radians (sorry, alex still hasn't fixed this)
 phases = [0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0, 195.0, 210.0, 225.0, 240.0, 255.0, 270.0, 285.0, 300.0, 315.0, 330.0, 345.0]
 #phases = [0.0, 15.0]
 # An inclination of 0 corresponds to edge on
+
 inclinations = [0.0]
 gcm_folder = 'GCM-OUTPUT'
 source_file_name = "Run_sbatch"
-
-lowest_phase = np.min(phases)
 
 @contextlib.contextmanager
 def change_directory(path):
@@ -153,8 +155,6 @@ for i in range(len(finished_gcms)):
                     line = '    STEP_THREE = False\n'
                 sys.stdout.write(line)
             for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + '_' + step + ".py"], inplace=True):
-                if line.strip().startswith('LOWEST_PHASE'):
-                    line = 'LOWEST_PHASE = True\n'
                 sys.stdout.write(line)
                 
         step1jobnum = runsbatch(phases, source_file_name, finished_gcms[i], step)
@@ -183,13 +183,6 @@ for i in range(len(finished_gcms)):
                 if line.strip().startswith('STEP_THREE'):
                     line = '    STEP_THREE = False\n'
                 sys.stdout.write(line)
-            if phase == lowest_phase:
-                for line in fileinput.input(
-                        ["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + '_' + step + ".py"],
-                        inplace=True):
-                    if line.strip().startswith('LOWEST_PHASE'):
-                        line = 'LOWEST_PHASE = True\n'
-                    sys.stdout.write(line)
                     
         step2jobnum = runsbatch(phases, source_file_name, finished_gcms[i], step,dependency)
         step2jobnums.append(step2jobnum)
@@ -207,7 +200,7 @@ if STEP_THREE:
                 dependency = step2jobnums[i]
             else:
                 dependency = 'none'
-                print('no dependency, running step 3 (calculations) immediately')
+                print('no dependency, running step 3 (calculations) immediately for', finished_gcms[i])
 
             for line in fileinput.input(["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + '_' + step + ".py"], inplace=True):
                 if line.strip().startswith('STEP_ONE'):
@@ -222,14 +215,6 @@ if STEP_THREE:
                     line = '    STEP_THREE = True\n'
                 sys.stdout.write(line)
 
-            if phase == lowest_phase:
-                for line in fileinput.input(
-                        ["Spectra/run_spectra_" + finished_gcms[i] + "_" + str(phase) + '_' + step + ".py"],
-                        inplace=True):
-                    if line.strip().startswith('LOWEST_PHASE'):
-                        line = 'LOWEST_PHASE = True\n'
-                    sys.stdout.write(line)
-
             phaseslist = [phase]
             step3jobnum = runsbatch(phaseslist, source_file_name, finished_gcms[i], step, dependency)
 
@@ -239,4 +224,3 @@ if STEP_THREE:
                 print('Waiting for previous phase to create the .exe file')
                 print('Waiting on ', executable)
                 time.sleep(60)
-

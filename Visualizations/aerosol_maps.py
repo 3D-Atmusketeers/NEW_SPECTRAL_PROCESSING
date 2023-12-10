@@ -9,7 +9,7 @@ from matplotlib.ticker import MultipleLocator, LogLocator
 def plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, cloud_wavelength):
     # cloud colormap
     cm_name = 'devon' 
-    cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
+    cm_file = np.loadtxt(f'ScientificColourMaps8/{cm_name}/{cm_name}.txt')
     my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file[0:240])
 
     def get_optical_depth(file, nlat, nlev):
