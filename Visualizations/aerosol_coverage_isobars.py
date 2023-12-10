@@ -25,13 +25,13 @@ def plot_aerosol_coverage_isobars(
 
     # temp colormap
     cm_name = 'lajolla'
-    cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
-    cm_file = np.flip(cm_file, axis=0)
+    cm_file = np.loadtxt(f'ScientificColourMaps8/{cm_name}/{cm_name}.txt')
+    #cm_file = np.flip(cm_file, axis=0)
     temperature_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
 
     # cloud colormap
     cm_name = 'devon'
-    cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
+    cm_file = np.loadtxt(f'ScientificColourMaps8/{cm_name}/{cm_name}.txt')
     cloud_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file[0:240])
 
     column_names = ['lat', 'lon', 'level',
@@ -164,12 +164,12 @@ def plot_aerosol_coverage_isobars(
             
         temp_cbar.set_label('Temperature (K)', fontsize=26)
         
-        if (pressure_lev_bar < 1e-3):
-            temp_cbar.set_ticks(np.arange(700, 1800, 100))
-        elif 'hd189' in planet_name.lower():
-            temp_cbar.set_ticks(np.arange(600, 1600, 100))
-        else:
-            temp_cbar.set_ticks(np.arange(1000, 1800, 100))
+        #if (pressure_lev_bar < 1e-3):
+        #    temp_cbar.set_ticks(np.arange(700, 1800, 100))
+        #elif 'hd189' in planet_name.lower():
+        #    temp_cbar.set_ticks(np.arange(600, 1600, 100))
+        #else:
+        #    temp_cbar.set_ticks(np.arange(1000, 1800, 100))
 
         
         

@@ -7,7 +7,7 @@ import matplotlib.colors as mcolors
 
 # colormap
 cm_name = 'romaO'
-cm_file = np.loadtxt(f'ScientificColourMaps7/{cm_name}/{cm_name}.txt')
+cm_file = np.loadtxt(f'ScientificColourMaps8/{cm_name}/{cm_name}.txt')
 my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file[::-1])
 
 def get_cc(file_dopp, file_rest):

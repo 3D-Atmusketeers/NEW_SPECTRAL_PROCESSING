@@ -41,7 +41,7 @@ def plot_observer_projection(planet_names, nlat, nlon,
 
         # Colormap
         cm_name = 'lajolla'
-        cm_file = np.loadtxt('ScientificColourMaps7/lajolla/lajolla.txt')
+        cm_file = np.loadtxt('ScientificColourMaps8/lajolla/lajolla.txt')
         my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file[::-1])
 
         # Create figure and adjust subplots

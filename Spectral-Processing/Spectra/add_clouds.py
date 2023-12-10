@@ -312,7 +312,8 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
     for cidx in range(13): # loop through species
         tcond = Tconds[cidx][layer_index] # cond Ts for each layer
         condfact = temp[:,:] <= tcond # everywhere below the cond curve
-#         condfact[:,:,0] = False # delete clouds from top layer
+
+#       condfact[:,:,0] = False # delete clouds from top layer
         botlay = condfact.cumsum(axis=2).argmax(axis=2).ravel() # find index of cloud base
         
         ### mask out everything above the cloud top
@@ -320,13 +321,11 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
         for i in range(int(nlat*nlon)):
             laymaxmsk = np.append(laymaxmsk, i*nlay + np.array(range(int(botlay[i]+1-aerosol_layers))))
         np.put(condfact,laymaxmsk.astype(int),0.0)
-        
-        
+
         ### Do the "if close to condensation curve, fraction condenses" calculation
         partcld = np.where((condfact.ravel()) & (temp[:,:] > tcond-10).ravel())[0]
         condfact = condfact.astype(float) # all the places with clouds are now 1, all others are 0
         np.put(condfact,partcld,((tcond - temp[:,:])/10).ravel()[partcld])
-        
         
         ### Calculate the actual cloud properties
         tau = dpg * MOLEF[cidx]*3./4./particle_size/DENSITY[cidx]*FMOLW[cidx]*condfact*MTLX*CORFACT
@@ -344,16 +343,18 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
         df_copy['g0'+str(cidx+1)] = g0.ravel()
         df_copy['pi0'+str(cidx+1)] = pi0.ravel()
         
-        #####################################
-        ### I THINK THIS PART WORKS RIGHT ###
-        #####################################
-        if HAZES == True:
-            df['tau_haze'] = (np.ones(np.shape(tau)) * delta_pres * QE_OPPR[13][haze_layer_index][:,wav_loc]).ravel()
-            df['g0_haze']  = (np.ones(np.shape(tau)) * G0_OPPR[13][haze_layer_index][:,wav_loc]).ravel()
-            df['pi0_haze'] = (np.ones(np.shape(tau)) * PI0_OPPR[13][haze_layer_index][:,wav_loc]).ravel()
-        ############################
-        ### THE REST SHOULD WORK ###
-        ############################
+
+    if HAZES == True:
+        df['tau_haze'] = 1.0
+        df['g0_haze']  = 1.0
+        df['pi0_haze'] = 1.0
+
+        df_copy['tau_haze'] = (np.ones(np.shape(tau)) * delta_pres * QE_OPPR[13][haze_layer_index][:,wav_loc]).ravel()
+        df_copy['g0_haze']  = (np.ones(np.shape(tau)) * G0_OPPR[13][haze_layer_index][:,wav_loc]).ravel()
+        df_copy['pi0_haze'] = (np.ones(np.shape(tau)) * PI0_OPPR[13][haze_layer_index][:,wav_loc]).ravel()
+
+
+
         
     planet_file_with_clouds = '../PLANET_MODELS/' + planet_name + '_with_clouds.txt'
     np.savetxt(planet_file_with_clouds, df.values, fmt=' '.join(['%5.4f']*2 + ['%3d']*1 + ['%9.4E']*6 + ['%9.4E']*42 + ['\t']))

@@ -7,6 +7,19 @@ This is a guide for how to use the files here
 
 Recently, Isaac and Alex have changed how to run the post processing. It is now much easier and faster. 
 
+
+*************************************************
+*********         Before Running      **********
+*************************************************
+
+The code needs some data files to run that are too big to keep in github. Isaac put these on Turbo
+Running download_all_data_files_from_turbo.py should get you the files
+Look at the bottom of the file in files_to_download to see which ones its grabbing
+
+Once the files are downloaded, move the SET_X of data to Spectra/DATA, and move the SCATTERING_DATA to Spectra/SCATTERING_DATA
+
+Also, make sure to put all the GCMs that you want to run in GCM-OUTPUT
+
 *************************************************
 ************         HOW TO RUN      ************
 *************************************************
@@ -19,7 +32,7 @@ Spectral-Processing/run_entire_suite.py
     
     Be sure to specify which phases you want run in run_entire_suite.py . 
 	
-    There are three parts to the post processing — altitude regridding, init files, and the final calculations. 
+    There are three parts to the post processing —altitude regridding, init files, and the final calculations. 
     STEP_ONE: Altitude regridding takes around an hour and submits one job. It creates 4 files for every planet and places them in /PLANET_MODELS/ . 
     STEP_TWO: The init files are placed in /Spectra/DATA/ . It will create a separate init file for every phase you run. These take around 20 minutes. 
     STEP_THREE: Finally, the ending calculations will be placed in /Spectra/OUT/ . There will be two data files for each phase ran. These can take 12 hours depending on the cloudiness of your model. 
@@ -88,7 +101,6 @@ AS YOU ADD STUFF TO THESE SETS PLEASE UPDATE THIS README!!!!
 *************************************************
 ************          NOTES         *************
 *************************************************
-
 
 In /Spectra/ , there will be (6 * number of phases + 2) number of files created. This is normal and is required for running the phases in parallel. You can easily delete them by running Clean_suite.py (by typing 'python3 Clean_suite.py' in command line). There will also be many slurm files created. Sorry. 
 

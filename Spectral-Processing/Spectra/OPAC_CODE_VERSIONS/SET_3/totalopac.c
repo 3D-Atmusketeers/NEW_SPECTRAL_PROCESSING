@@ -1,7 +1,6 @@
 /*----------------------- totalopac.c ----------------------------
 
 Author: Eliza Miller-Ricci (emillerricci@cfa.harvard.edu)
-Last modified: June 13, 2007
 
 ------------------------------------------------------------------ */
 
@@ -53,39 +52,30 @@ void FreeChemTable();
 
 void TotalOpac() {
 
+  double **opac_CIA_H_el, **opac_CIA_He_H, **opac_CIA_CH4_CH4, **opac_CIA_H2_He, **opac_CIA_H2_CH4,
+         **opac_CIA_H2_H, **opac_CIA_H2_H2, **opac_CIA_CO2_CO2;
   double *t_CIA, *lambda_CIA, **opac_CIA;
   int i, j, k, a, b, dum;
   char filename[65];
 
-  double m_H2 = 2.0158;
-  double m_H = 1.0079;
-  double m_He = 4.002602;
-  double m_H2O = 18.0152;
-  double m_CH4 = 16.0423;
-  double m_CO = 28.010;
-  double m_CO2 = 44.010;
-  double m_O = 15.9994;
-  double m_C = 12.0107;
-  double m_N = 14.0067;
-  double m_NH3 = 17.031;
-  double m_N2 = 28.0134;
-  double m_Na = 22.988977;
-  double m_Naxx  = 39.997;
-  double m_K = 39.0983;
-  double m_Kxx = 56.1056;
-  double m_O2 = 31.9988;
-  double m_O3 = 47.9982;
-
   FILE *f1;
 
   /* Allocate Memory */
-  
+
+  opac_CIA_H_el = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_He_H = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_CH4_CH4 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_H2_He = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_H2_CH4 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_H2_H = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_H2_H2 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_CO2_CO2 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+
   t_CIA = dvector(0, 18);
   lambda_CIA = dvector(0, 999);
   opac_CIA = dmatrix(0, 19, 0, 999);
  
   /* Read Chemistry Table */
-
   ReadChemTable();
   printf("ReadChemTable done\n");
 
@@ -94,18 +84,9 @@ void TotalOpac() {
   opac.mu = dmatrix(0, NPRESSURE-1, 0, NTEMP-1);
 
   for (j=0; j<NPRESSURE; j++) {
-    for (k=0; k<NTEMP; k++) {
-
-      opac.mu[j][k] = chem.H2[j][k]* m_H2 + chem.H[j][k]* m_H 
-	+ chem.He[j][k] * m_He + chem.H2O[j][k] * m_H2O 
-	+ chem.C[j][k] * m_C + chem.CH4[j][k] * m_CH4 
-	+ chem.CO[j][k] * m_CO + chem.CO2[j][k] * m_CO2 
-	+ chem.O[j][k] * m_O + chem.N[j][k] * m_N 
-	+ chem.NH3[j][k] * m_NH3 + chem.N2[j][k] * m_N2 
-	+ chem.O2[j][k] * m_O2 + chem.O3[j][k] * m_O3;
-
+    for (k=0; k<NTEMP; k++)
+    {
       opac.mu[j][k] = MU;
-
     }
   }
 
@@ -301,127 +282,92 @@ void TotalOpac() {
     }
   }
 
+
+
   /* Fill in collision-induced opacities */
-  
-  opacCIA.kappa = malloc(NLAMBDA*sizeof(double));
+
+
+  f1 = fopen("DATA/SET_3/opacCIA_hires.dat", "r");
+  if(f1 == NULL){
+    printf("\n totalopac.c:\nError opening CIA file: -- No such file or directory\n\n");
+  }
+  printf("CIA file found, good job!\n");
+  opacCIA.T = dvector(0, NTEMP-1);
+  opacCIA.P = dvector(0, NPRESSURE-1);
+  opacCIA.Plog10 = dvector(0, NPRESSURE-1);
+
+  for(i=0; i<NTEMP; i++){
+    fscanf(f1, "%le", &opacCIA.T[i]);
+  }
+  for (k=0; k<NTEMP; k++){
+    fscanf(f1, "%le", &opacCIA.T[k]);
+    for (i=0; i<NLAMBDA; i++){
+      fscanf(f1, "%le %le %le %le %le %le %le %le %le", &atmos.lambda[i],
+                                                        &opac_CIA_He_H[k][i],
+                                                        &opac_CIA_CH4_CH4[k][i],
+                                                        &opac_CIA_H2_He[k][i],
+                                                        &opac_CIA_H2_CH4[k][i],
+                                                        &opac_CIA_H2_H[k][i],
+                                                        &opac_CIA_H2_H2[k][i],
+                                                        &opac_CIA_CO2_CO2[k][i],
+                                                        &opac_CIA_H_el[k][i]);
+    }
+  }
+ 
+  opacCIA.kappa = calloc(NLAMBDA, sizeof(double));
   for(i=0; i<NLAMBDA; i++){
-    opacCIA.kappa[i] = malloc(NPRESSURE*sizeof(double));
+    opacCIA.kappa[i] = calloc(NPRESSURE, sizeof(double));
     for(j=0; j<NPRESSURE; j++){
-      opacCIA.kappa[i][j] = malloc(NTEMP*sizeof(double));
+      opacCIA.kappa[i][j] = calloc(NTEMP, sizeof(double));
     }
   }
 
-  /* CO2 - CO2 */
+  for (i=0; i<NLAMBDA; i++){
+    for (j=0; j<NPRESSURE; j++){
+      for (k=0; k<NTEMP; k++){
 
-  for (i=0; i<NLAMBDA; i++) {
-    for (j=0; j<NPRESSURE; j++) {
-      for (k=0; k<NTEMP; k++) {
-	opacCIA.kappa[i][j][k] = 1.80E-56*SQ(opacCO2.abundance[j][k]*
-				  opacCO2.P[j] / (KBOLTZMANN * opacCO2.T[k]));
+      opacCIA.kappa[i][j][k] += opac_CIA_H_el[k][i] *
+        (chem.H[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k])) *
+        (chem.el[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]));
+
+      opacCIA.kappa[i][j][k] += opac_CIA_He_H[k][i] *
+        chem.He[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
+        chem.H[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
+
+
+      opacCIA.kappa[i][j][k] += opac_CIA_CH4_CH4[k][i] *
+        chem.CH4[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
+        chem.CH4[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
+
+
+      opacCIA.kappa[i][j][k] += opac_CIA_H2_He[k][i] *
+        chem.H2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
+        chem.He[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
+
+
+      opacCIA.kappa[i][j][k] += opac_CIA_H2_CH4[k][i] *
+        chem.H2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
+        chem.CH4[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
+
+
+      opacCIA.kappa[i][j][k] += opac_CIA_H2_H[k][i] *
+        chem.H2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
+        chem.H[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
+
+
+      opacCIA.kappa[i][j][k] += opac_CIA_H2_H2[k][i] *
+        chem.H2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
+        chem.H2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
+
+
+      opacCIA.kappa[i][j][k] += opac_CIA_CO2_CO2[k][i] *
+        chem.CO2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
+        chem.CO2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
       }
     }
   }
 
-  /* H2 - H2 */
-
-  f1 = fopen("DATA/SET_3/H2_H2.dat", "r");
-  if(f1 == NULL){
-    printf("\totalopac.c:\nError opening file: H2-H2 CIA -- No such file or directory\n\n");
-    exit(1);
-  }
-  fscanf(f1, "%d %d", &dum, &dum);
-  for(i=0; i<19; i++){
-    fscanf(f1, "%le", &t_CIA[i]);
-    for(j=0; j<1000; j++){
-      fscanf(f1, "%le %le", &lambda_CIA[j], &opac_CIA[i][j]);
-      opac_CIA[i][j] = pow(10.0, opac_CIA[i][j]);
-      opac_CIA[i][j] *= 100.0/NL/NL;
-      lambda_CIA[j] = 1.0/(100.0*lambda_CIA[j]);
-    }
-  }
   fclose(f1);
-
-  for (i=0; i<NLAMBDA; i++) {
-    Locate(1000, lambda_CIA, atmos.lambda[i], &a);
-    for (k=0; k<NTEMP; k++) {
-      Locate(19, t_CIA, opacCO2.T[k], &b);
-      for (j=0; j<NPRESSURE; j++) {
-      	opacCIA.kappa[i][j][k] +=
-	  lint2D(lambda_CIA[a], lambda_CIA[a+1], t_CIA[b], t_CIA[b+1],
-		 opac_CIA[b][a], opac_CIA[b][a+1], opac_CIA[b+1][a],
-		 opac_CIA[b+1][a+1], atmos.lambda[i], opacCO2.T[k]) *
-	  SQ(chem.H2[j][k]* opacH2O.P[j] / (KBOLTZMANN * opacCO2.T[k]));
-      }
-    }
-  }
-
-  /* H2 - He */
-
-  f1 = fopen("DATA/SET_3/H2_He.dat", "r");
-  if(f1 == NULL){
-    printf("\totalopac.c:\nError opening file: H2-He CIA -- No such file or directory\n\n");
-    exit(1);
-  }
-  fscanf(f1, "%d %d", &dum, &dum);
-  for(i=0; i<19; i++){
-    fscanf(f1, "%le", &t_CIA[i]);
-    for(j=0; j<1000; j++){
-      fscanf(f1, "%le %le", &lambda_CIA[j], &opac_CIA[i][j]);
-      opac_CIA[i][j] = pow(10.0, opac_CIA[i][j]);
-      opac_CIA[i][j] *= 100.0/NL/NL;
-      lambda_CIA[j] = 1.0/(100.0*lambda_CIA[j]);
-    }
-  }
-  fclose(f1);
-
-  for (i=0; i<NLAMBDA; i++) {
-    Locate(1000, lambda_CIA, atmos.lambda[i], &a);
-    for (k=0; k<NTEMP; k++) {
-      Locate(19, t_CIA, opacCO2.T[k], &b);
-      for (j=0; j<NPRESSURE; j++) {
-      	opacCIA.kappa[i][j][k] +=
-	  lint2D(lambda_CIA[a], lambda_CIA[a+1], t_CIA[b], t_CIA[b+1],
-		 opac_CIA[b][a], opac_CIA[b][a+1], opac_CIA[b+1][a],
-		 opac_CIA[b+1][a+1], atmos.lambda[i], opacCO2.T[k]) *
-	  (chem.H2[j][k]* opacH2O.P[j] / (KBOLTZMANN * opacCO2.T[k])) *
-	  (chem.He[j][k]* opacH2O.P[j] / (KBOLTZMANN * opacCO2.T[k]));
-      }
-    }
-  }
-
-  /* H2 - CH4 */
-
-  f1 = fopen("DATA/SET_3/H2_CH4.dat", "r");
-  if(f1 == NULL){
-    printf("\totalopac.c:\nError opening file: H2-CH4 CIA -- No such file or directory\n\n");
-    exit(1);
-  }
-  fscanf(f1, "%d %d", &dum, &dum);
-  for(i=0; i<19; i++){
-    fscanf(f1, "%le", &t_CIA[i]);
-    for(j=0; j<1000; j++){
-      fscanf(f1, "%le %le", &lambda_CIA[j], &opac_CIA[i][j]);
-      opac_CIA[i][j] = pow(10.0, opac_CIA[i][j]);
-      opac_CIA[i][j] *= 100.0/NL/NL;
-      lambda_CIA[j] = 1.0/(100.0*lambda_CIA[j]);
-    }
-  }
-  fclose(f1);
-
-  for (i=0; i<NLAMBDA; i++) {
-    Locate(1000, lambda_CIA, atmos.lambda[i], &a);
-    for (k=0; k<NTEMP; k++) {
-      Locate(19, t_CIA, opacCO2.T[k], &b);
-      for (j=0; j<NPRESSURE; j++) {
-      	opacCIA.kappa[i][j][k] +=
-	  lint2D(lambda_CIA[a], lambda_CIA[a+1], t_CIA[b], t_CIA[b+1],
-		 opac_CIA[b][a], opac_CIA[b][a+1], opac_CIA[b+1][a],
-		 opac_CIA[b+1][a+1], atmos.lambda[i], opacCO2.T[k]) *
-	  (chem.H2[j][k]* opacH2O.P[j] / (KBOLTZMANN * opacCO2.T[k])) *
-	  (chem.CH4[j][k]* opacH2O.P[j] / (KBOLTZMANN * opacCO2.T[k]));
-      }
-    }
-  }
 	
 /* Rayleigh scattering */
 
@@ -430,7 +376,7 @@ void TotalOpac() {
   for (i=0; i<NLAMBDA; i++) {
     for (j=0; j<NPRESSURE; j++) {
       for (k=0; k<NTEMP; k++) {
-	opacscat.kappa[i][j][k] +=
+	  opacscat.kappa[i][j][k] +=
 	  (8.0*PI/3.0) * SQ(0.80e-30) *
 	  SQ(2.0*PI/ atmos.lambda[i]) * SQ(2.0*PI/ atmos.lambda[i]) *
 	  chem.H2[j][k]*chem.P[j] / (KBOLTZMANN * chem.T[k])
@@ -506,12 +452,10 @@ void TotalOpac() {
 	                    + opacNH3.kappa[i][j][k] + opacO2.kappa[i][j][k]
  	                    + opacO3.kappa[i][j][k] + opacscat.kappa[i][j][k]
  	                    + opacCIA.kappa[i][j][k];
-
-
- /* 	opac.alpha[i][j][k] = opacscat.kappa[i][j][k] / opac.kappa[i][j][k]; */
       }
     }
   }
+
   
   /* Free uneeded opacity structures and chemistry table */
 
@@ -526,7 +470,14 @@ void TotalOpac() {
   FreeOpacTable(opacscat);
   FreeChemTable();
 
+  free_dmatrix(opac_CIA_H_el, 0, NTEMP-1, 0, NLAMBDA-1);
+  free_dmatrix(opac_CIA_He_H, 0, NTEMP-1, 0, NLAMBDA-1);
+  free_dmatrix(opac_CIA_CH4_CH4, 0, NTEMP-1, 0, NLAMBDA-1);
+  free_dmatrix(opac_CIA_H2_He, 0, NTEMP-1, 0, NLAMBDA-1);
+  free_dmatrix(opac_CIA_H2_CH4, 0, NTEMP-1, 0, NLAMBDA-1);
+  free_dmatrix(opac_CIA_H2_H, 0, NTEMP-1, 0, NLAMBDA-1);
+  free_dmatrix(opac_CIA_H2_H2, 0, NTEMP-1, 0, NLAMBDA-1);
+  free_dmatrix(opac_CIA_CO2_CO2, 0, NTEMP-1, 0, NLAMBDA-1);
 }
 
 /* ------- end -------------- TotalOpac.c ------------------------ */
-

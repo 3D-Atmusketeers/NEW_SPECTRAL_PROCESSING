@@ -1,19 +1,21 @@
 #below it imports the compiled fortran subroutine as a python module
-import fortrantopythonfile as fp
+#import fortrantopythonfile as fp
 import re
 import pandas as pd
 import numpy as np
 
-def create_dict():
-    fp.readinvals()
-    #using comment, inppl, invarparam, inmag, inbinval, insimprad, incloudy
 
-    #initializes the dictionary
+def create_dict():
+    # Call the fortran
+
+    print('here!')
+    fp.readinvals()
+    print('done!')
+
+    # Create dictionary
     fort7dict = {}
 
     #assigns the dictionary values depending on the location from the compiled fortran
-    #     and the type of value it is
-
     fort7dict['THECOMMENT'] = str(fp.commen.thecomment.tolist())[2:-2].strip()
 
     fort7dict['GA'] = fp.ppl.ga.tolist()
@@ -103,14 +105,17 @@ def create_dict():
     fort7dict['SIG_AREA'] = fp.cloudy.sig_area.tolist()
     fort7dict['PHI_LON'] = fp.cloudy.phi_lon.tolist()
     return fort7dict
-#print(fort7dict)
 
 def get_input_data(path, runname, input_file, input_param):
-    # define the input_param and the regex pattern
+    # define the input_param and the regex pattern for numbers and booleans
     pattern = r"\b" + input_param + r"\s*=\s*(.*?)\s*(?:$|\||&)"
 
-    # compile the regex pattern
+    # define the regex pattern for strings
+    string_pattern = r"\b" + input_param + r"\s*=\s*'([^']*)'"
+
+    # compile the regex patterns
     regex = re.compile(pattern)
+    string_regex = re.compile(string_pattern)
 
     # open the file and read its contents
     with open(path + runname + "/" + input_file, "r") as f:
@@ -122,15 +127,18 @@ def get_input_data(path, runname, input_file, input_param):
         if "!" in line:
             continue
 
-        # find matches on the current line
+        # find matches for strings first
+        string_matches = string_regex.findall(line)
+        if string_matches:
+            return string_matches[0]
+
+        # find matches for numbers and booleans
         matches = regex.findall(line)
 
-        # print the matches
         for match in matches:
             # extract the values from the match, including scientific notation
             if (input_param == 'RADEA'):
                 values = re.findall(r"[+\-]?[^A-Za-z]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)", match)
-                # values = re.findall(r'=\s*([-+]?\d+(?:\.\d+)?(?:[Ee][-+]?\d+)?)', match)
             else:
                 values = re.findall(r"[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?", match)
 
@@ -148,13 +156,16 @@ def get_input_data(path, runname, input_file, input_param):
             elif len(values) == 1:
                 values = [float(i) for i in values]
 
-                # if there is only one number, print it
+                # if there is only one number, return it
                 return values[0]
             else:
                 values = [float(i) for i in values]
 
-                # if there are multiple values, print the list
+                # if there are multiple values, return the list
                 return values
+
+    return None
+
 
 
 def read_planet_and_star_params(planet_name, column_name_str):

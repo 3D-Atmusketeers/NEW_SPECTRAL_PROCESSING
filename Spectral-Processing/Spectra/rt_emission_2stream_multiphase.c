@@ -4,6 +4,8 @@
 #include <math.h>
 #include <stdlib.h>
 
+//#include <omp.h>
+
 #include "input.h"
 #include "opac.h"
 #include "atmos.h"
@@ -33,8 +35,10 @@ void Angles3d(double ds[], double theta[], double dtheta[], double lat);
 double Radius(double R_pl, double ds[]);
 double lint(double xa, double ya, double xb, double yb, double x);
 
+int num_tau_layers;
+
 // C HARADA -- update for 2stream //
-void two_stream(int NLAYER, int kmin, double *w0_array, double *g0_array, \
+void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, double *g0_array, \
                   const double *temperature_array, const double *tau_array, \
                   double NU, double NU_BIN, double incident_frac, double *dtau_array, double intensity_vals[]);
 
@@ -102,8 +106,9 @@ int RT_Emit_3D(double PHASE)
     FILE *file;
     FILE *finished_output_file;
     FILE *emission_map_file;
+    //FILE *testing_file;
     double solid;
-    double average, tau_sum, num_points;
+    double tau_sum, num_points;
     double u_vel, v_vel, w_vel, v_los, delta_lam, omega;
     double weight_1, weight_2, weight_3, weight_4, weight_5, weight_6, weight_7;
     double weight_8, weight_9, weight_10, weight_11, weight_12, weight_13, weight_haze;
@@ -118,6 +123,7 @@ int RT_Emit_3D(double PHASE)
     int pressure_index_hazes,  wavelength_index_hazes;
     double incident_frac;
     double ***pi0_tot, ***asym_tot;
+    double ***v_los_3D;
 
     FILE *input_file1;
     input_file1 = fopen("SCATTERING_DATA/pressure_array_for_cloud_scattering_data_in_pascals.txt", "r");
@@ -221,7 +227,6 @@ int RT_Emit_3D(double PHASE)
     static double haze_wav_gg[100][500];
     static double haze_wav_pi0[100][500];
     static double haze_wav_tau[100][500];
-
 
     // THIS IS A BAD HACK
     // In this case the tau values are all 0s, but it could be way better
@@ -553,9 +558,28 @@ int RT_Emit_3D(double PHASE)
     emission_map_file = fopen(OUTPUT_FILE_MAP, "w");
 
 
-
-
     /*Allocate memory*/
+    v_los_3D = malloc(NLAT * sizeof(double**));
+    if (!v_los_3D) {
+        // handle memory allocation failure
+        exit(1);
+    }
+
+    for (int l = 0; l < NLAT; l++) {
+        v_los_3D[l] = malloc(NLON * sizeof(double*));
+        if (!v_los_3D[l]) {
+            // handle memory allocation failure
+            exit(1);
+        }
+        for (int m = 0; m < NLON; m++) {
+            v_los_3D[l][m] = malloc(NTAU * sizeof(double));
+            if (!v_los_3D[l][m]) {
+                // handle memory allocation failure
+                exit(1);
+            }
+        }
+    }
+
     tau_em = malloc(NLAT*sizeof(double));
     for(l=0; l<NLAT; l++)
     {
@@ -1175,6 +1199,22 @@ int RT_Emit_3D(double PHASE)
         }
     }
     printf("solid %f\n", solid);
+    /*
+    #pragma omp parallel for num_threads(4) private(i, j, kmin, l, m, intensity_vals, tau_sum, tau_index, incident_frac, \
+                                    wavelength_microns, wavelength_index_clouds, wavelength_index_hazes, \
+                                    pressure_index_clouds, pressure_index_hazes, temperature, pressure, \
+                                    kappa_nu, delta_pressure_bar, aero_kappa_pre_qext_interp_1, aero_kappa_pre_qext_interp_2, \
+                                    aero_kappa_pre_qext_interp_3, aero_kappa_pre_qext_interp_4, aero_kappa_pre_qext_interp_5, \
+                                    aero_kappa_pre_qext_interp_6, aero_kappa_pre_qext_interp_7, aero_kappa_pre_qext_interp_8, \
+                                    aero_kappa_pre_qext_interp_9, aero_kappa_pre_qext_interp_10, aero_kappa_pre_qext_interp_11, \
+                                    aero_kappa_pre_qext_interp_12, aero_kappa_pre_qext_interp_13, \
+                                    aero_kappa_pre_tau_haze_interp, aero_kappa_1, aero_kappa_2, aero_kappa_3, aero_kappa_4, aero_kappa_5, \
+                                    aero_kappa_6, aero_kappa_7, aero_kappa_8, aero_kappa_9, aero_kappa_10, aero_kappa_11, aero_kappa_12, \
+                                    aero_kappa_13, aero_kappa_haze, total_cloud_and_haze_kappa, \
+                                    weight_1, weight_2, weight_3, weight_4, weight_5, weight_6, weight_7, \
+                                    weight_8, weight_9, weight_10, weight_11, weight_12, weight_13, weight_haze, \
+                                    u_vel, v_vel, w_vel, v_los, delta_lam, o, c, g, h, ii)
+    */
     for(i=0; i<NLAMBDA; i++)
     {
         // Get the points on the wavelength grids
@@ -1221,7 +1261,6 @@ int RT_Emit_3D(double PHASE)
                         }
 
                         if(atmos.T_3d[o][c][j] < 201.0 || atmos.T_3d[o][c+1][j] < 201.0 || atmos.T_3d[o+1][c][j] < 201.0 || atmos.T_3d[o+1][c+1][j] < 201.0)
-                        //if(atmos.T_3d[o][c][j] < 201.0 || atmos.T_3d[o][c+1][j] < 201.0)
                         {
                             temperature = 0.0;
                         }
@@ -1241,6 +1280,7 @@ int RT_Emit_3D(double PHASE)
                             v_vel = lint2D(atmos.lon[c], atmos.lon[c+1], atmos.lat[o], atmos.lat[o+1], atmos.vel_ns[o][c][j], atmos.vel_ns[o][c+1][j], atmos.vel_ns[o+1][c][j], atmos.vel_ns[o+1][c+1][j], phi_lon_solid[l][m][j]-PHASE, theta_lat_solid[l][m][j]);
                             w_vel = lint2D(atmos.lon[c], atmos.lon[c+1], atmos.lat[o], atmos.lat[o+1], atmos.vel_ve[o][c][j], atmos.vel_ve[o][c+1][j], atmos.vel_ve[o+1][c][j], atmos.vel_ve[o+1][c+1][j], phi_lon_solid[l][m][j]-PHASE, theta_lat_solid[l][m][j]);
                             v_los = u_vel*sin(phi_lon_solid[l][m][j]*PI/180.0) + v_vel*cos(phi_lon_solid[l][m][j]*PI/180.0)*sin(theta_lat_solid[l][m][j]*PI/180.0) - w_vel*cos(phi_lon_solid[l][m][j]*PI/180.0)*cos(theta_lat_solid[l][m][j]*PI/180.0) + cos(INPUT_INCLINATION)*omega*(R_PLANET + atmos.alt[j])*sin(phi_lon_solid[l][m][j]*PI/180.0)*cos(theta_lat_solid[l][m][j]*PI/180.0) + R_VEL*cos((90.0-PHASE)*PI/180.0); /*Everything*/
+                            v_los_3D[l][m][j] = v_los;
 
                             delta_lam = atmos.lambda[i]*v_los/CLIGHT;
                             Locate(NLAMBDA, atmos.lambda, atmos.lambda[i]+delta_lam, &ii);
@@ -1263,6 +1303,7 @@ int RT_Emit_3D(double PHASE)
                                                   opac.kappa[ii+1][h+1][g],
                                                   opac.kappa[ii+1][h+1][g+1],
                                                   temperature, pressure, atmos.lambda[i]+delta_lam);
+
                             }
                         }
 
@@ -1273,6 +1314,7 @@ int RT_Emit_3D(double PHASE)
                             v_vel = lint2D(atmos.lon[c], atmos.lon[c+1], atmos.lat[o], atmos.lat[o+1], atmos.vel_ns[o][c][j], atmos.vel_ns[o][c+1][j], atmos.vel_ns[o+1][c][j], atmos.vel_ns[o+1][c+1][j], phi_lon_solid[l][m][j]-PHASE, theta_lat_solid[l][m][j]);
                             w_vel = lint2D(atmos.lon[c], atmos.lon[c+1], atmos.lat[o], atmos.lat[o+1], atmos.vel_ve[o][c][j], atmos.vel_ve[o][c+1][j], atmos.vel_ve[o+1][c][j], atmos.vel_ve[o+1][c+1][j], phi_lon_solid[l][m][j]-PHASE, theta_lat_solid[l][m][j]);
                             v_los = u_vel*sin(phi_lon_solid[l][m][j]*PI/180.0) + v_vel*cos(phi_lon_solid[l][m][j]*PI/180.0)*sin(theta_lat_solid[l][m][j]*PI/180.0) - w_vel*cos(phi_lon_solid[l][m][j]*PI/180.0)*cos(theta_lat_solid[l][m][j]*PI/180.0) + R_VEL*cos((90.0-PHASE)*PI/180.0);
+                            v_los_3D[l][m][j] = v_los;
 
                             delta_lam = atmos.lambda[i]*v_los/CLIGHT;
                             Locate(NLAMBDA, atmos.lambda, atmos.lambda[i]+delta_lam, &ii);
@@ -1298,11 +1340,13 @@ int RT_Emit_3D(double PHASE)
                         }
 
                         /* Rotation Only */
-                        else if(DOPPLER==3){
+                        else if(DOPPLER==3)
+                        {
                             u_vel = lint2D(atmos.lon[c], atmos.lon[c+1], atmos.lat[o], atmos.lat[o+1], atmos.vel_ew[o][c][j], atmos.vel_ew[o][c+1][j], atmos.vel_ew[o+1][c][j], atmos.vel_ew[o+1][c+1][j], phi_lon_solid[l][m][j]-PHASE, theta_lat_solid[l][m][j]);
                             v_vel = lint2D(atmos.lon[c], atmos.lon[c+1], atmos.lat[o], atmos.lat[o+1], atmos.vel_ns[o][c][j], atmos.vel_ns[o][c+1][j], atmos.vel_ns[o+1][c][j], atmos.vel_ns[o+1][c+1][j], phi_lon_solid[l][m][j]-PHASE, theta_lat_solid[l][m][j]);
                             w_vel = lint2D(atmos.lon[c], atmos.lon[c+1], atmos.lat[o], atmos.lat[o+1], atmos.vel_ve[o][c][j], atmos.vel_ve[o][c+1][j], atmos.vel_ve[o+1][c][j], atmos.vel_ve[o+1][c+1][j], phi_lon_solid[l][m][j]-PHASE, theta_lat_solid[l][m][j]);
                             v_los = (cos(INPUT_INCLINATION)*(omega*(R_PLANET + atmos.alt[j])*sin(phi_lon_solid[l][m][j]*PI/180.0)*cos(theta_lat_solid[l][m][j]*PI/180.0) + R_VEL*cos((90.0-PHASE)*PI/180.0)));
+                            v_los_3D[l][m][j] = v_los;
 
                             delta_lam = atmos.lambda[i]*v_los/CLIGHT;
                             Locate(NLAMBDA, atmos.lambda, atmos.lambda[i]+delta_lam, &ii);
@@ -1330,6 +1374,13 @@ int RT_Emit_3D(double PHASE)
                         /* No Doppler Effects at all */
                         else
                         {
+                            // All the doppler effects
+                            u_vel = lint2D(atmos.lon[c], atmos.lon[c+1], atmos.lat[o], atmos.lat[o+1], atmos.vel_ew[o][c][j], atmos.vel_ew[o][c+1][j], atmos.vel_ew[o+1][c][j], atmos.vel_ew[o+1][c+1][j], phi_lon_solid[l][m][j]-PHASE, theta_lat_solid[l][m][j]);
+                            v_vel = lint2D(atmos.lon[c], atmos.lon[c+1], atmos.lat[o], atmos.lat[o+1], atmos.vel_ns[o][c][j], atmos.vel_ns[o][c+1][j], atmos.vel_ns[o+1][c][j], atmos.vel_ns[o+1][c+1][j], phi_lon_solid[l][m][j]-PHASE, theta_lat_solid[l][m][j]);
+                            w_vel = lint2D(atmos.lon[c], atmos.lon[c+1], atmos.lat[o], atmos.lat[o+1], atmos.vel_ve[o][c][j], atmos.vel_ve[o][c+1][j], atmos.vel_ve[o+1][c][j], atmos.vel_ve[o+1][c+1][j], phi_lon_solid[l][m][j]-PHASE, theta_lat_solid[l][m][j]);
+                            v_los = u_vel*sin(phi_lon_solid[l][m][j]*PI/180.0) + v_vel*cos(phi_lon_solid[l][m][j]*PI/180.0)*sin(theta_lat_solid[l][m][j]*PI/180.0) - w_vel*cos(phi_lon_solid[l][m][j]*PI/180.0)*cos(theta_lat_solid[l][m][j]*PI/180.0) + cos(INPUT_INCLINATION)*omega*(R_PLANET + atmos.alt[j])*sin(phi_lon_solid[l][m][j]*PI/180.0)*cos(theta_lat_solid[l][m][j]*PI/180.0) + R_VEL*cos((90.0-PHASE)*PI/180.0); /*Everything*/
+                            v_los_3D[l][m][j] = v_los;
+
                             if(temperature < 201.0 || pressure < 1e-5)
                             {
                                 kappa_nu = 0.0;
@@ -1494,7 +1545,6 @@ int RT_Emit_3D(double PHASE)
 
         
         //Calculate the intensity of emergent rays at each latitude and longitude
-        average = 0.0;
         for(l=0; l<NLAT; l++)
         {
             for(m=0; m<NLON; m++)
@@ -1527,7 +1577,9 @@ int RT_Emit_3D(double PHASE)
                         atmos.incident_frac[l][m][NTAU-10] = 0;
                     }
 
-                    two_stream(NTAU, kmin, pi0_tot[l][m], \
+                    num_tau_layers = NTAU;
+
+                    two_stream(num_tau_layers, NTAU - kmin - 1, kmin + 1, pi0_tot[l][m], \
                                asym_tot[l][m], temperature_3d[l][m], tau_em[l][m], \
                                CLIGHT / atmos.lambda[i], \
                                CLIGHT / atmos.lambda[i] - CLIGHT / atmos.lambda[i+1], \
@@ -1537,12 +1589,11 @@ int RT_Emit_3D(double PHASE)
                     intensity[l][m] = intensity_vals[0] + intensity_vals[1];
                     reflected_intensity[l][m] = intensity_vals[1];
 
-
                     //if (l == 36 && m == 24)
                     //{
-                    //    for (j = 0; j<NTAU; j++)
+                    //    for (j = kmin; j<NTAU; j++)
                     //    {
-                    //        printf("%d %.3e %.3e %.3e %.3e\n", j, temperature_3d[l][m][j], pressure_array[l][m][j], tau_em[l][m][j], dtau_em[l][m][j]);
+                    //        printf("%d %d %.3e %.3e %.3e %.3e\n", j, kmin, temperature_3d[l][m][j], pressure_array[l][m][j], tau_em[l][m][j], dtau_em[l][m][j]);
                     //    }
                     //    printf("\n\n");
                     //}
@@ -1554,7 +1605,7 @@ int RT_Emit_3D(double PHASE)
                         reflected_intensity[l][m] = 0.0;
                     }
 
-                    if (i % 1000 == 1)
+                    if (i % 2000 == 0)
                     {
                         tau_sum = 0.0;
                         j = kmin;
@@ -1566,13 +1617,19 @@ int RT_Emit_3D(double PHASE)
                             j = j + 1;
                         }
                         tau_index = j;
-                        fprintf(emission_map_file, "%d %le %le %le %le\n", tau_index, atmos.lambda[i], atmos.lon[m], atmos.lat[l], pressure_array[l][m][tau_index]);
+                        fprintf(emission_map_file, "%d %le %le %le %le %le %le\n", tau_index,
+                                                                           atmos.lambda[i],
+                                                                           atmos.lon[m],
+                                                                           atmos.lat[l],
+                                                                           pressure_array[l][m][tau_index],
+                                                                           temperature_3d[l][m][tau_index],
+                                                                           v_los_3D[l][m][tau_index]);
                     }
 
                 }
             }
         }
-        
+
 
 
         /*
@@ -1597,13 +1654,15 @@ int RT_Emit_3D(double PHASE)
                     for(j=0; j<NTAU; j++)
                     {
                         intensity[l][m] += Planck(temperature_3d[l][m][j], atmos.lambda[i]) * exp(-tau_em[l][m][j]) * dtau_em[l][m][j];
-                        //printf("\'OLD\', %d, %le, %le, %le, \n", j, temperature_3d[l][m][j], tau_em[l][m][j],  intensity[l][m]);
+                        //intensity[l][m] += Planck(1000, atmos.lambda[i]) * exp(-tau_em[l][m][j]) * dtau_em[l][m][j];
+                        printf("\'OLD\', %d, %le, %le, %le, %le\n", j, temperature_3d[l][m][j], tau_em[l][m][j],  intensity[l][m], intensity_vals[0]);
                     }
+
+                    exit(0);
                 }
             }
         }
         */
-        
 
         /*Calculate the total flux received by us*/
         flux_pl[i] = 0.0;

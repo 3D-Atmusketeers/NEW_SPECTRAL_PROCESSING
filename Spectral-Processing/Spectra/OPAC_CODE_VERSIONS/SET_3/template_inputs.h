@@ -44,53 +44,14 @@ Defines input values and files for 3-D emission spectra
 #define P_ROT  <<P_ROT>>                        /* Rotation period in days (= P_ORB for tidally locked planet)    */
 #define HAZE_TYPE <<HAZE_TYPE>>
 #define HAZES <<HAZES>>
-
 #define R_VEL 0.0                          /* Radial Velocity                        */
 #define MU <<MEAN_MOLECULAR_WEIGHT>>          /* Mean molecular weight                  */
 #define FORMAT 2                           /* FORMAT=1 -> small opacity table        */
                                            /* FORMAT=2 -> large opacity table        */
 
-/* Aerosol properties (calculated by the Mischenko Mie code) */
+#define ABUND_TRACK_IND 2 /* if test visualize, the index of the mapped species in the EOS file */
+#define CHEM_FILE_NCOLS 17
 
-#define PI0_KCl 0.74
-#define G0_KCl 0.15
-#define QE_KCl 0.12
-#define PI0_ZnS 0.74
-#define G0_ZnS 0.15
-#define QE_ZnS 0.12
-#define PI0_Na2S 0.74
-#define G0_Na2S 0.15
-#define QE_Na2S 0.12
-#define PI0_MnS 0.74
-#define G0_MnS 0.15
-#define QE_MnS 0.12
-#define PI0_Cr 0.74
-#define G0_Cr 0.15
-#define QE_Cr 0.12
-#define PI0_SiO2 0.74
-#define G0_SiO2 0.15
-#define QE_SiO2 0.12
-#define PI0_Mg2SiO4 0.74
-#define G0_Mg2SiO4 0.15
-#define QE_Mg2SiO4 0.12
-#define PI0_VO 0.74
-#define G0_VO 0.15
-#define QE_VO 0.12
-#define PI0_Ni 0.74
-#define G0_Ni 0.15
-#define QE_Ni 0.12
-#define PI0_Fe 0.74
-#define G0_Fe 0.15
-#define QE_Fe 0.12
-#define PI0_CaSiO4 0.74
-#define G0_CaSiO4 0.15
-#define QE_CaSiO4 0.12
-#define PI0_CaTiO3 0.74
-#define G0_CaTiO3 0.15
-#define QE_CaTiO3 0.15
-#define PI0_Al2O3 0.74
-#define G0_Al2O3 0.15
-#define QE_Al2O3 0.12
 
 /* Opacities for spectra */
 #define CHEM_FILE   <<CHEMISTRY_FILE>>

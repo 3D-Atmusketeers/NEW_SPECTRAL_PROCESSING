@@ -21,7 +21,7 @@ struct Opac {
 
 struct Chem {
   double **total,
-                  **E,
+                  **el,
                   **H,
                   **H2,
                   **He,

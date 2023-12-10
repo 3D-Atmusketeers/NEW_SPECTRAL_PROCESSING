@@ -2,5 +2,7 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Spectral-Processing/GCM-OUTPUT/GJ1214b-none-0clouds-1met" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Spectral-Processing/GCM-OUTPUT/GJ1214b-soot-50clouds-100met" vcs="Git" />
   </component>
 </project>

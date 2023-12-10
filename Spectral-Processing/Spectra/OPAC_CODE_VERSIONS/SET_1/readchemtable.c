@@ -54,9 +54,9 @@ void ReadChemTable()
   for(i=0; i<NPRESSURE; i++)
     chem.total[i] = malloc(NTEMP*sizeof(double));
 
-  chem.E = malloc(NPRESSURE*sizeof(double));
+  chem.el = malloc(NPRESSURE*sizeof(double));
   for(i=0; i<NPRESSURE; i++)
-    chem.E[i] = malloc(NTEMP*sizeof(double));
+    chem.el[i] = malloc(NTEMP*sizeof(double));
 
   chem.H = malloc(NPRESSURE*sizeof(double));
   for(i=0; i<NPRESSURE; i++)
@@ -126,8 +126,6 @@ void ReadChemTable()
   for(i=0; i<NPRESSURE; i++)
     chem.FeH[i] = malloc(NTEMP*sizeof(double));
 
-
-
   chem.Ar = malloc(NPRESSURE*sizeof(double));
   for(i=0; i<NPRESSURE; i++)
     chem.Ar[i] = malloc(NTEMP*sizeof(double));
@@ -155,7 +153,7 @@ void ReadChemTable()
   for (i=0; i<CHEM_FILE_NCOLS; i++) {
     fscanf(f1,"%s", dum);
   }
-
+  //e- H H2 He C2H2 C1H4 C1O1 C1O2 H2O1 H2S1 C1H1N1_1 K Na H3N1 H3P1 O1Ti1 O1V1 Fe1H1 Ar N2 O2
   for (i=NPRESSURE-1; i>=0; i--)
     {
     fscanf(f1,"%le", &chem.P[i]);
@@ -164,7 +162,7 @@ void ReadChemTable()
       fscanf(f1,"%le", &chem.T[j]);
       k = 1;
       k = ReadChemLine(f1, i, j, k, chem.total);
-      k = ReadChemLine(f1, i, j, k, chem.E);
+      k = ReadChemLine(f1, i, j, k, chem.el);
       k = ReadChemLine(f1, i, j, k, chem.H);
       k = ReadChemLine(f1, i, j, k, chem.H2);
       k = ReadChemLine(f1, i, j, k, chem.He);
@@ -208,7 +206,7 @@ void FreeChemTable()
   free(chem.P);
   free(chem.T);
   free(chem.total);
-  free(chem.E);
+  free(chem.el);
   free(chem.H);
   free(chem.H2);
   free(chem.He);
