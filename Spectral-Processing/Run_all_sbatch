@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ####  Job name
-#SBATCH --job-name=job_manager
+#SBATCH --job-name=manager
 
 ####  Request resources here
 ####  These are typically, number of processors, amount of memory,
@@ -21,7 +21,7 @@
 
 ####  Your e-mail address and when you want e-mail
 
-#SBATCH --mail-user=
+####SBATCH --mail-user=
 #SBATCH --mail-type=BEGIN,END,FAIL
 
 module load gcc/10.3.0
