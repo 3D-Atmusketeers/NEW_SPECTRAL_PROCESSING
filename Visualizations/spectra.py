@@ -761,7 +761,6 @@ def plot_fp_fs_phase_curves(planet_names, planet_name_char_len, planet_radii, nu
                 linewidth=2,
                 label=planet_name)
 
-    # Figure legend stuff
     ax.set_xlim(min(phases), max(phases))
     ax.legend(fontsize=11, loc=(0, 1.03), ncol=3, mode='expand')
     ax.set_xlabel('Orbital Phase')
@@ -953,7 +952,7 @@ def plot_fp_fs_spectra(planet_names, planet_radii, num_phases, transmission_filt
         # Figure legend
         ax.set_ylim(1, 1399)
         ax.minorticks_on()  # This enables minor ticks
-        ax.set_xlim(min(planet_spectra.wavelength * 1e6), max(planet_spectra.wavelength * 1e6))
+        ax.set_xlim(1, max(planet_spectra.wavelength * 1e6))
         ax.legend(fontsize=12, loc=(0, 1.03), ncol=5, mode='expand', title='Orbital Phase', title_fontsize=18)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
         ax.set_ylabel(r'F$_p$/F$_s$ (ppm)')  # (W m$^{-2}$)
@@ -1034,7 +1033,7 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
                          ).to_csv('OUTPUT_DATA/Fp_Spectra_{}_{}.txt'.format(str(i * rot_val), planet_name), sep=' ')
 
 
-
+        """
         df = pd.read_excel('/home/imalsky/Desktop/41586_2023_6159_MOESM2_ESM.xlsx',
                            skiprows=3,
                            names=["Wavelength","Fp_day","Up 1-sigma","Low 1-sigma","Fp_night","Up 1-sigma","Low 1-sigma"])
@@ -1043,7 +1042,7 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
              fmt='o-', label='Fp_day', capsize=2, linewidth=2)
         ax.errorbar(df['Wavelength'], df['Fp_night'], yerr=[df['Low 1-sigma.1'], df['Up 1-sigma.1']],
              fmt='o-', label='Fp_night', capsize=2, linewidth=2)
-
+        """
         ax.set_xlim(5, 12)
         ax.set_ylim(1, 1399)
         ax.minorticks_on()  # This enables minor ticks

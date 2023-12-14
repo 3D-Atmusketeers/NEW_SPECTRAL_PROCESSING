@@ -162,10 +162,14 @@ void ReadChemTable()
 
   printf("Read in chemtable\n");
   fclose(f1);
-  printf("Chemistry: \nP_0\t%e \nT_0\t%e \ntotal00 \t%e \nC\t%e \nCH4\t%e \nCO\t%e \n",
-	 chem.P[0], chem.T[0], chem.total[0][0], chem.C[0][0], chem.CH4[0][0], chem.CO[0][0]);
+  printf("Chemistry: P: %.3e, T: %.3e, total: %.3e, C: %.3e, CH4: %.3e, "
+       "CO: %.3e, CO2: %.3e, H: %.3e, H2: %.3e, H2O: %.3e, He: %.3e, "
+       "N: %.3e, N2: %.3e, NH3: %.3e, O: %.3e, O2: %.3e, O3: %.3e, el: %.3e\n",
+       chem.P[0], chem.T[0], chem.total[0][0], chem.C[0][0], chem.CH4[0][0],
+       chem.CO[0][0], chem.CO2[0][0], chem.H[0][0], chem.H2[0][0],
+       chem.H2O[0][0], chem.He[0][0], chem.N[0][0], chem.N2[0][0],
+       chem.NH3[0][0], chem.O[0][0], chem.O2[0][0], chem.O3[0][0], chem.el[0][0]);
   return;
-
 }
 /* ------- end -------------- ReadChemTable.c -------------------- */
 
@@ -177,18 +181,18 @@ void FreeChemTable()
   free(chem.P);
   free(chem.T);
   free(chem.total);
-  free(chem.H2);
-  free(chem.H);
-  free(chem.He);
-  free(chem.H2O);
+  free(chem.C);
   free(chem.CH4);
   free(chem.CO);
   free(chem.CO2);
-  free(chem.O);
-  free(chem.C);
+  free(chem.H);
+  free(chem.H2);
+  free(chem.H2O);
+  free(chem.He);
   free(chem.N);
-  free(chem.NH3);
   free(chem.N2);
+  free(chem.NH3);
+  free(chem.O);
   free(chem.O2);
   free(chem.O3);
   free(chem.el);

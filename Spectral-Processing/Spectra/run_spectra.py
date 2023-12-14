@@ -63,9 +63,14 @@ smoothing = True
 
 # These are the planet files that you neesd to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-none-0clouds-1met"]
+planet_names = ["GJ1214b-soot-50clouds-100met",
+                "GJ1214b-soot-50clouds-1met",
+                "GJ1214b-soot-0clouds-100met",
+                "GJ1214b-soot-0clouds-1met",
+                "GJ1214b-none-50clouds-100met",
+                "GJ1214b-none-50clouds-1met"]
 
-opacity_files = 'SET_3'
+opacity_files = 'SET_1'
 
 # Set the wavelength to evaluate the clouds at for plotting!
 # This could be put in a better place I think
@@ -108,7 +113,7 @@ for q in range(len(planet_names)):
     MOLEF          = grab_input_data.get_input_data(path, runname, "fort.7","MOLEF")
 
     HAZE_TYPE      = grab_input_data.get_input_data(path, runname, "fort.7","HAZETYPE")
-    if HAZE_TYPE == []:
+    if HAZE_TYPE == [] or HAZE_TYPE == None:
         HAZE_TYPE = 'None'
     HAZE_TYPE = HAZE_TYPE.lower()
 
@@ -352,9 +357,9 @@ for q in range(len(planet_names)):
     phase_strs = []
 
 
-    STEP_ONE = False
-    STEP_TWO = False
-    STEP_THREE = True
+    STEP_ONE = True
+    STEP_TWO = True
+    STEP_THREE = False
 
     if STEP_ONE:
         # Convert the fort files to the correct format

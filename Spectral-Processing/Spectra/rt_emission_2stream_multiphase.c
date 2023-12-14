@@ -4,8 +4,6 @@
 #include <math.h>
 #include <stdlib.h>
 
-//#include <omp.h>
-
 #include "input.h"
 #include "opac.h"
 #include "atmos.h"
@@ -1199,22 +1197,7 @@ int RT_Emit_3D(double PHASE)
         }
     }
     printf("solid %f\n", solid);
-    /*
-    #pragma omp parallel for num_threads(4) private(i, j, kmin, l, m, intensity_vals, tau_sum, tau_index, incident_frac, \
-                                    wavelength_microns, wavelength_index_clouds, wavelength_index_hazes, \
-                                    pressure_index_clouds, pressure_index_hazes, temperature, pressure, \
-                                    kappa_nu, delta_pressure_bar, aero_kappa_pre_qext_interp_1, aero_kappa_pre_qext_interp_2, \
-                                    aero_kappa_pre_qext_interp_3, aero_kappa_pre_qext_interp_4, aero_kappa_pre_qext_interp_5, \
-                                    aero_kappa_pre_qext_interp_6, aero_kappa_pre_qext_interp_7, aero_kappa_pre_qext_interp_8, \
-                                    aero_kappa_pre_qext_interp_9, aero_kappa_pre_qext_interp_10, aero_kappa_pre_qext_interp_11, \
-                                    aero_kappa_pre_qext_interp_12, aero_kappa_pre_qext_interp_13, \
-                                    aero_kappa_pre_tau_haze_interp, aero_kappa_1, aero_kappa_2, aero_kappa_3, aero_kappa_4, aero_kappa_5, \
-                                    aero_kappa_6, aero_kappa_7, aero_kappa_8, aero_kappa_9, aero_kappa_10, aero_kappa_11, aero_kappa_12, \
-                                    aero_kappa_13, aero_kappa_haze, total_cloud_and_haze_kappa, \
-                                    weight_1, weight_2, weight_3, weight_4, weight_5, weight_6, weight_7, \
-                                    weight_8, weight_9, weight_10, weight_11, weight_12, weight_13, weight_haze, \
-                                    u_vel, v_vel, w_vel, v_los, delta_lam, o, c, g, h, ii)
-    */
+
     for(i=0; i<NLAMBDA; i++)
     {
         // Get the points on the wavelength grids
@@ -1243,7 +1226,7 @@ int RT_Emit_3D(double PHASE)
                     {
                         Locate(NLAT, atmos.lat, theta_lat_solid[l][m][j], &o);
                         Locate(NLON, atmos.lon, phi_lon_solid[l][m][j]-PHASE, &c);
-                        
+
                         if(atmos.P_3d[o][c][j] < 1e-10 || atmos.P_3d[o][c+1][j] < 1e-10 || atmos.P_3d[o+1][c][j] < 1e-10 || atmos.P_3d[o+1][c+1][j] < 1e-10)
                         {
                             pressure = 0;
@@ -1252,7 +1235,7 @@ int RT_Emit_3D(double PHASE)
                         {
                             pressure = lint2D(atmos.lon[c], atmos.lon[c+1], atmos.lat[o], atmos.lat[o+1], atmos.P_3d[o][c][j], atmos.P_3d[o][c+1][j], atmos.P_3d[o+1][c][j], atmos.P_3d[o+1][c+1][j], phi_lon_solid[l][m][j]-PHASE, theta_lat_solid[l][m][j]);
                         }
-                        
+
                         //The pressure breaks this if it's too high
                         if (pressure > 9.99e9)
                         {
@@ -1529,7 +1512,7 @@ int RT_Emit_3D(double PHASE)
                 if(atmos.lon[m]>=90.0-PHASE && atmos.lon[m]<=270.0-PHASE)
                 {
                     for(j=0; j<NTAU; j++)
-                    {   
+                    {
                         if(j==0)
                         {
                             tau_em[l][m][j]=dtau_em[l][m][j];
@@ -1543,7 +1526,7 @@ int RT_Emit_3D(double PHASE)
             }
         }
 
-        
+
         //Calculate the intensity of emergent rays at each latitude and longitude
         for(l=0; l<NLAT; l++)
         {
@@ -1629,8 +1612,6 @@ int RT_Emit_3D(double PHASE)
                 }
             }
         }
-
-
 
         /*
         // ~~~ THIS IS THE OLD RT ROUTINE ~~~ //

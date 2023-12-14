@@ -14,6 +14,7 @@ from scipy.interpolate import interp1d
 import math
 import matplotlib.pylab as pl
 import grab_input_data
+from matplotlib.ticker import MultipleLocator
 
 
 #print ("Plotting the pressure temperature condensation curves...")
@@ -44,9 +45,6 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
         if any(i < 1e-20 for i in molef):
             nucleation_lim = True
 
-        if (AERLAYERS == 0):
-            clouds = False
-
         df = pd.read_csv(base + planet_name + '.txt', names=column_names, delim_whitespace=True)
         df.lon = df.lon.mask(df.lon >= 180.0, df.lon - 360.0)
         max_temp = math.ceil(df['temp'].max() / 100) * 100
@@ -58,12 +56,12 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
         # plot all TP-profiles (expensive)
         for i in range(nlat):
             for j in range(nlon):
-                axes.semilogy(data[i][j][:, 5], data[i][j][:, 4], alpha=0.2, color='gray', linewidth=0.2)
+                axes.semilogy(data[i][j][:, 5], data[i][j][:, 4], alpha=1.0, color='gray', linewidth=1)
 
         # colormap
         cm_name = 'bamO'
         cm_file = np.loadtxt(f'ScientificColourMaps8/{cm_name}/{cm_name}.txt')
-        cm_file = np.roll(cm_file, 140, axis=0)
+        cm_file = np.roll(cm_file, int(len(cm_file) / 2), axis=0)
         my_colors = mcolors.LinearSegmentedColormap.from_list(cm_name, cm_file)
 
         colors = np.linspace(0, 1, nlon)
@@ -73,7 +71,7 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
         # plot colored equatorial TP-profiles
         for i in range(96):
             axes.semilogy(data[24][i][:, 5], data[24][i][:, 4],
-                          '-', lw=1.8, alpha=0.75, color=my_colors(colors[color_idx]))
+                          '-', lw=2.0, alpha=1.0, color=my_colors(colors[color_idx]))
 
             color_idx += 1
             if (color_idx > 95):
@@ -162,7 +160,6 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
             
             press_con = [1e-05, 1.39e-05, 1.93e-05, 2.68e-05, 3.73e-05, 5.18e-05, 7.2e-05, 0.0001, 0.0001389, 0.0001931, 0.0002683, 0.0003728, 0.0005179, 0.0007197, 0.001, 0.0013895, 0.0019307, 0.0026827, 0.0037276, 0.0051795, 0.0071969, 0.01, 0.013895, 0.019307, 0.026827, 0.0372759, 0.0517947, 0.0719686, 0.1, 0.1389495, 0.1930698, 0.2682696, 0.3727594, 0.5179475, 0.7196857, 1.0, 1.3894955, 1.9306977, 2.6826958, 3.7275937, 5.1794747, 7.1968567, 10.0, 13.8949549, 19.3069773, 26.826958, 37.2759372, 51.7947468, 71.9685673, 100.0]
 
-            
             # KCl, cr, sio2, Mg$_2$SiO$_4$, VO, Ni, Ca$_2$SiO$_4$, CaTiO$_3$, Al$_2$O$_3$
             new_pressures = np.logspace(-5, 2, 200)
     
@@ -188,14 +185,14 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
             #          '#f032e6', '#bfef45', '#fabed4', '#469990', '#dcbeff', '#9A6324', '#fffac8',
             #          '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#a9a9a9', '#ffffff']
 
-            axes.semilogy(f_kcl(new_pressures), new_pressures, lw=2, label='KCl', color=cloud_colors[0])
-            axes.semilogy(f_cr(new_pressures), new_pressures, lw=2, label='Cr', color=cloud_colors[1])
-            axes.semilogy(f_sio2(new_pressures), new_pressures, lw=2, label=r'SiO$_2$', color=cloud_colors[2])
-            axes.semilogy(f_mg2sio4(new_pressures), new_pressures, lw=2, label=r'Mg$_2$SiO$_4$', color=cloud_colors[3])
-            axes.semilogy(f_vo(new_pressures), new_pressures, lw=2, label='VO', color=cloud_colors[4])
-            axes.semilogy(f_ca2sio4(new_pressures), new_pressures, lw=2, label=r'Ca$_2$SiO$_4$', color=cloud_colors[5])
-            axes.semilogy(f_catio3(new_pressures), new_pressures, lw=2, label=r'CaTiO$_3$', color=cloud_colors[6])
-            axes.semilogy(f_al2o3(new_pressures), new_pressures, lw=2, label=r'Al$_2$O$_3$', color=cloud_colors[7])
+            axes.semilogy(f_kcl(new_pressures), new_pressures, lw=2, label='KCl', color='#03719c', linestyle='dotted')
+            #axes.semilogy(f_cr(new_pressures), new_pressures, lw=2, label='Cr', color=cloud_colors[1])
+            #axes.semilogy(f_sio2(new_pressures), new_pressures, lw=2, label=r'SiO$_2$', color=cloud_colors[2])
+            #axes.semilogy(f_mg2sio4(new_pressures), new_pressures, lw=2, label=r'Mg$_2$SiO$_4$', color=cloud_colors[3])
+            #axes.semilogy(f_vo(new_pressures), new_pressures, lw=2, label='VO', color=cloud_colors[4])
+            #axes.semilogy(f_ca2sio4(new_pressures), new_pressures, lw=2, label=r'Ca$_2$SiO$_4$', color=cloud_colors[5])
+            #axes.semilogy(f_catio3(new_pressures), new_pressures, lw=2, label=r'CaTiO$_3$', color=cloud_colors[6])
+            #axes.semilogy(f_al2o3(new_pressures), new_pressures, lw=2, label=r'Al$_2$O$_3$', color=cloud_colors[7])
 
             if not nucleation_lim:
                 axes.semilogy(f_fe(new_pressures), new_pressures, lw=2, label=r'Fe', color=cloud_colors[8])
@@ -206,13 +203,14 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
 
             axes.legend(fontsize=14, ncol=2, labelspacing=0.0, loc='lower left')
 
-        axes.set_ylim(0.99e2, 9.99999 ** (2 - num_orders_of_magnitude))
-        #axes.set_xlim([0, 1500])
+        axes.set_ylim(np.max(data[24][0][:, 4]), np.min(data[24][0][:, 4]))
+        axes.set_xlim([150, 1125])
 
         axes.xaxis.set_ticks_position('bottom')
         axes.xaxis.set_label_position('bottom')
 
-        #axes.xaxis.set_minor_locator(MultipleLocator(5))
+        axes.minorticks_on()  # This enables minor ticks
+
 
         # tp labels
         axes.set_ylabel('Pressure (bars)', fontsize=24)
@@ -228,4 +226,4 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
 
         print('Creating plot DONE')
 
-        fig.savefig('../Figures/PTC_Curves_{}.png'.format(planet_name), bbox_inches='tight', dpi=100)
+        fig.savefig('../Figures/PTC_Curves_{}.png'.format(planet_name), bbox_inches='tight', dpi=250)

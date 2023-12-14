@@ -9,10 +9,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from matplotlib import ticker
-
-#print ("Plotting the isobaric projections...")
-#print ()
-#print ()
+from matplotlib.ticker import AutoMinorLocator
 
 def plot_aerosol_coverage_isobars(
         planet_names,
@@ -155,28 +152,24 @@ def plot_aerosol_coverage_isobars(
 
         temp_map = axes.contourf(lons,
                                  lats, np.concatenate([temps, temps], axis=1), extend='both',
-                                 cmap=temperature_colors)
+                                 cmap=temperature_colors, levels=np.linspace(250, 750, 100))
         temp_cbar = fig.colorbar(
         temp_map,
         aspect=30,
         pad=0.015,
         orientation='horizontal')
+
+        print(np.amin(temps), np.amax(temps))
             
         temp_cbar.set_label('Temperature (K)', fontsize=26)
         
-        #if (pressure_lev_bar < 1e-3):
-        #    temp_cbar.set_ticks(np.arange(700, 1800, 100))
-        #elif 'hd189' in planet_name.lower():
-        #    temp_cbar.set_ticks(np.arange(600, 1600, 100))
-        #else:
-        #    temp_cbar.set_ticks(np.arange(1000, 1800, 100))
 
-        
+        temp_cbar.ax.xaxis.set_minor_locator(AutoMinorLocator(5))
         
         axes.streamplot(test_x, test_y,
                                np.concatenate([EW_vels, EW_vels], axis=1),
                                np.concatenate([NS_vels, NS_vels], axis=1),
-                               linewidth=1.2, density=([1, 1.5]), color='#d8dcd6', zorder=1)
+                               linewidth=1.2, density=([0.5, 0.5]), color='#d8dcd6', zorder=1)
 
         # format axes
         axes.set_xlim([-180, 180])
@@ -209,7 +202,8 @@ def plot_aerosol_coverage_isobars(
 
         plt.savefig('../Figures/Temperature_Isobars_{}_bar_{}.png'.format(
             P_phots[0], planet_name), bbox_inches='tight', dpi=250)
-        
+
+        """
         if any(i > 1e-20 for i in molef) or hazes:
             plt.clf()
             fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(12, 9))
@@ -251,11 +245,17 @@ def plot_aerosol_coverage_isobars(
             axes.patch.set_linewidth('2')
             axes.grid(color='w', alpha=0.5, ls=':')
 
-            cloud_cbar = fig.colorbar(cloud_map, aspect=30, pad=0.015, orientation='horizontal')
+            #cloud_cbar = fig.colorbar(cloud_map, aspect=30, pad=0.015, orientation='horizontal')
+            #tick_locator = ticker.MaxNLocator(nbins=6)
+            #cloud_cbar.locator = tick_locator
+            #cloud_cbar.update_ticks()
 
+
+            cloud_cbar = fig.colorbar(cloud_map, aspect=30, pad=0.015, orientation='horizontal')
             tick_locator = ticker.MaxNLocator(nbins=6)
             cloud_cbar.locator = tick_locator
             cloud_cbar.update_ticks()
+            cloud_cbar.ax.xaxis.set_minor_locator(AutoMinorLocator())
 
 
             if plot_hazes:
@@ -265,3 +265,4 @@ def plot_aerosol_coverage_isobars(
 
             plt.savefig('../Figures/Cloud_Coverage_Isobars_{}_bar_{}.png'.format(
                 P_phots[0], planet_name), bbox_inches='tight', dpi=250)
+        """

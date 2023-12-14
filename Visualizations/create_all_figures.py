@@ -38,26 +38,14 @@ planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/'
 
 
 planet_names = ["GJ1214b-none-0clouds-1met",
-                "GJ1214b-none-50clouds-1met",
-                "GJ1214b-none-0clouds-100met",
-                "GJ1214b-none-50clouds-100met",
-                "GJ1214b-soot-0clouds-1met",
+                "GJ1214b-soot-50clouds-100met",
                 "GJ1214b-soot-50clouds-1met",
                 "GJ1214b-soot-0clouds-100met",
-                "GJ1214b-soot-50clouds-100met"]
-planet_names = ["GJ1214b-none-0clouds-1met"]
+                "GJ1214b-soot-0clouds-1met",
+                "GJ1214b-none-50clouds-100met",
+                "GJ1214b-none-50clouds-1met"]
 
-#planet_names = ["GJ1214b-none-0clouds-1met",
-#                "GJ1214b-none-25clouds-1met",
-#                "GJ1214b-none-50clouds-1met",
-#                "GJ1214b-none-0clouds-30met",
-#                "GJ1214b-none-25clouds-30met",
-#                "GJ1214b-none-50clouds-30met",
-#                "GJ1214b-none-0clouds-100met",
-#                "GJ1214b-none-25clouds-100met",
-#                "GJ1214b-none-50clouds-100met"]
-
-#planet_names = ["GJ1214b-none-0clouds-100met", "GJ1214b-none-50clouds-100met", "GJ1214b-soot-0clouds-100met"]
+planet_names = ["GJ1214b-soot-50clouds-100met"]
 
 
 
@@ -131,7 +119,7 @@ else:
 # If the extra_pressure level is greater than 0, its plots it also
 # If it is 0, then it plots the IR photosphere pressure
 #aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes=False, extra_pressure_level_bar=0)
-#aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes = True, extra_pressure_level_bar = 1e-1)
+#aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes = True, extra_pressure_level_bar = 1e-3)
 #aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes = True, extra_pressure_level_bar = 1)
 
 
@@ -141,7 +129,7 @@ else:
 
 # Plot other planet characteristics
 #aerosol_maps.plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, cloud_wavelength)
-#aerosol_profiles.plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
+aerosol_profiles.plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
 #wind_maps.plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
 #wind_isobars.plot_wind_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes=False, extra_pressure_level_bar=0.01)
 
@@ -168,7 +156,7 @@ else:
 #spectra.plot_star_spectra_test(planet_names)
 #spectra.plot_spectra_simple(planet_names, num_phases=4)
 
-
+"""
 for filter_name in ['None']:
     if filter_name != 'None':
         print()
@@ -180,28 +168,30 @@ for filter_name in ['None']:
                             wav_subset=[5e-6, 12e-6],
                             resolution=100)
 
-    #spectra.plot_fp_fs_spectra(planet_names,
-    #                            planet_radii,
-    #                            num_phases=4,
-    #                            transmission_filter_name=filter_name,
-    #                            wav_subset=[0,100],
-    #                            resolution=100)
+    spectra.plot_fp_fs_spectra(planet_names,
+                                planet_radii,
+                                num_phases=4,
+                                transmission_filter_name=filter_name,
+                                wav_subset=[0,100],
+                                resolution=100)
     
-    #spectra.plot_fp_phase_curves(planet_names,
-    #                        planet_name_char_len,
-    #                        num_phases=24,
-    #                        transmission_filter_name=filter_name,
-    #                        wav_subset=[0, 100])
+    spectra.plot_fp_phase_curves(planet_names,
+                            planet_name_char_len,
+                            num_phases=24,
+                            transmission_filter_name=filter_name,
+                            wav_subset=[0, 100])
 
-    #spectra.plot_fp_fs_phase_curves(planet_names,
-    #                        planet_name_char_len,
-    #                        planet_radii,
-    #                        num_phases=24,
-    #                        transmission_filter_name=filter_name,
-    #                        wav_subset=[0, 100])
+    spectra.plot_fp_fs_phase_curves(planet_names,
+                            planet_name_char_len,
+                            planet_radii,
+                            num_phases=24,
+                            transmission_filter_name=filter_name,
+                            wav_subset=[0, 100])
+"""
 
 # Notes
 # if the transmission filter name is set to 'None', then it will plot the full spectrum
 # unless you specify a wavelength subset
 # the options for filters are MIRI, SPITZER_3_6, SPITZER_4_5
 # If resolution is set to 0, don't convolve at all
+

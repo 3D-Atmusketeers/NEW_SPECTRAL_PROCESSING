@@ -24,6 +24,7 @@ extern struct Atmos atmos;
 
 struct Chem chem;
 
+// The included opacity sources
 struct Opac opacCH4;
 struct Opac opacCO2;
 struct Opac opacCO;
@@ -31,8 +32,13 @@ struct Opac opacH2O;
 struct Opac opacNH3;
 struct Opac opacO2;
 struct Opac opacO3;
-struct Opac opacscat;
+
+// Collisional opacities
 struct Opac opacCIA;
+
+// The Rayleigh Scattering opacity
+struct Opac opacscat;
+
  
 /* --- Function prototypes --------------------------------------- */
 
@@ -57,25 +63,6 @@ void TotalOpac() {
   int i, j, k, a, b, dum;
   char filename[65];
 
-  double m_H2 = 2.0158;
-  double m_H = 1.0079;
-  double m_He = 4.002602;
-  double m_H2O = 18.0152;
-  double m_CH4 = 16.0423;
-  double m_CO = 28.010;
-  double m_CO2 = 44.010;
-  double m_O = 15.9994;
-  double m_C = 12.0107;
-  double m_N = 14.0067;
-  double m_NH3 = 17.031;
-  double m_N2 = 28.0134;
-  double m_Na = 22.988977;
-  double m_Naxx  = 39.997;
-  double m_K = 39.0983;
-  double m_Kxx = 56.1056;
-  double m_O2 = 31.9988;
-  double m_O3 = 47.9982;
-
   FILE *f1;
 
   /* Allocate Memory */
@@ -95,17 +82,7 @@ void TotalOpac() {
 
   for (j=0; j<NPRESSURE; j++) {
     for (k=0; k<NTEMP; k++) {
-
-      opac.mu[j][k] = chem.H2[j][k]* m_H2 + chem.H[j][k]* m_H 
-	+ chem.He[j][k] * m_He + chem.H2O[j][k] * m_H2O 
-	+ chem.C[j][k] * m_C + chem.CH4[j][k] * m_CH4 
-	+ chem.CO[j][k] * m_CO + chem.CO2[j][k] * m_CO2 
-	+ chem.O[j][k] * m_O + chem.N[j][k] * m_N 
-	+ chem.NH3[j][k] * m_NH3 + chem.N2[j][k] * m_N2 
-	+ chem.O2[j][k] * m_O2 + chem.O3[j][k] * m_O3;
-
       opac.mu[j][k] = MU;
-
     }
   }
 
