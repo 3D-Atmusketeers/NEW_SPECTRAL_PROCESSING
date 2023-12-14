@@ -20,8 +20,8 @@ struct Opac {
 /* --- Chemistry structure ------------------------------------------ */
 
 struct Chem {
-  double **total, **H2, **H, **He, **H2O, **CH4, **CO, **CO2, **O, **C, **N,
-    **NH3, **N2, **Na, **Naxx, **K, **Kxx, **O2, **O3, **el, **map_abund, **rho_k_T, **mu;
+  double **total, **C, **CH4, **CO, **CO2, **H, **H2, **H2O, **He, **N,
+  **N2, **NH3, **O, **O2, **O3, **el, **map_abund, **rho_k_T, **mu;
   double *P, *T;
 };
 

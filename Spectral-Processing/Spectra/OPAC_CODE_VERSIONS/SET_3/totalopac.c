@@ -30,6 +30,8 @@ struct Opac opacH2O;
 struct Opac opacNH3;
 struct Opac opacO2;
 struct Opac opacO3;
+
+
 struct Opac opacscat;
 struct Opac opacCIA;
  
