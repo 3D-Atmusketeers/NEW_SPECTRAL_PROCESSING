@@ -310,7 +310,7 @@ def reduceSpectralResolution(x, y, R_low, R_high=None, lambda_mid=None, n=4):
 
 
 # ## Spectra Test
-def plot_planet_spectra_blackbody_comparison_hz(planet_names, black_body_temperatures, num_phases):
+def plot_planet_spectra_blackbody_comparison_hz(planet_names, black_body_temperatures, num_phases, INC_STRING):
     """
     plot the planet spectra, compared to a blackbody
     planet names: list of strings
@@ -336,12 +336,6 @@ def plot_planet_spectra_blackbody_comparison_hz(planet_names, black_body_tempera
             rot_val = 360. / num_phases
 
             # Get the file path
-            if planet_name == 'Peg51b':
-                INC_STRING = '0.17450'
-            elif planet_name == 'Taub':
-                INC_STRING = '0.7850'
-            else:
-                INC_STRING = '0.00'
 
             file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
 
@@ -390,7 +384,7 @@ def plot_planet_spectra_blackbody_comparison_hz(planet_names, black_body_tempera
 
 
 
-def plot_planet_spectra_blackbody_comparison_microns(planet_names, black_body_temperatures, num_phases):
+def plot_planet_spectra_blackbody_comparison_microns(planet_names, black_body_temperatures, num_phases, INC_STRING):
     """
     plot the planet spectra, compared to a blackbody
     planet names: list of strings
@@ -414,14 +408,6 @@ def plot_planet_spectra_blackbody_comparison_microns(planet_names, black_body_te
         for i in range(num_phases):
             # Get the phase value
             rot_val = 360. / num_phases
-
-            # Get the file path
-            if planet_name == 'Peg51b':
-                INC_STRING = '0.17450'
-            elif planet_name == 'Taub':
-                INC_STRING = '0.7850'
-            else:
-                INC_STRING = '0.00'
 
             # Get the file path
             file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
@@ -535,7 +521,7 @@ def plot_star_spectra_test(planet_names):
     return None
 
 
-def plot_filters(planet_names, transmission_filter_name):
+def plot_filters(planet_names, transmission_filter_name, INC_STRING):
     spectral_filter, spectral_filter_function = get_filter(which_filter=transmission_filter_name)
 
     # Figure aesthetics
@@ -543,12 +529,6 @@ def plot_filters(planet_names, transmission_filter_name):
     plt.subplots_adjust(hspace=0.05, wspace=0.25)
 
     # Get the file path
-    if planet_names[0] == 'Peg51b':
-        INC_STRING = '0.17450'
-    elif planet_names[0] == 'Taub':
-        INC_STRING = '0.7850'
-    else:
-        INC_STRING = '0.00'
 
     file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_names[0] + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
     spectra = pd.read_csv(
@@ -578,7 +558,7 @@ def plot_filters(planet_names, transmission_filter_name):
     #return None
 
 
-def plot_spectra_simple(planet_names, num_phases):
+def plot_spectra_simple(planet_names, num_phases, INC_STRING):
     cm_name = 'batlow'
     cm_file = np.loadtxt(f'ScientificColourMaps8/{cm_name}/{cm_name}.txt')
     cm_file = np.roll(cm_file, 140, axis=0)
@@ -594,12 +574,6 @@ def plot_spectra_simple(planet_names, num_phases):
             rot_val = 360. / num_phases
 
             # Get the file path
-            if planet_name == 'Peg51b':
-                INC_STRING = '0.17450'
-            elif planet_name == 'Taub':
-                INC_STRING = '0.7850'
-            else:
-                INC_STRING = '0.00'
 
             file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
 
@@ -647,7 +621,7 @@ def plot_spectra_simple(planet_names, num_phases):
 
 
 def plot_fp_fs_phase_curves(planet_names, planet_name_char_len, planet_radii, num_phases,
-                            transmission_filter_name, wav_subset):
+                            transmission_filter_name, wav_subset, INC_STRING):
     # Figure aesthetics
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12, 6), sharex=True, sharey=False)
     plt.subplots_adjust(hspace=0.05, wspace=0.25)
@@ -701,12 +675,6 @@ def plot_fp_fs_phase_curves(planet_names, planet_name_char_len, planet_radii, nu
             integrated_signal_star.append(0)
 
             # Get the file path
-            if planet_name == 'Peg51b':
-                INC_STRING = '0.17450'
-            elif planet_name == 'Taub':
-                INC_STRING = '0.7850'
-            else:
-                INC_STRING = '0.00'
             file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
 
             # Load in the planet spectra
@@ -771,7 +739,7 @@ def plot_fp_fs_phase_curves(planet_names, planet_name_char_len, planet_radii, nu
 
 
 def plot_fp_phase_curves(planet_names, planet_name_char_len, num_phases,
-                         transmission_filter_name, wav_subset):
+                         transmission_filter_name, wav_subset, INC_STRING):
     # Figure aesthetics
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12, 6), sharex=True, sharey=False)
     plt.subplots_adjust(hspace=0.05, wspace=0.25)
@@ -810,12 +778,6 @@ def plot_fp_phase_curves(planet_names, planet_name_char_len, num_phases,
 
             # Load in the planet spectra and convert to per microns
             # Get the file path
-            if planet_name == 'Peg51b':
-                INC_STRING = '0.17450'
-            elif planet_name == 'Taub':
-                INC_STRING = '0.7850'
-            else:
-                INC_STRING = '0.00'
             file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
 
             # Load in the planet spectra
@@ -865,7 +827,8 @@ def plot_fp_phase_curves(planet_names, planet_name_char_len, num_phases,
     return None
 
 
-def plot_fp_fs_spectra(planet_names, planet_radii, num_phases, transmission_filter_name, wav_subset, resolution):
+def plot_fp_fs_spectra(planet_names, planet_radii, num_phases, transmission_filter_name,
+                       wav_subset, resolution, INC_STRING):
     cm_name = 'batlow'
     cm_file = np.loadtxt(f'ScientificColourMaps8/{cm_name}/{cm_name}.txt')
     cm_file = np.roll(cm_file, 140, axis=0)
@@ -910,12 +873,6 @@ def plot_fp_fs_spectra(planet_names, planet_radii, num_phases, transmission_filt
             phase_degrees = rot_val * i
 
             # Get the file path
-            if planet_name == 'Peg51b':
-                INC_STRING = '0.17450'
-            elif planet_name == 'Taub':
-                INC_STRING = '0.7850'
-            else:
-                INC_STRING = '0.00'
 
             file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
 
@@ -961,7 +918,7 @@ def plot_fp_fs_spectra(planet_names, planet_radii, num_phases, transmission_filt
     return None
 
 
-def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subset, resolution):
+def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subset, resolution, INC_STRING):
     cm_name = 'batlow'
     cm_file = np.loadtxt(f'ScientificColourMaps8/{cm_name}/{cm_name}.txt')
     cm_file = np.roll(cm_file, 140, axis=0)
@@ -992,12 +949,6 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
             phase_degrees = rot_val * i
 
             # Get the file path
-            if planet_name == 'Peg51b':
-                INC_STRING = '0.17450'
-            elif planet_name == 'Taub':
-                INC_STRING = '0.7850'
-            else:
-                INC_STRING = '0.00'
             file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
 
             # Load in the planet spectra
