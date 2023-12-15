@@ -50,6 +50,18 @@ planet_names = ["GJ1214b-none-0clouds-1met",
                 "GJ1214b-none-50clouds-1met"]
 
 
+#planet_names = ["GJ1214b-none-0clouds-1met",
+#                "GJ1214b-none-25clouds-1met",
+#                "GJ1214b-none-50clouds-1met",
+#                "GJ1214b-none-0clouds-30met",
+#                "GJ1214b-none-25clouds-30met",
+#                "GJ1214b-none-50clouds-30met",
+#                "GJ1214b-none-0clouds-100met",
+#                "GJ1214b-none-25clouds-100met",
+#                "GJ1214b-none-50clouds-100met"]
+
+#planet_names = ["GJ1214b-none-0clouds-100met", "GJ1214b-none-50clouds-100met", "GJ1214b-soot-0clouds-100met"]
+
 # Set the opacity files to use
 opacity_files = 'SET_1'
 if opacity_files == 'SET_1':
@@ -171,9 +183,6 @@ for filter_name in ['None']:
     spectra.plot_fp_spectra(planet_names,num_phases=4,
                             transmission_filter_name=filter_name,
                             wav_subset=[5e-6, 12e-6],
-
-                            resolution=100,
-                            inclination)
 
     spectra.plot_fp_fs_spectra(planet_names,
                                 planet_radii,
