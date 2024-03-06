@@ -2,7 +2,6 @@
 from shutil import copyfile
 from sys import exit
 import os
-import sys
 import numpy as np
 import run_grid
 import altitude_regridding
@@ -17,8 +16,6 @@ import tempfile
 from filelock import FileLock
 import grab_input_data
 import fcntl
-import os
-from shutil import copyfile
 import sys
 #import Clean_suite
 
@@ -61,22 +58,16 @@ USE_FORT_FILES = True
 # If false, just use the GCM TP profiles
 smoothing = True
 
-# These are the planet files that you neesd to run the code
+# These are the planet files that you need to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-soot-50clouds-100met",
-                "GJ1214b-soot-50clouds-1met",
-                "GJ1214b-soot-0clouds-100met",
-                "GJ1214b-soot-0clouds-1met",
-                "GJ1214b-none-50clouds-100met",
-                "GJ1214b-none-50clouds-1met"]
-
+planet_names = ["GJ1214b-soot-50clouds-100met-REDO"]
 opacity_files = 'SET_1'
 
 # Set the wavelength to evaluate the clouds at for plotting!
 # This could be put in a better place I think
 wavelength_grid = np.loadtxt('SCATTERING_DATA/wavelength_array_for_cloud_scattering_data_in_microns.txt')
 if opacity_files == 'SET_1':
-    cloud_wavelength = 5.0
+    cloud_wavelength = 0.500
     wav_loc = np.absolute(wavelength_grid-cloud_wavelength).argmin()
 elif opacity_files == 'SET_2':
     cloud_wavelength = 2.3
@@ -112,10 +103,10 @@ for q in range(len(planet_names)):
     HAZES = grab_input_data.get_input_data(path, runname, "fort.7", "HAZES")[0] == 'T'
     MOLEF          = grab_input_data.get_input_data(path, runname, "fort.7","MOLEF")
 
-    HAZE_TYPE      = grab_input_data.get_input_data(path, runname, "fort.7","HAZETYPE")
-    if HAZE_TYPE == [] or HAZE_TYPE == None:
-        HAZE_TYPE = 'None'
-    HAZE_TYPE = HAZE_TYPE.lower()
+    print('MAKE SURE TO FIX THIS!!!!!!!!!!!!!!!!!!')
+    print('MAKE SURE TO FIX THIS!!!!!!!!!!!!!!!!!!')
+    print('MAKE SURE TO FIX THIS!!!!!!!!!!!!!!!!!!')
+    HAZE_TYPE      = 'soot'
 
     GAS_CONSTANT_R = 8.314462618
     MEAN_MOLECULAR_WEIGHT = np.round((GAS_CONSTANT_R/gasconst) * 1000, 4)
@@ -143,7 +134,7 @@ for q in range(len(planet_names)):
             print("Error in choosing which metallicy the chemistry file should be")
             exit(0)
     elif (opacity_files == "SET_3"):
-        if (0.5  <= MET_X_SOLAR < 2.0):
+        if (0.5  <= MET_X_SOLAR <= 2.0):
             chemistry_file_path = "DATA/SET_3/eos_solar_doppler_with_el.dat"
         else:
             print("Error in choosing which metallicy the chemistry file should be")
@@ -154,7 +145,6 @@ for q in range(len(planet_names)):
     print ("*************************************")
     print ("*************************************")
     print ("RUNNING: " + planet_name)
-
 
 
     # Check if the substring 'soot_2xpi0' is in HAZE_TYPE
@@ -300,6 +290,32 @@ for q in range(len(planet_names)):
             filedata = filedata.replace("<<phase>>", phase_strs[i])
             filedata = filedata.replace("<<CHEMISTRY_FILE>>", "\"" + chemistry_file_path + "\"")
 
+
+            # Prepare to add opacity file definitions
+            files_in_directory = os.listdir('DATA/' + opacity_files + '/')
+            opacity_files_list = [file for file in files_in_directory if file.startswith("opac")]
+
+            # Find the position of #endif in filedata to insert the new lines before it
+            endif_position = filedata.rfind("#endif")
+
+            for opacity_file in opacity_files_list:
+                # Skip files that contain 'CIA' in their name
+                if "CIA" in opacity_file:
+                    continue
+                molecule_name = opacity_file[4:-4]  # Remove 'opac' prefix and '.dat' suffix
+                new_line = f'#define {molecule_name.upper()}_FILE   "DATA/SET_1/{opacity_file}"\n'
+                # Insert the new line before the #endif marker
+                filedata = filedata[:endif_position] + new_line + filedata[endif_position:]
+                # Update the endif_position to account for the length of the newly added line
+                endif_position += len(new_line)
+
+            # After finishing the loop, filedata will have all the new lines added just before #endif
+            # Now write the modified content back to the inputs_file
+            with open(inputs_file, 'w') as file:
+                file.write(filedata)
+
+            exit(0)
+
             filedata = filedata.replace("<<CLOUDS>>", str(CLOUDS))
             filedata = filedata.replace("<<NTAU>>", str(NTAU))
             filedata = filedata.replace("<<NLAT>>", str(NLAT))
@@ -317,7 +333,6 @@ for q in range(len(planet_names)):
             filedata = filedata.replace("<<P_ROT>>",        str(P_ROT))
 
             filedata = filedata.replace("<<MEAN_MOLECULAR_WEIGHT>>", str(MEAN_MOLECULAR_WEIGHT))
-
 
             filedata = filedata.replace("<<HAZE_TYPE>>", "\"" + HAZE_TYPE +"\"")
             if (HAZES == True):
@@ -357,12 +372,13 @@ for q in range(len(planet_names)):
     phase_strs = []
 
 
-    STEP_ONE = True
-    STEP_TWO = True
-    STEP_THREE = False
+    STEP_ONE = False
+    STEP_TWO = False
+    STEP_THREE = True
 
     if STEP_ONE:
         # Convert the fort files to the correct format
+
         if USE_FORT_FILES == True:
             convert_fort_files.convert_to_correct_format(path, runname, planet_name, INITIAL_NTAU, surfp, oom, tgr, grav, gasconst)
             print ("Converted the fort files to the new format")

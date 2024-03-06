@@ -2,7 +2,17 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Spectral-Processing/GCM-OUTPUT/GJ1214b" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Spectral-Processing/GCM-OUTPUT/GJ1214b-none-0clouds-1met" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Spectral-Processing/GCM-OUTPUT/GJ1214b-none-50clouds-100met" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Spectral-Processing/GCM-OUTPUT/GJ1214b-none-50clouds-1met" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Spectral-Processing/GCM-OUTPUT/GJ1214b-soot-0clouds-100met" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Spectral-Processing/GCM-OUTPUT/GJ1214b-soot-0clouds-1met" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Spectral-Processing/GCM-OUTPUT/GJ1214b-soot-50clouds-100met" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Spectral-Processing/GCM-OUTPUT/GJ1214b-soot-50clouds-100met-REDO" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Spectral-Processing/GCM-OUTPUT/GJ1214b-soot-50clouds-1met" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Spectral-Processing/GCM-OUTPUT/OLD/GJ1214b-none-0clouds-100met" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Spectral-Processing/GCM-OUTPUT/RM-GCM" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Spectral-Processing/GJ1214b-soot-50clouds-100met-REDO" vcs="Git" />
   </component>
 </project>

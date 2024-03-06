@@ -33,9 +33,7 @@ void ReadOpacTable(struct Opac opac, char *filename) {
   double junk;
 
   FILE *f1;
-
   fmt = FORMAT;
-
   atmos.lambda = malloc(NLAMBDA*sizeof(double));
 
 
@@ -52,7 +50,6 @@ void ReadOpacTable(struct Opac opac, char *filename) {
     for (k=0; k<opac.NT; k++) {
       fscanf(f1,"%le", &opac.T[k]);
     }
-
     
     for (j=0; j<opac.NP; j++) {
       fscanf(f1,"%le", &opac.P[j]);
@@ -62,12 +59,11 @@ void ReadOpacTable(struct Opac opac, char *filename) {
     for (i=0; i<NLAMBDA; i++) {
       fscanf(f1,"%le", &atmos.lambda[i]);
     }
-
     
     for (j=0; j<opac.NP; j++) {
         for (k=0; k<opac.NT; k++) {
 	          for (i=0; i<NLAMBDA; i++)
-            {
+              {
 	              fscanf(f1,"%le", &opac.kappa[i][j][k]);
 	          }
         }
@@ -103,8 +99,9 @@ void ReadOpacTable(struct Opac opac, char *filename) {
       for (j=0; j<opac.NP; j++) {
 	        fscanf(f1,"%le", &junk);
 	        for (k=0; k<opac.NT; k++)
-          {
+            {
 	            fscanf(f1,"%le", &opac.kappa[i][j][k]);
+	            printf("%le \n", opac.abundance[j][k] );
 	            opac.kappa[i][j][k] *= opac.abundance[j][k] * opac.P[j] / (KBOLTZMANN * opac.T[k]);
 	        }
       }

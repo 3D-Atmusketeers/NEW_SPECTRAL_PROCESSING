@@ -2,7 +2,6 @@
 figure.figsize: 12,8
 figure.dpi : 100
 
-lines.linewidth : 3.0
 axes.linewidth: 1.5
 axes.titlesize : 16
 font.size : 16
@@ -26,6 +25,9 @@ xtick.major.pad : 6
 xtick.minor.pad : 6
 ytick.major.pad : 6
 ytick.minor.pad : 6
+
+xtick.minor.visible  : True
+ytick.minor.visible  : True
 
 axes.labelpad: 6
 

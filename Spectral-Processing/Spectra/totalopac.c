@@ -1,6 +1,7 @@
 /*----------------------- totalopac.c ----------------------------
 
 Author: Eliza Miller-Ricci (emillerricci@cfa.harvard.edu)
+Last modified: June 13, 2007
 
 ------------------------------------------------------------------ */
 
@@ -23,13 +24,19 @@ extern struct Atmos atmos;
 
 struct Chem chem;
 
+struct Opac opacC2H2;
 struct Opac opacCH4;
-struct Opac opacCO2;
 struct Opac opacCO;
+struct Opac opacCO2;
+struct Opac opacFeH;
 struct Opac opacH2O;
+struct Opac opacH2S;
+struct Opac opacHCN;
+struct Opac opacK;
+struct Opac opacNa;
 struct Opac opacNH3;
-struct Opac opacO2;
-struct Opac opacO3;
+struct Opac opacTiO;
+struct Opac opacVO;
 struct Opac opacscat;
 struct Opac opacCIA;
  
@@ -52,8 +59,9 @@ void FreeChemTable();
 
 void TotalOpac() {
 
-  double **opac_CIA_H_el, **opac_CIA_He_H, **opac_CIA_CH4_CH4, **opac_CIA_H2_He, **opac_CIA_H2_CH4,
-         **opac_CIA_H2_H, **opac_CIA_H2_H2, **opac_CIA_CO2_CO2;
+  double **opac_CIA_H2H2, **opac_CIA_H2He, **opac_CIA_H2H, **opac_CIA_H2CH4, **opac_CIA_CH4Ar,
+         **opac_CIA_CH4CH4, **opac_CIA_CO2CO2, **opac_CIA_HeH, **opac_CIA_N2CH4, **opac_CIA_N2H2,
+         **opac_CIA_N2N2, **opac_CIA_O2CO2, **opac_CIA_O2N2, **opac_CIA_O2O2, **opac_CIA_Hel;
   double *t_CIA, *lambda_CIA, **opac_CIA;
   int i, j, k, a, b, dum;
   char filename[65];
@@ -62,15 +70,23 @@ void TotalOpac() {
 
   /* Allocate Memory */
 
-  opac_CIA_H_el = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
-  opac_CIA_He_H = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
-  opac_CIA_CH4_CH4 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
-  opac_CIA_H2_He = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
-  opac_CIA_H2_CH4 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
-  opac_CIA_H2_H = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
-  opac_CIA_H2_H2 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
-  opac_CIA_CO2_CO2 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_H2H2 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_H2He = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_H2H = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_H2CH4 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_CH4Ar = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_CH4CH4 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_CO2CO2 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_HeH = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_N2CH4 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_N2H2 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_N2N2 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_O2CO2 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_O2N2 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_O2O2 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
+  opac_CIA_Hel = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
 
+  
   t_CIA = dvector(0, 18);
   lambda_CIA = dvector(0, 999);
   opac_CIA = dmatrix(0, 19, 0, 999);
@@ -89,32 +105,6 @@ void TotalOpac() {
       opac.mu[j][k] = MU;
     }
   }
-
-  /* Fill in CH4 opacities */
-  
-  opacCH4.T = dvector(0, NTEMP-1);
-  opacCH4.P = dvector(0, NPRESSURE-1);
-  opacCH4.Plog10 = dvector(0, NPRESSURE-1);
-  opacCH4.kappa = malloc(NLAMBDA*sizeof(double));
-  for(i=0; i<NLAMBDA; i++){
-    opacCH4.kappa[i] = malloc(NPRESSURE*sizeof(double));
-    for(j=0; j<NPRESSURE; j++){
-      opacCH4.kappa[i][j] = malloc(NTEMP*sizeof(double));
-    }
-  }
-  opacCH4.abundance = dmatrix(0, NPRESSURE-1, 0, NTEMP-1);
-  
-  for(j=0; j<NPRESSURE; j++){
-    for(k=0; k<NTEMP; k++){
-      opacCH4.abundance[j][k] = chem.CH4[j][k];
-    }
-  }
-
-  strcpy(filename, CH4_FILE);
-
-  ReadOpacTable(opacCH4, filename);
- 
-  printf("Read CH4 Opacity done\n");
 
   /* Fill in CO opacities */
   
@@ -142,6 +132,75 @@ void TotalOpac() {
  
   printf("Read CO Opacity done\n");
 
+
+  //for(j=0; j<NPRESSURE; j++)
+  //{
+  //    printf("%d %le %le %le %le\n", j, opacCO.kappa[0][j][0], opacCO.kappa[0][j][1], opacCO.kappa[0][j][2], opacCO.kappa[0][j][3]);
+  //}
+  
+  //printf("\n\n");
+  //for(j=0; j<NPRESSURE; j++)
+  //{
+  //    printf("%d %le %le %le %le\n", j, opacCO.kappa[6632][j][0], opacCO.kappa[6632][j][1], opacCO.kappa[6632][j][2], opacCO.kappa[6632][j][3]);
+  //}
+  //printf("EXITING HERE!\n");
+  //exit(0);  
+
+  /* Fill in C2H2 opacities */
+
+  opacC2H2.T = dvector(0, NTEMP-1);
+  opacC2H2.P = dvector(0, NPRESSURE-1);
+  opacC2H2.Plog10 = dvector(0, NPRESSURE-1);
+  opacC2H2.kappa = malloc(NLAMBDA*sizeof(double));
+  for(i=0; i<NLAMBDA; i++){
+    opacC2H2.kappa[i] = malloc(NPRESSURE*sizeof(double));
+    for(j=0; j<NPRESSURE; j++){
+      opacC2H2.kappa[i][j] = malloc(NTEMP*sizeof(double));
+    }
+  }
+  opacC2H2.abundance = dmatrix(0, NPRESSURE-1, 0, NTEMP-1);
+
+  for(j=0; j<NPRESSURE; j++){
+    for(k=0; k<NTEMP; k++){
+      opacC2H2.abundance[j][k] = chem.C2H2[j][k];
+    }
+  }
+
+  strcpy(filename, C2H2_FILE);
+
+  ReadOpacTable(opacC2H2, filename);
+
+  printf("Read C2H2 Opacity done\n");
+
+
+
+
+  /* Fill in CH4 opacities */
+  
+  opacCH4.T = dvector(0, NTEMP-1);
+  opacCH4.P = dvector(0, NPRESSURE-1);
+  opacCH4.Plog10 = dvector(0, NPRESSURE-1);
+  opacCH4.kappa = malloc(NLAMBDA*sizeof(double));
+  for(i=0; i<NLAMBDA; i++){
+    opacCH4.kappa[i] = malloc(NPRESSURE*sizeof(double));
+    for(j=0; j<NPRESSURE; j++){
+      opacCH4.kappa[i][j] = malloc(NTEMP*sizeof(double));
+    }
+  }
+  opacCH4.abundance = dmatrix(0, NPRESSURE-1, 0, NTEMP-1);
+  
+  for(j=0; j<NPRESSURE; j++){
+    for(k=0; k<NTEMP; k++){
+      opacCH4.abundance[j][k] = chem.CH4[j][k];
+    }
+  }
+
+  strcpy(filename, CH4_FILE);
+
+  ReadOpacTable(opacCH4, filename);
+ 
+  printf("Read CH4 Opacity done\n");
+
   /* Fill in CO2 opacities */
   
   opacCO2.T = dvector(0, NTEMP-1);
@@ -167,6 +226,33 @@ void TotalOpac() {
   ReadOpacTable(opacCO2, filename);
  
   printf("Read CO2 Opacity done\n");
+
+
+  /* Fill in FeH opacities */
+
+  opacFeH.T = dvector(0, NTEMP-1);
+  opacFeH.P = dvector(0, NPRESSURE-1);
+  opacFeH.Plog10 = dvector(0, NPRESSURE-1);
+  opacFeH.kappa = malloc(NLAMBDA*sizeof(double));
+  for(i=0; i<NLAMBDA; i++){
+    opacFeH.kappa[i] = malloc(NPRESSURE*sizeof(double));
+    for(j=0; j<NPRESSURE; j++){
+      opacFeH.kappa[i][j] = malloc(NTEMP*sizeof(double));
+    }
+  }
+  opacFeH.abundance = dmatrix(0, NPRESSURE-1, 0, NTEMP-1);
+
+  for(j=0; j<NPRESSURE; j++){
+    for(k=0; k<NTEMP; k++){
+      opacFeH.abundance[j][k] = chem.FeH[j][k];
+    }
+  }
+
+  strcpy(filename, FeH_FILE);
+
+  ReadOpacTable(opacFeH, filename);
+
+  printf("Read FeH Opacity done\n");
 
   /* Fill in H2O opacities */
   
@@ -194,6 +280,115 @@ void TotalOpac() {
 
   printf("Read H2O Opacity done\n");
 
+
+  /* Fill in H2S opacities */
+
+  opacH2S.T = dvector(0, NTEMP-1);
+  opacH2S.P = dvector(0, NPRESSURE-1);
+  opacH2S.Plog10 = dvector(0, NPRESSURE-1);
+  opacH2S.kappa = malloc(NLAMBDA*sizeof(double));
+  for(i=0; i<NLAMBDA; i++){
+    opacH2S.kappa[i] = malloc(NPRESSURE*sizeof(double));
+    for(j=0; j<NPRESSURE; j++){
+      opacH2S.kappa[i][j] = malloc(NTEMP*sizeof(double));
+    }
+  }
+  opacH2S.abundance = dmatrix(0, NPRESSURE-1, 0, NTEMP-1);
+
+  for(j=0; j<NPRESSURE; j++){
+    for(k=0; k<NTEMP; k++){
+      opacH2S.abundance[j][k] = chem.H2S[j][k];
+    }
+  }
+
+  strcpy(filename, H2S_FILE);
+
+  ReadOpacTable(opacH2S, filename);
+
+  printf("Read H2S Opacity done\n");
+
+
+
+  /* Fill in HCN opacities */
+
+  opacHCN.T = dvector(0, NTEMP-1);
+  opacHCN.P = dvector(0, NPRESSURE-1);
+  opacHCN.Plog10 = dvector(0, NPRESSURE-1);
+  opacHCN.kappa = malloc(NLAMBDA*sizeof(double));
+  for(i=0; i<NLAMBDA; i++){
+    opacHCN.kappa[i] = malloc(NPRESSURE*sizeof(double));
+    for(j=0; j<NPRESSURE; j++){
+      opacHCN.kappa[i][j] = malloc(NTEMP*sizeof(double));
+    }
+  }
+  opacHCN.abundance = dmatrix(0, NPRESSURE-1, 0, NTEMP-1);
+
+  for(j=0; j<NPRESSURE; j++){
+    for(k=0; k<NTEMP; k++){
+      opacHCN.abundance[j][k] = chem.HCN[j][k];
+    }
+  }
+
+  strcpy(filename, HCN_FILE);
+
+  ReadOpacTable(opacHCN, filename);
+
+  printf("Read HCN Opacity done\n");
+
+
+  /* Fill in K opacities */
+
+  opacK.T = dvector(0, NTEMP-1);
+  opacK.P = dvector(0, NPRESSURE-1);
+  opacK.Plog10 = dvector(0, NPRESSURE-1);
+  opacK.kappa = malloc(NLAMBDA*sizeof(double));
+  for(i=0; i<NLAMBDA; i++){
+    opacK.kappa[i] = malloc(NPRESSURE*sizeof(double));
+    for(j=0; j<NPRESSURE; j++){
+      opacK.kappa[i][j] = malloc(NTEMP*sizeof(double));
+    }
+  }
+  opacK.abundance = dmatrix(0, NPRESSURE-1, 0, NTEMP-1);
+
+  for(j=0; j<NPRESSURE; j++){
+    for(k=0; k<NTEMP; k++){
+      opacK.abundance[j][k] = chem.K[j][k];
+    }
+  }
+
+  strcpy(filename, K_FILE);
+
+  ReadOpacTable(opacK, filename);
+
+  printf("Read K Opacity done\n");
+
+  /* Fill in Na opacities */
+
+  opacNa.T = dvector(0, NTEMP-1);
+  opacNa.P = dvector(0, NPRESSURE-1);
+  opacNa.Plog10 = dvector(0, NPRESSURE-1);
+  opacNa.kappa = malloc(NLAMBDA*sizeof(double));
+  for(i=0; i<NLAMBDA; i++){
+    opacNa.kappa[i] = malloc(NPRESSURE*sizeof(double));
+    for(j=0; j<NPRESSURE; j++){
+      opacNa.kappa[i][j] = malloc(NTEMP*sizeof(double));
+    }
+  }
+  opacNa.abundance = dmatrix(0, NPRESSURE-1, 0, NTEMP-1);
+
+  for(j=0; j<NPRESSURE; j++){
+    for(k=0; k<NTEMP; k++){
+      opacNa.abundance[j][k] = chem.Na[j][k];
+    }
+  }
+
+  strcpy(filename, Na_FILE);
+
+  ReadOpacTable(opacNa, filename);
+
+  printf("Read Na Opacity done\n");
+
+
   /* Fill in NH3 opacities */
   
   opacNH3.T = dvector(0, NTEMP-1);
@@ -220,57 +415,58 @@ void TotalOpac() {
  
   printf("Read NH3 Opacity done\n");
 
-  /* Fill in O2 opacities */
-  
-  opacO2.T = dvector(0, NTEMP-1);
-  opacO2.P = dvector(0, NPRESSURE-1);
-  opacO2.Plog10 = dvector(0, NPRESSURE-1);
-  opacO2.kappa = malloc(NLAMBDA*sizeof(double));
+  /* Fill in TiO opacities */
+
+  opacTiO.T = dvector(0, NTEMP-1);
+  opacTiO.P = dvector(0, NPRESSURE-1);
+  opacTiO.Plog10 = dvector(0, NPRESSURE-1);
+  opacTiO.kappa = malloc(NLAMBDA*sizeof(double));
   for(i=0; i<NLAMBDA; i++){
-    opacO2.kappa[i] = malloc(NPRESSURE*sizeof(double));
+    opacTiO.kappa[i] = malloc(NPRESSURE*sizeof(double));
     for(j=0; j<NPRESSURE; j++){
-      opacO2.kappa[i][j] = malloc(NTEMP*sizeof(double));
+      opacTiO.kappa[i][j] = malloc(NTEMP*sizeof(double));
     }
   }
-  opacO2.abundance = dmatrix(0, NPRESSURE-1, 0, NTEMP-1);
+  opacTiO.abundance = dmatrix(0, NPRESSURE-1, 0, NTEMP-1);
 
   for(j=0; j<NPRESSURE; j++){
     for(k=0; k<NTEMP; k++){
-      opacO2.abundance[j][k] = chem.O2[j][k];
+      opacTiO.abundance[j][k] = chem.TiO[j][k];
     }
   }
-  
-  strcpy(filename, O2_FILE);
 
-  ReadOpacTable(opacO2, filename);
- 
-  printf("Read O2 Opacity done\n");
+  strcpy(filename, TiO_FILE);
 
-  /* Fill in O3 opacities */
-  
-  opacO3.T = dvector(0, NTEMP-1);
-  opacO3.P = dvector(0, NPRESSURE-1);
-  opacO3.Plog10 = dvector(0, NPRESSURE-1);
-  opacO3.kappa = malloc(NLAMBDA*sizeof(double));
+  ReadOpacTable(opacTiO, filename);
+
+  printf("Read TiO Opacity done\n");
+
+  /* Fill in VO opacities */
+
+  opacVO.T = dvector(0, NTEMP-1);
+  opacVO.P = dvector(0, NPRESSURE-1);
+  opacVO.Plog10 = dvector(0, NPRESSURE-1);
+  opacVO.kappa = malloc(NLAMBDA*sizeof(double));
   for(i=0; i<NLAMBDA; i++){
-    opacO3.kappa[i] = malloc(NPRESSURE*sizeof(double));
+    opacVO.kappa[i] = malloc(NPRESSURE*sizeof(double));
     for(j=0; j<NPRESSURE; j++){
-      opacO3.kappa[i][j] = malloc(NTEMP*sizeof(double));
+      opacVO.kappa[i][j] = malloc(NTEMP*sizeof(double));
     }
   }
-  opacO3.abundance = dmatrix(0, NPRESSURE-1, 0, NTEMP-1);
+  opacVO.abundance = dmatrix(0, NPRESSURE-1, 0, NTEMP-1);
 
   for(j=0; j<NPRESSURE; j++){
     for(k=0; k<NTEMP; k++){
-      opacO3.abundance[j][k] = chem.O3[j][k];
+      opacVO.abundance[j][k] = chem.VO[j][k];
     }
   }
 
-  strcpy(filename, O3_FILE);
+  strcpy(filename, VO_FILE);
 
-  ReadOpacTable(opacO3, filename);
- 
-  printf("Read O3 Opacity done\n");
+  ReadOpacTable(opacVO, filename);
+
+  printf("Read VO Opacity done\n");
+
 
   /* Fill in scattering coefficients */
   
@@ -284,10 +480,13 @@ void TotalOpac() {
 
 
 
+
+
+
   /* Fill in collision-induced opacities */
 
 
-  f1 = fopen("DATA/SET_3/opacCIA_hires.dat", "r");
+  f1 = fopen("DATA/SET_1/opacCIA_low_temp.dat", "r");
   if(f1 == NULL){
     printf("\n totalopac.c:\nError opening CIA file: -- No such file or directory\n\n");
   }
@@ -302,17 +501,25 @@ void TotalOpac() {
   for (k=0; k<NTEMP; k++){
     fscanf(f1, "%le", &opacCIA.T[k]);
     for (i=0; i<NLAMBDA; i++){
-      fscanf(f1, "%le %le %le %le %le %le %le %le %le", &atmos.lambda[i],
-                                                        &opac_CIA_He_H[k][i],
-                                                        &opac_CIA_CH4_CH4[k][i],
-                                                        &opac_CIA_H2_He[k][i],
-                                                        &opac_CIA_H2_CH4[k][i],
-                                                        &opac_CIA_H2_H[k][i],
-                                                        &opac_CIA_H2_H2[k][i],
-                                                        &opac_CIA_CO2_CO2[k][i],
-                                                        &opac_CIA_H_el[k][i]);
+      fscanf(f1, "%le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le", &atmos.lambda[i],
+                                                                                    &opac_CIA_Hel[k][i],
+                                                                                    &opac_CIA_H2H2[k][i],
+                                                                                    &opac_CIA_H2He[k][i],
+                                                                                    &opac_CIA_H2H[k][i],
+                                                                                    &opac_CIA_H2CH4[k][i],
+                                                                                    &opac_CIA_CH4Ar[k][i],
+                                                                                    &opac_CIA_CH4CH4[k][i],
+                                                                                    &opac_CIA_CO2CO2[k][i],
+                                                                                    &opac_CIA_HeH[k][i],
+                                                                                    &opac_CIA_N2CH4[k][i],
+                                                                                    &opac_CIA_N2H2[k][i],
+                                                                                    &opac_CIA_N2N2[k][i],
+                                                                                    &opac_CIA_O2CO2[k][i],
+                                                                                    &opac_CIA_O2N2[k][i],
+                                                                                    &opac_CIA_O2O2[k][i]);
     }
   }
+  printf("CIA: %e   %e\n", atmos.lambda[NLAMBDA-1], opac_CIA_H2H2[NTEMP-1][NLAMBDA-1]);
  
   opacCIA.kappa = calloc(NLAMBDA, sizeof(double));
   for(i=0; i<NLAMBDA; i++){
@@ -321,61 +528,99 @@ void TotalOpac() {
       opacCIA.kappa[i][j] = calloc(NTEMP, sizeof(double));
     }
   }
-
+  
+  
   for (i=0; i<NLAMBDA; i++){
     for (j=0; j<NPRESSURE; j++){
       for (k=0; k<NTEMP; k++){
 
-      opacCIA.kappa[i][j][k] += opac_CIA_H_el[k][i] *
-        (chem.H[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k])) *
-        (chem.el[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]));
+      opacCIA.kappa[i][j][k] += opac_CIA_H2H2[k][i] *
+        (chem.H2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k])) *
+        (chem.H2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]));
 
-      opacCIA.kappa[i][j][k] += opac_CIA_He_H[k][i] *
-        chem.He[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
-        chem.H[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
-
-
-      opacCIA.kappa[i][j][k] += opac_CIA_CH4_CH4[k][i] *
-        chem.CH4[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
-        chem.CH4[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
-
-
-      opacCIA.kappa[i][j][k] += opac_CIA_H2_He[k][i] *
+      opacCIA.kappa[i][j][k] += opac_CIA_H2He[k][i] *
         chem.H2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
         chem.He[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
 
 
-      opacCIA.kappa[i][j][k] += opac_CIA_H2_CH4[k][i] *
-        chem.H2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
-        chem.CH4[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
-
-
-      opacCIA.kappa[i][j][k] += opac_CIA_H2_H[k][i] *
+      opacCIA.kappa[i][j][k] += opac_CIA_H2H[k][i] *
         chem.H2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
         chem.H[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
 
 
-      opacCIA.kappa[i][j][k] += opac_CIA_H2_H2[k][i] *
+      opacCIA.kappa[i][j][k] += opac_CIA_H2CH4[k][i] *
         chem.H2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
+        chem.CH4[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
+
+
+      opacCIA.kappa[i][j][k] += opac_CIA_CH4Ar[k][i] *
+        chem.CH4[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
+        chem.Ar[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
+
+
+      opacCIA.kappa[i][j][k] += opac_CIA_CH4CH4[k][i] *
+        chem.CH4[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
+        chem.CH4[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
+
+
+      opacCIA.kappa[i][j][k] += opac_CIA_CO2CO2[k][i] *
+        chem.CO2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
+        chem.CO2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
+
+
+      opacCIA.kappa[i][j][k] += opac_CIA_HeH[k][i] *
+        chem.He[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
+        chem.H[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
+
+
+      opacCIA.kappa[i][j][k] += opac_CIA_N2CH4[k][i] *
+        chem.N2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
+        chem.CH4[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
+
+
+      opacCIA.kappa[i][j][k] += opac_CIA_N2H2[k][i] *
+        chem.N2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
         chem.H2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
 
 
-      opacCIA.kappa[i][j][k] += opac_CIA_CO2_CO2[k][i] *
-        chem.CO2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
+      opacCIA.kappa[i][j][k] += opac_CIA_N2N2[k][i] *
+        chem.N2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
+        chem.N2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
+
+
+      opacCIA.kappa[i][j][k] += opac_CIA_O2CO2[k][i] *
+        chem.O2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
         chem.CO2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
+
+
+      opacCIA.kappa[i][j][k] += opac_CIA_O2N2[k][i] *
+        chem.O2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
+        chem.N2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
+
+      opacCIA.kappa[i][j][k] += opac_CIA_O2O2[k][i] *
+        chem.O2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
+        chem.O2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
+
+
+      opacCIA.kappa[i][j][k] += opac_CIA_Hel[k][i] *
+	       chem.H[j][k] * chem.P[j] / (KBOLTZMANN * chem.T[k]) *  
+	       chem.el[j][k] * chem.P[j] / (KBOLTZMANN * chem.T[k]);
       }
     }
   }
 
   fclose(f1);
 	
-/* Rayleigh scattering */
+  /* Rayleigh scattering */
 
   /* (Polarizabilities from the CRC Handbook) */
 
-  for (i=0; i<NLAMBDA; i++) {
-    for (j=0; j<NPRESSURE; j++) {
-      for (k=0; k<NTEMP; k++) {
+  for (i=0; i<NLAMBDA; i++)
+    {
+    for (j=0; j<NPRESSURE; j++)
+      {
+      for (k=0; k<NTEMP; k++)
+      {
 	  opacscat.kappa[i][j][k] +=
 	  (8.0*PI/3.0) * SQ(0.80e-30) *
 	  SQ(2.0*PI/ atmos.lambda[i]) * SQ(2.0*PI/ atmos.lambda[i]) *
@@ -384,10 +629,6 @@ void TotalOpac() {
 	  (8.0*PI/3.0) * SQ(0.21e-30) *
 	  SQ(2.0*PI/ atmos.lambda[i]) * SQ(2.0*PI/ atmos.lambda[i]) *
 	  chem.He[j][k]*chem.P[j] / (KBOLTZMANN * chem.T[k])
-	  +
-	  (8.0*PI/3.0) * SQ(1.74e-30) *
-	  SQ(2.0*PI/ atmos.lambda[i]) * SQ(2.0*PI/ atmos.lambda[i]) *
-	  chem.N2[j][k]*chem.P[j] / (KBOLTZMANN * chem.T[k])
 	  +
 	  (8.0*PI/3.0) * SQ(1.45e-30) *
 	  SQ(2.0*PI/ atmos.lambda[i]) * SQ(2.0*PI/ atmos.lambda[i]) *
@@ -407,15 +648,7 @@ void TotalOpac() {
 	  +
 	  (8.0*PI/3.0) * SQ(2.59e-30) *
 	  SQ(2.0*PI/ atmos.lambda[i]) * SQ(2.0*PI/ atmos.lambda[i]) *
-	  chem.CH4[j][k]*chem.P[j] / (KBOLTZMANN * chem.T[k])
-	  +
-	  (8.0*PI/3.0) * SQ(1.58e-30) *
-	  SQ(2.0*PI/ atmos.lambda[i]) * SQ(2.0*PI/ atmos.lambda[i]) *
-	  chem.O2[j][k]*chem.P[j] / (KBOLTZMANN * chem.T[k])
-	  +
-	  (8.0*PI/3.0) * SQ(3.21e-30) *
-	  SQ(2.0*PI/ atmos.lambda[i]) * SQ(2.0*PI/ atmos.lambda[i]) *
-	  chem.O3[j][k]*chem.P[j] / (KBOLTZMANN * chem.T[k]);
+	  chem.CH4[j][k]*chem.P[j] / (KBOLTZMANN * chem.T[k]);
       }
     }
   }
@@ -447,37 +680,63 @@ void TotalOpac() {
   for (i=0; i<NLAMBDA; i++) {
     for (j=0; j<NPRESSURE; j++) {
       for (k=0; k<NTEMP; k++) {
-          opac.kappa[i][j][k] = opacCH4.kappa[i][j][k] + opacCO.kappa[i][j][k]
-	                    + opacCO2.kappa[i][j][k] + opacH2O.kappa[i][j][k]
-	                    + opacNH3.kappa[i][j][k] + opacO2.kappa[i][j][k]
- 	                    + opacO3.kappa[i][j][k] + opacscat.kappa[i][j][k]
- 	                    + opacCIA.kappa[i][j][k];
+          opac.kappa[i][j][k] = opacC2H2.kappa[i][j][k]
+                              + opacCH4.kappa[i][j][k]
+                              + opacCO.kappa[i][j][k]
+	                            + opacCO2.kappa[i][j][k]
+	                            + opacFeH.kappa[i][j][k]
+	                            + opacH2O.kappa[i][j][k]
+	                            + opacH2S.kappa[i][j][k]
+	                            + opacHCN.kappa[i][j][k]
+	                            + opacK.kappa[i][j][k]
+	                            + opacNa.kappa[i][j][k]
+	                            + opacNH3.kappa[i][j][k]
+                              + opacTiO.kappa[i][j][k]
+                              + opacVO.kappa[i][j][k]
+ 	                            + opacscat.kappa[i][j][k]
+ 	                            + opacCIA.kappa[i][j][k];
       }
     }
   }
 
+
   
   /* Free uneeded opacity structures and chemistry table */
 
+  FreeOpacTable(opacC2H2);
   FreeOpacTable(opacCH4);
   FreeOpacTable(opacCO);
   FreeOpacTable(opacCO2);
+  FreeOpacTable(opacFeH);
   FreeOpacTable(opacH2O);
+  FreeOpacTable(opacH2S);
+  FreeOpacTable(opacHCN);
+  FreeOpacTable(opacK);
+  FreeOpacTable(opacNa);
   FreeOpacTable(opacNH3);
-  FreeOpacTable(opacO2);
-  FreeOpacTable(opacO3);
+  FreeOpacTable(opacTiO);
+  FreeOpacTable(opacVO);
   FreeOpacTable(opacCIA);
   FreeOpacTable(opacscat);
   FreeChemTable();
 
-  free_dmatrix(opac_CIA_H_el, 0, NTEMP-1, 0, NLAMBDA-1);
-  free_dmatrix(opac_CIA_He_H, 0, NTEMP-1, 0, NLAMBDA-1);
-  free_dmatrix(opac_CIA_CH4_CH4, 0, NTEMP-1, 0, NLAMBDA-1);
-  free_dmatrix(opac_CIA_H2_He, 0, NTEMP-1, 0, NLAMBDA-1);
-  free_dmatrix(opac_CIA_H2_CH4, 0, NTEMP-1, 0, NLAMBDA-1);
-  free_dmatrix(opac_CIA_H2_H, 0, NTEMP-1, 0, NLAMBDA-1);
-  free_dmatrix(opac_CIA_H2_H2, 0, NTEMP-1, 0, NLAMBDA-1);
-  free_dmatrix(opac_CIA_CO2_CO2, 0, NTEMP-1, 0, NLAMBDA-1);
+
+  free_dmatrix(opac_CIA_H2H2, 0, NTEMP-1, 0, NLAMBDA-1);
+  free_dmatrix(opac_CIA_H2He, 0, NTEMP-1, 0, NLAMBDA-1);
+  free_dmatrix(opac_CIA_H2H, 0, NTEMP-1, 0, NLAMBDA-1);
+  free_dmatrix(opac_CIA_H2CH4, 0, NTEMP-1, 0, NLAMBDA-1);
+  free_dmatrix(opac_CIA_CH4Ar, 0, NTEMP-1, 0, NLAMBDA-1);
+  free_dmatrix(opac_CIA_CH4CH4, 0, NTEMP-1, 0, NLAMBDA-1);
+  free_dmatrix(opac_CIA_CO2CO2, 0, NTEMP-1, 0, NLAMBDA-1);
+  free_dmatrix(opac_CIA_HeH, 0, NTEMP-1, 0, NLAMBDA-1);
+  free_dmatrix(opac_CIA_N2CH4, 0, NTEMP-1, 0, NLAMBDA-1);
+  free_dmatrix(opac_CIA_N2H2, 0, NTEMP-1, 0, NLAMBDA-1);
+  free_dmatrix(opac_CIA_N2N2, 0, NTEMP-1, 0, NLAMBDA-1);
+  free_dmatrix(opac_CIA_O2CO2, 0, NTEMP-1, 0, NLAMBDA-1);
+  free_dmatrix(opac_CIA_O2N2, 0, NTEMP-1, 0, NLAMBDA-1);
+  free_dmatrix(opac_CIA_O2O2, 0, NTEMP-1, 0, NLAMBDA-1);
+  free_dmatrix(opac_CIA_Hel, 0, NTEMP-1, 0, NLAMBDA-1);
+
 }
 
 /* ------- end -------------- TotalOpac.c ------------------------ */

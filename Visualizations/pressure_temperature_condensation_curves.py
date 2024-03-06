@@ -204,22 +204,28 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
             axes.legend(fontsize=14, ncol=2, labelspacing=0.0, loc='lower left')
 
         axes.set_ylim(np.max(data[24][0][:, 4]), np.min(data[24][0][:, 4]))
-        axes.set_xlim([150, 1125])
+        axes.set_xlim([0, 1250])
 
         axes.xaxis.set_ticks_position('bottom')
         axes.xaxis.set_label_position('bottom')
 
         axes.minorticks_on()  # This enables minor ticks
 
-
         # tp labels
         axes.set_ylabel('Pressure (bars)', fontsize=24)
 
         # colorbars
+        #sm = plt.cm.ScalarMappable(cmap=my_colors, norm=plt.Normalize(vmin=-180, vmax=180))
+        #sm._A = []
+        #tp_cbar = fig.colorbar(sm, aspect=15, pad=0.02, ticks=[0, -60, -120, 60, 120])
+        #tp_cbar.set_label('Lon (deg)', fontsize=24, labelpad=5)
         sm = plt.cm.ScalarMappable(cmap=my_colors, norm=plt.Normalize(vmin=-180, vmax=180))
         sm._A = []
-        tp_cbar = fig.colorbar(sm, aspect=15, pad=0.02, ticks=[0, -60, -120, 60, 120])
+
+        # Updated line: passing the Axes object to colorbar
+        tp_cbar = fig.colorbar(sm, ax=axes, aspect=15, pad=0.02, ticks=[0, -60, -120, 60, 120])
         tp_cbar.set_label('Lon (deg)', fontsize=24, labelpad=5)
+
 
 
         fig.text(0.5, 0.03, r"Temperature (K)", size=24, ha='center')
