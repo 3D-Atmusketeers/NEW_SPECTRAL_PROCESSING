@@ -41,24 +41,8 @@ planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/'
 inclination = '0.00'
 
 
-planet_names = ["GJ1214b-none-0clouds-1met",
-                "GJ1214b-soot-50clouds-100met",
-                "GJ1214b-soot-50clouds-1met",
-                "GJ1214b-soot-0clouds-100met",
-                "GJ1214b-soot-0clouds-1met",
-                "GJ1214b-none-50clouds-100met",
-                "GJ1214b-none-50clouds-1met"]
+planet_names = ["GJ1214b-soot-50clouds-100met-REDO"]
 
-
-#planet_names = ["GJ1214b-none-0clouds-1met",
-#                "GJ1214b-none-25clouds-1met",
-#                "GJ1214b-none-50clouds-1met",
-#                "GJ1214b-none-0clouds-30met",
-#                "GJ1214b-none-25clouds-30met",
-#                "GJ1214b-none-50clouds-30met",
-#                "GJ1214b-none-0clouds-100met",
-#                "GJ1214b-none-25clouds-100met",
-#                "GJ1214b-none-50clouds-100met"]
 
 #planet_names = ["GJ1214b-none-0clouds-100met", "GJ1214b-none-50clouds-100met", "GJ1214b-soot-0clouds-100met"]
 
@@ -137,14 +121,14 @@ else:
 
 
 # Plot the ptc curves
-#pressure_temperature_condensation_curves.plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
+pressure_temperature_condensation_curves.plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
 
 
 # Plot other planet characteristics
-#aerosol_maps.plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, cloud_wavelength)
+aerosol_maps.plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, cloud_wavelength)
 aerosol_profiles.plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
-#wind_maps.plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
-#wind_isobars.plot_wind_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes=False, extra_pressure_level_bar=0.01)
+wind_maps.plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
+wind_isobars.plot_wind_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes=False, extra_pressure_level_bar=0.01)
 
 
 # Plotting the emission maps

@@ -10,12 +10,12 @@ Defines input values and files for 3-D emission spectra
 /* I/O SETTINGS. */
 
 /* File names */
-#define OUTPUT_PREFIX "OUT/Spec_0_GJ1214b-soot-50clouds-100met-REDO_phase_0.0_inc_0.00.00.0"      /* output name */
-#define T_P_3D_FILE "DATA/init_GJ1214b-soot-50clouds-100met-REDO_phase_0.0_inc_0.0.txt"         /* input file */
+#define OUTPUT_PREFIX <<output_file>>      /* output name */
+#define T_P_3D_FILE <<input_file>>         /* input file */
 
 /* Output settings */
 #define N_PHASE 1                          /* Number of phases [96 max; lon grid in increments of 3.75] */
-#define DOPPLER 0                /* 0:Off; 1:On */
+#define DOPPLER <<doppler>>                /* 0:Off; 1:On */
 #define CLOUDS <<CLOUDS>>                           /* 0:Off; 1:On */
 
 /* Grid settings */
@@ -33,8 +33,8 @@ Defines input values and files for 3-D emission spectra
 #define G0_VAL <<G0_VAL>>
 
 /* Planet parameters */
-#define INPUT_INCLINATION 0.0  /* Planet inclination in radians            */
-#define INPUT_PHASE 0.0              /* Planet inclination in degrees           */
+#define INPUT_INCLINATION <<inclination>>  /* Planet inclination in radians            */
+#define INPUT_PHASE <<phase>>              /* Planet inclination in degrees           */
 #define G <<GRAVITY_SI>>                   /* Planet surface gravity                 */
 
 #define R_PLANET <<R_PLANET>>              /* Planet radius at base of atmosphere      */
@@ -52,35 +52,43 @@ Defines input values and files for 3-D emission spectra
 #define ABUND_TRACK_IND 2 /* if test visualize, the index of the mapped species in the EOS file */
 #define CHEM_FILE_NCOLS 23
 
-/* Opacities for spectra */
-#define CHEM_FILE   "DATA/SET_1/ordered_100x_solar_metallicity_chem.dat"
-//#define C2H2_FILE   "DATA/SET_1/opacC2H2.dat"
-//#define CH4_FILE    "DATA/SET_1/opacCH4.dat"
-//#define CO_FILE     "DATA/SET_1/opacCO.dat"
-//#define CO2_FILE    "DATA/SET_1/opacCO2.dat"
-//#define FeH_FILE    "DATA/SET_1/opacFeH.dat"
-//#define H2O_FILE    "DATA/SET_1/opacH2O.dat"
-//#define H2S_FILE    "DATA/SET_1/opacH2S.dat"
-//#define HCN_FILE    "DATA/SET_1/opacHCN.dat"
-//#define K_FILE      "DATA/SET_1/opacK.dat"
-//#define Na_FILE     "DATA/SET_1/opacNa.dat"
-//#define NH3_FILE    "DATA/SET_1/opacNH3.dat"
-//#define TiO_FILE    "DATA/SET_1/opacTiO.dat"
-//#define VO_FILE     "DATA/SET_1/opacVO.dat"
+/* Get the Chemistry data file */
+#define CHEM_FILE   <<CHEMISTRY_FILE>>
 
-#define C2H2_FILE   "DATA/SET_1/opacC2H2.dat"
-#define CH4_FILE   "DATA/SET_1/opacCH4.dat"
-#define CO_FILE   "DATA/SET_1/opacCO.dat"
-#define CO2_FILE   "DATA/SET_1/opacCO2.dat"
-#define FEH_FILE   "DATA/SET_1/opacFeH.dat"
-#define H2S_FILE   "DATA/SET_1/opacH2S.dat"
-#define HCN_FILE   "DATA/SET_1/opacHCN.dat"
-#define K_FILE   "DATA/SET_1/opacK.dat"
-#define NA_FILE   "DATA/SET_1/opacNa.dat"
-#define NH3_FILE   "DATA/SET_1/opacNH3.dat"
-#define TIO_FILE   "DATA/SET_1/opacTiO.dat"
-#define VO_FILE   "DATA/SET_1/opacVO.dat"
-#define H2O_FILE   "DATA/SET_1/opacH2O.dat"
+/* Opacities for spectra */
+#define H2O_FILE "DATA/New_Set_1/opacH2O.dat"
+#define CO2_FILE "DATA/New_Set_1/opacCO2.dat"
+#define CO_FILE "DATA/New_Set_1/opacCO.dat"
+#define CH4_FILE "DATA/New_Set_1/opacCH4.dat"
+#define HCN_FILE "DATA/New_Set_1/opacHCN.dat"
+#define NH3_FILE "DATA/New_Set_1/opacNH3.dat"
+#define C2H2_FILE "DATA/New_Set_1/opacC2H2.dat"
+#define PH3_FILE "DATA/New_Set_1/opacPH3.dat"
+#define H2S_FILE "DATA/New_Set_1/opacH2S.dat"
+#define K_FILE "DATA/New_Set_1/opacK.dat"
+#define Na_FILE "DATA/New_Set_1/opacNa.dat"
+#define NaH_FILE "DATA/New_Set_1/opacNaH.dat"
+#define SiH_FILE "DATA/New_Set_1/opacSiH.dat"
+#define MgH_FILE "DATA/New_Set_1/opacMgH.dat"
+#define AlH_FILE "DATA/New_Set_1/opacAlH.dat"
+#define CrH_FILE "DATA/New_Set_1/opacCrH.dat"
+#define SH_FILE "DATA/New_Set_1/opacSH.dat"
+#define HF_FILE "DATA/New_Set_1/opacHF.dat"
+#define FeH_FILE "DATA/New_Set_1/opacFeH.dat"
+#define CaH_FILE "DATA/New_Set_1/opacCaH.dat"
+#define CaO_FILE "DATA/New_Set_1/opacCaO.dat"
+#define SiO_FILE "DATA/New_Set_1/opacSiO.dat"
+#define AlO_FILE "DATA/New_Set_1/opacAlO.dat"
+#define TiO_FILE "DATA/New_Set_1/opacTiO.dat"
+#define VO_FILE "DATA/New_Set_1/opacVO.dat"
+#define OH_FILE "DATA/New_Set_1/opacOH.dat"
+#define Fe_FILE "DATA/New_Set_1/opacFe.dat"
+#define Fe+_FILE "DATA/New_Set_1/opacFe+.dat"
+#define Mg_FILE "DATA/New_Set_1/opacMg.dat"
+#define Ca_FILE "DATA/New_Set_1/opacCa.dat"
+#define C_FILE "DATA/New_Set_1/opacC.dat"
+
+
 #endif /* !__INPUT_H__ */
 
 /* ------- end ---------------------------- input.h  ----------------- */

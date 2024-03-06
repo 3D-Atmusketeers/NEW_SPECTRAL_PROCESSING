@@ -258,7 +258,6 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
     g012  = np.loadtxt('SCATTERING_DATA/Al2O3_wav_gg.txt')
     pi012 = np.loadtxt('SCATTERING_DATA/Al2O3_wav_pi0.txt')
 
-
     if (HAZES == True):
         print ('haze_' + HAZE_TYPE + '_wav_tau_per_bar.txt')
         tau_haze = np.loadtxt('SCATTERING_DATA/haze_' + HAZE_TYPE + '_wav_tauperbar.txt')
@@ -352,8 +351,6 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
         df_copy['tau_haze'] = (np.ones(np.shape(tau)) * delta_pres * QE_OPPR[13][haze_layer_index][:,wav_loc]).ravel()
         df_copy['g0_haze']  = (np.ones(np.shape(tau)) * G0_OPPR[13][haze_layer_index][:,wav_loc]).ravel()
         df_copy['pi0_haze'] = (np.ones(np.shape(tau)) * PI0_OPPR[13][haze_layer_index][:,wav_loc]).ravel()
-
-
 
         
     planet_file_with_clouds = '../PLANET_MODELS/' + planet_name + '_with_clouds.txt'

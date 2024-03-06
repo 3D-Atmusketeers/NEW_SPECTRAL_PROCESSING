@@ -105,21 +105,11 @@ void ReadOpacTable(struct Opac opac, char *filename) {
 	        for (k=0; k<opac.NT; k++)
           {
 	            fscanf(f1,"%le", &opac.kappa[i][j][k]);
-
-              //if (i == 0)
-              //{
-              //    printf("%d %d %le %s\n", i, k, opac.kappa[i][0][0], filename);
-              //}
-	      
-	            /*   kappa in file is actually cross section, sigma.   Need to multiply by number density */
 	            opac.kappa[i][j][k] *= opac.abundance[j][k] * opac.P[j] / (KBOLTZMANN * opac.T[k]);
 	        }
       }
     }
 
-
-
-    
     fclose(f1);
     printf("opac %e %e %e\n", atmos.lambda[NLAMBDA-1], opac.P[0], 
 	   opac.T[0]);
