@@ -294,6 +294,7 @@ for q in range(len(planet_names)):
             # Prepare to add opacity file definitions
             files_in_directory = os.listdir('DATA/' + opacity_files + '/')
             opacity_files_list = [file for file in files_in_directory if file.startswith("opac")]
+            #opacity_files_list = opacity_files_list[:1]
 
             # Find the position of #endif in filedata to insert the new lines before it
             endif_position = filedata.rfind("#endif")
@@ -302,10 +303,14 @@ for q in range(len(planet_names)):
                 # Skip files that contain 'CIA' in their name
                 if "CIA" in opacity_file:
                     continue
-                molecule_name = opacity_file[4:-4]  # Remove 'opac' prefix and '.dat' suffix
-                new_line = f'#define {molecule_name.upper()}_FILE   "DATA/SET_1/{opacity_file}"\n'
+
+                # Remove 'opac' prefix and '.dat' suffix
+                molecule_name = opacity_file[4:-4]
+                new_line = f'#define {molecule_name}_FILE   "DATA/SET_1/{opacity_file}"\n'
+
                 # Insert the new line before the #endif marker
                 filedata = filedata[:endif_position] + new_line + filedata[endif_position:]
+
                 # Update the endif_position to account for the length of the newly added line
                 endif_position += len(new_line)
 
@@ -314,18 +319,13 @@ for q in range(len(planet_names)):
             with open(inputs_file, 'w') as file:
                 file.write(filedata)
 
-            exit(0)
-
             filedata = filedata.replace("<<CLOUDS>>", str(CLOUDS))
             filedata = filedata.replace("<<NTAU>>", str(NTAU))
             filedata = filedata.replace("<<NLAT>>", str(NLAT))
             filedata = filedata.replace("<<NLON>>", str(NLON))
-
             filedata = filedata.replace("<<W0_VAL>>", str(W0_VAL))
             filedata = filedata.replace("<<G0_VAL>>", str(G0_VAL))
-
             filedata = filedata.replace("<<GRAVITY_SI>>", str(grav))
-
             filedata = filedata.replace("<<R_PLANET>>",     str(R_PLANET))
             filedata = filedata.replace("<<ORB_SEP>>",      str(ORB_SEP))
             filedata = filedata.replace("<<STELLAR_TEMP>>", str(STELLAR_TEMP))
