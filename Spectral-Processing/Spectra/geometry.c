@@ -20,11 +20,6 @@ a transmission spectrum.
 #include "constant.h"
 #include "include.h"
 
-/* --- Global variables ------------------------------------------ */
-
-extern struct Atmos atmos;
-extern struct Opac opac;
-
 /* --- Function prototypes --------------------------------------- */
 
 double lint(double x1, double y1, double x2, double y2, double x);
@@ -44,21 +39,6 @@ double Radius(double R_pl, double ds[])
   int i;
   
   R = R_pl;
-
-  /* i=0; */
-/*   do{ */
-/*     if (i == NTAU) { */
-/*       printf("WARNING: P never reaches 1 bar\n"); */
-/*       break; */
-/*     } */
-/*     R += ds[i]; */
-/*     i++; */
-/*   }while(atmos.P[i] < 1.0e+05); */
-
-/*   if (i < NTAU) { */
-/*     R += lint(atmos.P[i-1], 0, atmos.P[i], ds[i], 1.0e+05); */
-/*   } */
-
   for(i=0; i<NTAU; i++){
     R += ds[i];
   }

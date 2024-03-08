@@ -24,10 +24,8 @@ extern struct Atmos atmos;
  * --------------------------------------------------------------- */
 
 /* ------- begin ------------ ReadOpacTable.c -------------------- */
-void ReadOpacTable(struct Opac *opac, const char *filename, const char *speciesName) {
+void ReadOpacTable(struct Opac *opac, const char *filename, const char *speciesNames) {
     int i, j, k, fmt;
-    double junk;
-
     FILE *f1;
     fmt = FORMAT;
     atmos.lambda = malloc(NLAMBDA * sizeof(double));
@@ -38,7 +36,6 @@ void ReadOpacTable(struct Opac *opac, const char *filename, const char *speciesN
             exit(0);
             break;
         }
-
         case (2): {
             opac->NP = NPRESSURE;
             opac->NT = NTEMP;
@@ -53,9 +50,7 @@ void ReadOpacTable(struct Opac *opac, const char *filename, const char *speciesN
             for (i = 0; i < NLAMBDA; i++) {
                 fscanf(f1, "%le", &atmos.lambda[i]);
             }
-
             fclose(f1);
-            //printf("Read opacity table (format 2) from %s\n", filename);
             break;
         }
 

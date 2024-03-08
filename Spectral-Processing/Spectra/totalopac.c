@@ -19,64 +19,51 @@ Last modified: June 13, 2007
 #include "nrutil.h"
 
 /* --- Global variables ------------------------------------------ */
-struct Opac** opacArray = NULL;
-int opacCount = 0;
-
-extern struct Atmos atmos;
-struct Chemistry chem; // Assuming the chemistry structure is declared in another header file
+extern struct Opac *opac; // Using global opac variable
+extern struct Chem chem;  // Assuming chem is declared and defined globally
 
 /* --- Function prototypes --------------------------------------- */
 void Locate(int n, double *array, double value, int *ilow);
-void ReadOpacTable(struct Opac *opac, const char *filename, const char *speciesName);
-void InitializeOpac(struct Opac* opac, const char* speciesName);
+double lint2D(double x1, double x2, double y1, double y2, double z1, double z2, double z3, double z4, double x, double y);
 void FreeOpacTable(struct Opac* opac);
 void ReadChemTable();
 void FreeChemTable();
+void ReadOpacTable(struct Opac *opac, const char *filename, const char *speciesName) // Function prototype
 
-void InitializeOpac(struct Opac* opac, const char* speciesName) {
-    // Error checking omitted for brevity
 
-    // Allocate memory for T, P, and Plog10
-    opac->T = malloc(NTEMP * sizeof(double));
-    opac->P = malloc(NPRESSURE * sizeof(double));
-    opac->Plog10 = malloc(NPRESSURE * sizeof(double));
 
-    // Correctly allocating kappa to be a 3D array
-    opac->kappa = malloc(NLAMBDA * sizeof(double**));
-    for (int i = 0; i < NLAMBDA; i++) {
-        opac->kappa[i] = malloc(NPRESSURE * sizeof(double*));
-        for (int j = 0; j < NPRESSURE; j++) {
-            opac->kappa[i][j] = malloc(NTEMP * sizeof(double));
-        }
+void InitializeOpac(const char* speciesName) {
+    if (!opac) {
+        fprintf(stderr, "Opac structure not initialized.\n");
+        return;
     }
 
-    // Allocate memory for abundance and initialize it based on species data
-    opac->abundance = dmatrix(0, NPRESSURE-1, 0, NTEMP-1);
-    for (int j = 0; j < NPRESSURE; j++) {
-        for (int k = 0; k < NTEMP; k++) {
-            // Dynamically select the right abundance data based on the species name
-            for (int speciesIdx = 0; speciesIdx < chem.numSpecies; speciesIdx++) {
-                if (strcmp(speciesName, chem.species[speciesIdx]) == 0) {
-                    opac->abundance[j][k] = chem.speciesData[speciesIdx][j][k];
-                    break; // Break the loop once the species data is found
-                }
+    // Error checking omitted for brevity
+
+    // Allocate memory for T, P, and Plog10 if not already done
+    if (!opac->T) opac->T = (double*)malloc(NTEMP * sizeof(double));
+    if (!opac->P) opac->P = (double*)malloc(NPRESSURE * sizeof(double));
+    if (!opac->Plog10) opac->Plog10 = (double*)malloc(NPRESSURE * sizeof(double));
+
+    // Allocate and initialize kappa to be a 3D array if not already done
+    if (!opac->kappa) {
+        opac->kappa = (double***)malloc(NLAMBDA * sizeof(double**));
+        for (int i = 0; i < NLAMBDA; i++) {
+            opac->kappa[i] = (double**)malloc(NPRESSURE * sizeof(double*));
+            for (int j = 0; j < NPRESSURE; j++) {
+                opac->kappa[i][j] = (double*)malloc(NTEMP * sizeof(double));
             }
         }
     }
-    
-    // Set the species name
-    strncpy(opac->speciesName, speciesName, MAX_NAME_LENGTH - 1);
-    opac->speciesName[MAX_NAME_LENGTH - 1] = '\0'; // Ensure null termination
 
-    // Read the opacity table which will populate kappa (and possibly adjust based on abundance)
+    // Assuming abundance is handled elsewhere or not directly related to individual speciesName in this context
+
+    // Read the opacity table to populate kappa
     char filename[256];
     snprintf(filename, sizeof(filename), "DATA/SET_1/opac%s.dat", speciesName);
-    ReadOpacTable(opac, filename, speciesName); // Call the function without 'struct' keyword
+    ReadOpacTable(opac, filename, speciesName); // Ensure ReadOpacTable is adapted to use global opac
 
-    printf("Initialized and added species '%s'.\n", speciesName);
-
-    // Assuming opacArray and opacCount are globally accessible
-    opacArray[opacCount++] = opac;
+    printf("Opacity data initialized for species '%s'.\n", speciesName);
 }
 
 /* ---------------------------------------------------------------
@@ -85,7 +72,7 @@ void InitializeOpac(struct Opac* opac, const char* speciesName) {
  * --------------------------------------------------------------- */
 
 /* ------- begin ------------ TotalOpac.c ------------------------ */
-void TotalOpac(struct Opac* opac) {
+void TotalOpac() {
   double **opac_CIA_H2H2, **opac_CIA_H2He, **opac_CIA_H2H, **opac_CIA_H2CH4, **opac_CIA_CH4Ar,
          **opac_CIA_CH4CH4, **opac_CIA_CO2CO2, **opac_CIA_HeH, **opac_CIA_N2CH4, **opac_CIA_N2H2,
          **opac_CIA_N2N2, **opac_CIA_O2CO2, **opac_CIA_O2N2, **opac_CIA_O2O2, **opac_CIA_Hel;
@@ -118,13 +105,6 @@ void TotalOpac(struct Opac* opac) {
 
   exit(0);
 
-
-  // Structure to hold species names
-  typedef struct {
-      char names[MAX_OPACITY_SPECIES][MAX_NAME_LENGTH];
-      int count;
-  } SpeciesList;
-
   FILE* file = fopen("input.h", "r");
   if (!file) {
       perror("Failed to open file");
@@ -154,10 +134,10 @@ void TotalOpac(struct Opac* opac) {
               if (strstr(tempName, "chem") == NULL && strstr(tempName, "CIA") == NULL) {
                   char* lastSlash = strrchr(tempName, '/'); // Find the last slash to isolate the filename
                   if (lastSlash != NULL) {
-                      char* speciesName = lastSlash + 5; // Skip past the slash and "opac"
-                      int speciesNameLength = strlen(speciesName) - 4; // Remove the ".dat" part
+                      char* speciesNames = lastSlash + 5; // Skip past the slash and "opac"
+                      int speciesNameLength = strlen(speciesNames) - 4; // Remove the ".dat" part
                       if (speciesNameLength > 0 && speciesNameLength < MAX_NAME_LENGTH) {
-                          strncpy(speciesList.names[speciesList.count], speciesName, speciesNameLength);
+                          strncpy(speciesList.names[speciesList.count], speciesNames, speciesNameLength);
                           speciesList.names[speciesList.count][speciesNameLength] = '\0'; // Ensure null-termination
                           //printf("Extracted species name: %s\n", speciesList.names[speciesList.count]); // Debug
                           speciesList.count++;
@@ -177,7 +157,6 @@ void TotalOpac(struct Opac* opac) {
   }
 
   fclose(file);
-  //printf("File closed.\n");
 
   // Print the species names
   printf("Extracted Species Names:\n");
@@ -426,25 +405,7 @@ void TotalOpac(struct Opac* opac) {
   }
   
   /* Free uneeded opacity structures and chemistry table */
-
-  //FreeOpacTable(opacC2H2);
-  //FreeOpacTable(opacCH4);
-  //FreeOpacTable(opacCO);
-  //FreeOpacTable(opacCO2);
-  //FreeOpacTable(opacFeH);
-  //FreeOpacTable(opacH2O);
-  //FreeOpacTable(opacH2S);
-  //FreeOpacTable(opacHCN);
-  //FreeOpacTable(opacK);
-  //FreeOpacTable(opacNa);
-  //FreeOpacTable(opacNH3);
-  //FreeOpacTable(opacTiO);
-  //FreeOpacTable(opacVO);
-
-  //FreeOpacTable(opacCIA);
-  //FreeOpacTable(opacscat);
   FreeChemTable();
-
 
   free_dmatrix(opac_CIA_H2H2, 0, NTEMP-1, 0, NLAMBDA-1);
   free_dmatrix(opac_CIA_H2He, 0, NTEMP-1, 0, NLAMBDA-1);
@@ -464,8 +425,23 @@ void TotalOpac(struct Opac* opac) {
 }
 
 
+void FreeOpacTable(struct Opac* opac) {
+    if (opac) {
+        if (opac->T) free(opac->T);
+        if (opac->P) free(opac->P);
+        if (opac->Plog10) free(opac->Plog10);
+        // Iterate through kappa and free each allocated memory block
+        for (int i = 0; i < NLAMBDA; i++) {
+            for (int j = 0; j < NPRESSURE; j++) {
+                if (opac->kappa[i][j]) free(opac->kappa[i][j]);
+            }
+            if (opac->kappa[i]) free(opac->kappa[i]);
+        }
+        if (opac->kappa) free(opac->kappa);
 
-
+        free(opac); // Finally, free the opac structure itself
+    }
+}
 
 
 /* ------- end -------------- TotalOpac.c ------------------------ */
