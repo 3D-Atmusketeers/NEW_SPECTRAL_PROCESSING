@@ -60,7 +60,7 @@ smoothing = True
 
 # These are the planet files that you need to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-soot-50clouds-100met-REDO"]
+planet_names = ["GJ1214b-none-0clouds-1met"]
 opacity_files = 'SET_1'
 
 # Set the wavelength to evaluate the clouds at for plotting!
@@ -302,19 +302,21 @@ for q in range(len(planet_names)):
                 # Skip files that contain 'CIA' in their name
                 if "CIA" in opacity_file:
                     continue
+
                 molecule_name = opacity_file[4:-4]  # Remove 'opac' prefix and '.dat' suffix
-                new_line = f'#define {molecule_name.upper()}_FILE   "DATA/SET_1/{opacity_file}"\n'
+                new_line = f'#define {molecule_name}_FILE   "DATA/' + opacity_files + "/" + opacity_file +"\"\n"
+
                 # Insert the new line before the #endif marker
                 filedata = filedata[:endif_position] + new_line + filedata[endif_position:]
+                
                 # Update the endif_position to account for the length of the newly added line
                 endif_position += len(new_line)
+
 
             # After finishing the loop, filedata will have all the new lines added just before #endif
             # Now write the modified content back to the inputs_file
             with open(inputs_file, 'w') as file:
                 file.write(filedata)
-
-            exit(0)
 
             filedata = filedata.replace("<<CLOUDS>>", str(CLOUDS))
             filedata = filedata.replace("<<NTAU>>", str(NTAU))

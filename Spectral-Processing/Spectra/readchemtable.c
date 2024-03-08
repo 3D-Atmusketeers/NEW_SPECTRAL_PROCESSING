@@ -1,19 +1,15 @@
-/*----------------------- readchemtable.c ------------------------
-Author: Eliza Miller-Ricci (emillerricci@cfa.harvard.edu)
-Last modified: October 20, 2009
------------------------------------------------------------------- */
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "input.h"
 #include "opac.h"
 
 /* --- Global variables ------------------------------------------ */
-
-extern struct Chem chem;
+struct Chem chem;
 
 /* --- Function prototypes --------------------------------------- */
+int ReadChemLine(FILE *f1, int i, int j, int k, double **chem_array);
 
 /* ---------------------------------------------------------------
  * Read in chemistry files: abundance(pressure, temperature)
@@ -21,213 +17,87 @@ extern struct Chem chem;
 
 /* ------- begin ------------ ReadChemTable.c -------------------- */
 
+void ReadChemTable() {
+    int i, j, k;
+    char speciesNames[1000];
+
+    FILE *f1 = fopen(CHEM_FILE, "r");
+    if (f1 == NULL) {
+        fprintf(stderr, "Error opening file: %s\n", CHEM_FILE);
+        exit(EXIT_FAILURE);
+    }
+
+    fgets(speciesNames, sizeof(speciesNames), f1);
+
+    char *token = strtok(speciesNames, " ");
+    int speciesCount = 0;
+    while (token != NULL) {
+        chem.species[speciesCount++] = strdup(token);
+        token = strtok(NULL, " ");
+    }
+    chem.numSpecies = speciesCount;
+
+    chem.T = malloc(NTEMP * sizeof(double));
+    chem.P = malloc(NPRESSURE * sizeof(double));
+    chem.species = malloc(chem.numSpecies * sizeof(char *));
+    chem.speciesData = malloc(chem.numSpecies * sizeof(double *));
+    for (i = 0; i < chem.numSpecies; i++) {
+        chem.speciesData[i] = malloc(NPRESSURE * sizeof(double *));
+        for (j = 0; j < NPRESSURE; j++) {
+            chem.speciesData[i][j] = malloc(NTEMP * sizeof(double));
+        }
+    }
+
+    for (i = NPRESSURE - 1; i >= 0; i--) {
+        fscanf(f1, "%le", &chem.P[i]);
+        for (j = NTEMP - 1; j >= 0; j--) {
+            fscanf(f1, "%le", &chem.T[j]);
+            k = 0;
+            for (int speciesIdx = 0; speciesIdx < chem.numSpecies; speciesIdx++) {
+                k = ReadChemLine(f1, i, j, k, chem.speciesData[speciesIdx]);
+            }
+        }
+    }
+    fclose(f1);
+
+    printf("Species Names:\n");
+    for (i = 0; i < chem.numSpecies; i++) {
+        printf("%s ", chem.species[i]);
+    }
+    printf("\n");
+
+    printf("\nSpecies Data:\n");
+    for (i = 0; i < chem.numSpecies; i++) {
+        printf("%s: %.3e\n", chem.species[i], chem.speciesData[i][NPRESSURE - 1][NTEMP - 1]);
+    }
+}
 
 int ReadChemLine(FILE *f1, int i, int j, int k, double **chem_array) {
-    /* Reads a chemistry line. keeps a running tally k of how many
-    columns have been read in already. Also takes care of reading into
-    the map_abund array. */
-    fscanf(f1,"%le", &chem_array[i][j]);
+    fscanf(f1, "%le", &chem_array[i][j]);
     if (ABUND_TRACK_IND <= 1) {
-        printf("\nMapping temperature/pressure doesn't make sense here!\n");
-        exit(1);
+        fprintf(stderr, "Mapping temperature/pressure doesn't make sense here!\n");
+        exit(EXIT_FAILURE);
     }
-    if (k == ABUND_TRACK_IND) {
-        chem.map_abund[i][j] = chem_array[i][j];
-    }
-
     k = k + 1;
     return k;
 }
 
-void ReadChemTable()
-  {
-  int i, j, k;
-  char dum[1000];
-
-  FILE *f1;
-  /* Allocate memory for Chem structure */
-
-  chem.T = malloc(NTEMP*sizeof(double));
-  chem.P = malloc(NPRESSURE*sizeof(double));
-
-  chem.total = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.total[i] = malloc(NTEMP*sizeof(double));
-
-  chem.el = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.el[i] = malloc(NTEMP*sizeof(double));
-
-  chem.H = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.H[i] = malloc(NTEMP*sizeof(double));
-
-  chem.H2 = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.H2[i] = malloc(NTEMP*sizeof(double));
-
-  chem.He = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.He[i] = malloc(NTEMP*sizeof(double));
-
-  chem.C2H2 = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.C2H2[i] = malloc(NTEMP*sizeof(double));
-
-  chem.CH4 = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.CH4[i] = malloc(NTEMP*sizeof(double));
-
-  chem.CO = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.CO[i] = malloc(NTEMP*sizeof(double));
-
-  chem.CO2 = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.CO2[i] = malloc(NTEMP*sizeof(double));
-
-  chem.H2O = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.H2O[i] = malloc(NTEMP*sizeof(double));
-
-  chem.H2S = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.H2S[i] = malloc(NTEMP*sizeof(double));
-
-  chem.HCN = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.HCN[i] = malloc(NTEMP*sizeof(double));
-
-  chem.K = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.K[i] = malloc(NTEMP*sizeof(double));
-
-  chem.Na = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.Na[i] = malloc(NTEMP*sizeof(double));
-
-  chem.NH3 = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.NH3[i] = malloc(NTEMP*sizeof(double));
-
-  chem.PH3 = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.PH3[i] = malloc(NTEMP*sizeof(double));
-
-  chem.TiO = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.TiO[i] = malloc(NTEMP*sizeof(double));
-
-  chem.VO = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.VO[i] = malloc(NTEMP*sizeof(double));
-
-  chem.FeH = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.FeH[i] = malloc(NTEMP*sizeof(double));
-
-  chem.Ar = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.Ar[i] = malloc(NTEMP*sizeof(double));
-
-  chem.N2 = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.N2[i] = malloc(NTEMP*sizeof(double));
-
-  chem.O2 = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.O2[i] = malloc(NTEMP*sizeof(double));
-
-  chem.map_abund = malloc(NPRESSURE*sizeof(double));
-  for(i=0; i<NPRESSURE; i++)
-    chem.map_abund[i] = malloc(NTEMP*sizeof(double));
-
-  /* Read in chemistry table */
-
-  f1 = fopen(CHEM_FILE,"r");
-  if(f1 == NULL){
-      printf("\nreadchemtable.c:\nError opening file: No such file or directory\n\n");
-      exit(1);
-    }
-
-  for (i=0; i<CHEM_FILE_NCOLS; i++) {
-    fscanf(f1,"%s", dum);
-  }
-  //e- H H2 He C2H2 C1H4 C1O1 C1O2 H2O1 H2S1 C1H1N1_1 K Na H3N1 H3P1 O1Ti1 O1V1 Fe1H1 Ar N2 O2
-  for (i=NPRESSURE-1; i>=0; i--)
-    {
-    fscanf(f1,"%le", &chem.P[i]);
-    for (j=NTEMP-1; j>=0; j--)
-      {
-      fscanf(f1,"%le", &chem.T[j]);
-      k = 1;
-      k = ReadChemLine(f1, i, j, k, chem.total);
-      k = ReadChemLine(f1, i, j, k, chem.el);
-      k = ReadChemLine(f1, i, j, k, chem.H);
-      k = ReadChemLine(f1, i, j, k, chem.H2);
-      k = ReadChemLine(f1, i, j, k, chem.He);
-      k = ReadChemLine(f1, i, j, k, chem.C2H2);
-      k = ReadChemLine(f1, i, j, k, chem.CH4);
-      k = ReadChemLine(f1, i, j, k, chem.CO);
-      k = ReadChemLine(f1, i, j, k, chem.CO2);
-      k = ReadChemLine(f1, i, j, k, chem.H2O);
-      k = ReadChemLine(f1, i, j, k, chem.H2S);
-      k = ReadChemLine(f1, i, j, k, chem.HCN);
-      k = ReadChemLine(f1, i, j, k, chem.K);
-      k = ReadChemLine(f1, i, j, k, chem.Na);
-      k = ReadChemLine(f1, i, j, k, chem.NH3);
-      k = ReadChemLine(f1, i, j, k, chem.PH3);
-      k = ReadChemLine(f1, i, j, k, chem.TiO);
-      k = ReadChemLine(f1, i, j, k, chem.VO);
-      k = ReadChemLine(f1, i, j, k, chem.FeH);
-      k = ReadChemLine(f1, i, j, k, chem.Ar);
-      k = ReadChemLine(f1, i, j, k, chem.N2);
-      k = ReadChemLine(f1, i, j, k, chem.O2);
-      }
-  }
-
-
-  printf("Read in chemtable\n");
-  /* Added: parts for Fe, Fe+ */
-  fclose(f1);
-  printf("Chemistry: \nP_0\t%e \nT_0\t%e \ntotal00 \t%e \ntotal11 \t%e \nH2 \t%e \nH \t%e \nHe \t%e \nH2O \t%e \nCH4 \t%e \nCO \t%e \nCO2 \t%e \n",
-	 chem.P[0], chem.T[0], chem.total[0][0], chem.total[1][1],chem.H2[0][0], chem.H[0][0],
-	 chem.He[0][0], chem.H2O[0][0], chem.CH4[0][0],chem.CO[0][0], chem.CO2[0][0]);
-  return;
-
-}
 /* ------- end -------------- ReadChemTable.c -------------------- */
 
 /* ------- start ------------ FreeChemTable.c -------------------- */
 
-/* Added: free Fe, Fe+ */
-void FreeChemTable()
-{
-  free(chem.P);
-  free(chem.T);
-  free(chem.total);
-  free(chem.el);
-  free(chem.H);
-  free(chem.H2);
-  free(chem.He);
-  free(chem.C2H2);
-  free(chem.CH4);
-  free(chem.CO);
-  free(chem.CO2);
-  free(chem.H2O);
-  free(chem.H2S);
-  free(chem.HCN);
-  free(chem.K);
-  free(chem.Na);
-  free(chem.NH3);
-  free(chem.PH3);
-  free(chem.TiO);
-  free(chem.VO);
-  free(chem.FeH);
-  free(chem.Ar);
-  free(chem.N2);
-  free(chem.O2);
-  free(chem.map_abund);
+void FreeChemTable() {
+    free(chem.P);
+    free(chem.T);
+    for (int i = 0; i < chem.numSpecies; i++) {
+        free(chem.species[i]);
+        for (int j = 0; j < NPRESSURE; j++) {
+            free(chem.speciesData[i][j]);
+        }
+        free(chem.speciesData[i]);
+    }
+    free(chem.species);
+    free(chem.speciesData);
 }
 
 /* ------- end -------------- FreeChemTable.c -------------------- */

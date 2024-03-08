@@ -54,19 +54,6 @@ Defines input values and files for 3-D emission spectra
 
 /* Opacities for spectra */
 #define CHEM_FILE   <<CHEMISTRY_FILE>>
-//#define C2H2_FILE   "DATA/SET_1/opacC2H2.dat"
-//#define CH4_FILE    "DATA/SET_1/opacCH4.dat"
-//#define CO_FILE     "DATA/SET_1/opacCO.dat"
-//#define CO2_FILE    "DATA/SET_1/opacCO2.dat"
-//#define FeH_FILE    "DATA/SET_1/opacFeH.dat"
-//#define H2O_FILE    "DATA/SET_1/opacH2O.dat"
-//#define H2S_FILE    "DATA/SET_1/opacH2S.dat"
-//#define HCN_FILE    "DATA/SET_1/opacHCN.dat"
-//#define K_FILE      "DATA/SET_1/opacK.dat"
-//#define Na_FILE     "DATA/SET_1/opacNa.dat"
-//#define NH3_FILE    "DATA/SET_1/opacNH3.dat"
-//#define TiO_FILE    "DATA/SET_1/opacTiO.dat"
-//#define VO_FILE     "DATA/SET_1/opacVO.dat"
 
 #endif /* !__INPUT_H__ */
 

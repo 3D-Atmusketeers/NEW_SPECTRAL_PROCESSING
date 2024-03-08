@@ -1,4 +1,3 @@
-
 /*----------------------- readopactable.c ------------------------
 
 Author: Sara Seager
@@ -17,126 +16,105 @@ Last modified: October 20, 2009
 #include "constant.h" 
 
 extern struct Atmos atmos;
- 
+
 /* ---------------------------------------------------------------
  * Read in opacity files: kappa(pressure, temperature, lambda)
  * Opacity file actually contains cross section in units of m^2.  
- * Need to multiply by the number density to get kappa in units of
- * m^-1
+ * Need to multiply by the number density to get kappa in units of m^-1
  * --------------------------------------------------------------- */
 
 /* ------- begin ------------ ReadOpacTable.c -------------------- */
+void ReadOpacTable(struct Opac *opac, const char *filename, const char *speciesName) {
+    int i, j, k, fmt;
+    double junk;
 
-void ReadOpacTable(struct Opac opac, char *filename) {
+    FILE *f1;
+    fmt = FORMAT;
+    atmos.lambda = malloc(NLAMBDA * sizeof(double));
 
-  int i, j, k, fmt;
-  double junk;
+    switch (fmt) {
+        case (1): {
+            printf("ERROR IN CHOOSING CASE 1");
+            exit(0);
+            break;
+        }
 
-  FILE *f1;
+        case (2): {
+            opac->NP = NPRESSURE;
+            opac->NT = NTEMP;
+            atmos.Nlambda = NLAMBDA;
 
-  fmt = FORMAT;
+            f1 = fopen(filename, "r");
+            if (f1 == NULL) {
+                printf("\nreadopactable.c:\nError opening file: %s -- No such file or directory\n\n", filename);
+                exit(1);
+            }
 
-  atmos.lambda = malloc(NLAMBDA*sizeof(double));
+            for (i = 0; i < NLAMBDA; i++) {
+                fscanf(f1, "%le", &atmos.lambda[i]);
+            }
 
+            fclose(f1);
+            //printf("Read opacity table (format 2) from %s\n", filename);
+            break;
+        }
 
-  switch(fmt){
-  case (1): {
-    f1 = fopen(filename,"r");
-    if(f1 == NULL){
-      printf("\nreadopactable.c:\nError opening file: No such file or directory\n\n");
-      exit(1);
-    }
-
-    fscanf(f1,"%d %d %d", &opac.NP, &opac.NT, &atmos.Nlambda);
-    
-    for (k=0; k<opac.NT; k++) {
-      fscanf(f1,"%le", &opac.T[k]);
-    }
-
-    
-    for (j=0; j<opac.NP; j++) {
-      fscanf(f1,"%le", &opac.P[j]);
-      opac.Plog10[j] = log10(opac.P[j]);
-    }
-    
-    for (i=0; i<NLAMBDA; i++) {
-      fscanf(f1,"%le", &atmos.lambda[i]);
-    }
-
-    
-    for (j=0; j<opac.NP; j++) {
-        for (k=0; k<opac.NT; k++) {
-	          for (i=0; i<NLAMBDA; i++)
-            {
-	              fscanf(f1,"%le", &opac.kappa[i][j][k]);
-	          }
+        default: {
+            printf("Invalid format for opacity table\n\n");
+            exit(1);
         }
     }
-    fclose(f1);
-    break;
-  }
-
-  case(2): {
-    opac.NP = NPRESSURE;
-    opac.NT = NTEMP; 
-    atmos.Nlambda = NLAMBDA;
-
-    f1 = fopen(filename,"r");
-    if(f1 == NULL){
-      printf("\nreadopactable.c:\nError opening file: No such file or directory\n\n");
-      exit(1);
-    }
-
-    for (k=0; k<opac.NT; k++) {
-      fscanf(f1,"%le", &opac.T[k]);
-    }
-    
-    for (j=0; j<opac.NP; j++) {
-      fscanf(f1,"%le", &opac.P[j]);
-      opac.Plog10[j] = log10(opac.P[j]);
-    }
-
-
-    for (i=0; i<NLAMBDA; i++)
-    {
-      fscanf(f1,"%le", &atmos.lambda[i]);
-      for (j=0; j<opac.NP; j++) {
-	        fscanf(f1,"%le", &junk);
-	        for (k=0; k<opac.NT; k++)
-          {
-	            fscanf(f1,"%le", &opac.kappa[i][j][k]);
-	            opac.kappa[i][j][k] *= opac.abundance[j][k] * opac.P[j] / (KBOLTZMANN * opac.T[k]);
-	        }
-      }
-    }
-
-    fclose(f1);
-    printf("opac %e %e %e\n", atmos.lambda[NLAMBDA-1], opac.P[0], 
-	   opac.T[0]);
-    break;
-  }
-
-  default: {
-    printf("Invalid format for opacity table\n\n");
-    exit(1);
-  }
-    
-  }
+    printf("Read opacity table from %s\n", filename);
 }
 
 /* ------- end -------------- ReadOpacTable.c -------------------- */
 
 /* ------- begin ------------ FreeOpacTable.c -------------------- */
 
-void FreeOpacTable(struct Opac opac)
-{
+void FreeOpacTable(struct Opac* opac) {
+    if (opac == NULL) return; // Safety check
 
-  free(opac.T);
-  free(opac.P);
-  free(opac.Plog10);
-  free(opac.kappa);
-  free(opac.kappa_pl);
+    // Free the temperature array
+    if (opac->T != NULL) {
+        free(opac->T);
+        opac->T = NULL;
+    }
 
+    // Free the pressure array
+    if (opac->P != NULL) {
+        free(opac->P);
+        opac->P = NULL;
+    }
+
+    // Free the log pressure array
+    if (opac->Plog10 != NULL) {
+        free(opac->Plog10);
+        opac->Plog10 = NULL;
+    }
+
+    // Free the 3D kappa array
+    if (opac->kappa != NULL) {
+        for (int i = 0; i < NLAMBDA; i++) {
+            if (opac->kappa[i] != NULL) {
+                for (int j = 0; j < opac->NP; j++) {
+                    free(opac->kappa[i][j]);
+                }
+                free(opac->kappa[i]);
+            }
+        }
+        free(opac->kappa);
+        opac->kappa = NULL;
+    }
+
+    // Free the abundance array
+    if (opac->abundance != NULL) {
+        for (int j = 0; j < opac->NP; j++) {
+            free(opac->abundance[j]);
+        }
+        free(opac->abundance);
+        opac->abundance = NULL;
+    }
 }
+
 
 /* ------- end -------------- FreeOpacTable.c -------------------- */
