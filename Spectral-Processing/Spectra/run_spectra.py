@@ -71,14 +71,27 @@ opacity_files_directory = os.path.join('DATA', opacity_set_number)
 opacity_species = [file[4:-4] for file in os.listdir(opacity_files_directory)
                    if file.startswith("opac") and "CIA" not in file and file.endswith(".dat")]
 
+# Check if H2O, CO, and CO2 are included
+required_species = ["H2O", "CO", "CO2"]
+missing_species = [species for species in required_species if species not in opacity_species]
+
+if missing_species:
+    print("\n" + "="*60)
+    print("WARNING: The following species are not included:", ', '.join(missing_species))
+    print("Stopping the code to prevent incorrect calculations.")
+    print("="*60 + "\n")
+    # Stop the code here to prevent further execution
+    quit()
+
 # Use only a subset of the available species
-#opacity_species = opacity_species[:1]
+#opacity_species = required_species
 
 print("\n" + "="*60)
 print("WARNING: Using a limited subset of available species!")
 print("-" * 60)
 print(f"Selected Species: {opacity_species}")
 print("="*60 + "\n")
+
 
 # Set the wavelength to evaluate the clouds at for plotting!
 # This could be put in a better place I think

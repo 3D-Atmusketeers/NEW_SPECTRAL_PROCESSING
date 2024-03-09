@@ -190,20 +190,26 @@ def modify_totalopac(opacity_files, species_to_include):
 
             # Add new lines for final summation over species
             summation_lines = [
-                "  // Do a final summation over the species\n",
                 "  for (i=0; i<NLAMBDA; i++) {\n",
                 "    for (j=0; j<NPRESSURE; j++) {\n",
                 "      for (k=0; k<NTEMP; k++) {\n",
-                "          opac.kappa[i][j][k] = "
+                "          opac.kappa[i][j][k] ="
             ]
+
+            # Add individual species opacities to the summation lines
             for species in species_to_include:
                 summation_lines.append(f"                              + opac{species}.kappa[i][j][k]\n")
-            summation_lines.append("                              ;\n")
+
+            # Add opacscat and opacCIA
+            summation_lines.append("                              + opacscat.kappa[i][j][k]\n")
+            summation_lines.append("                              + opacCIA.kappa[i][j][k];\n")
+
             summation_lines.extend([
                 "      }\n",
                 "    }\n",
                 "  }\n"
             ])
+
             lines.insert(index_to_add_summation + 1, "".join(summation_lines))
 
             # Find the index where new lines should be added for freeing uneeded opacity structures
