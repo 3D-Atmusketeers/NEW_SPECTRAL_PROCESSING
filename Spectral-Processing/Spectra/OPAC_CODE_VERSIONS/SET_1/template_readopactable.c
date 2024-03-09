@@ -33,11 +33,8 @@ void ReadOpacTable(struct Opac opac, char *filename) {
   double junk;
 
   FILE *f1;
-
   fmt = FORMAT;
-
   atmos.lambda = malloc(NLAMBDA*sizeof(double));
-
 
   switch(fmt){
   case (1): {
@@ -52,7 +49,6 @@ void ReadOpacTable(struct Opac opac, char *filename) {
     for (k=0; k<opac.NT; k++) {
       fscanf(f1,"%le", &opac.T[k]);
     }
-
     
     for (j=0; j<opac.NP; j++) {
       fscanf(f1,"%le", &opac.P[j]);
@@ -120,7 +116,6 @@ void ReadOpacTable(struct Opac opac, char *filename) {
     printf("Invalid format for opacity table\n\n");
     exit(1);
   }
-    
   }
 }
 

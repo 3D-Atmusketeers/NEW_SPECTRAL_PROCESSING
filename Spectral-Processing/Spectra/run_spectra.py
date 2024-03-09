@@ -17,6 +17,8 @@ from filelock import FileLock
 import grab_input_data
 import fcntl
 import sys
+from setup_opac_versions import replace_files, modify_input_h, insert_opacity_definitions, modify_totalopac
+
 #import Clean_suite
 
 # Phases in degrees, inclination in radians (sorry)
@@ -43,7 +45,6 @@ NLON = 96
 # 3 is rotation only
 dopplers = [0]
 
-
 # If you only need to change the phase you can use this knob
 # It skips a lot of steps for the regridding
 ONLY_PHASE = True
@@ -61,18 +62,34 @@ smoothing = True
 # These are the planet files that you need to run the code
 # They should be pretty big files, and don't include the .txt with the names here
 planet_names = ["GJ1214b-soot-50clouds-100met-REDO"]
-opacity_files = 'SET_1'
+opacity_set_number = 'SET_1'
+
+# Construct the path to the directory
+opacity_files_directory = os.path.join('DATA', opacity_set_number)
+
+# Adjust the list comprehension to parse filenames
+opacity_species = [file[4:-4] for file in os.listdir(opacity_files_directory)
+                   if file.startswith("opac") and "CIA" not in file and file.endswith(".dat")]
+
+# Use only a subset of the available species
+#opacity_species = opacity_species[:1]
+
+print("\n" + "="*60)
+print("WARNING: Using a limited subset of available species!")
+print("-" * 60)
+print(f"Selected Species: {opacity_species}")
+print("="*60 + "\n")
 
 # Set the wavelength to evaluate the clouds at for plotting!
 # This could be put in a better place I think
 wavelength_grid = np.loadtxt('SCATTERING_DATA/wavelength_array_for_cloud_scattering_data_in_microns.txt')
-if opacity_files == 'SET_1':
+if opacity_set_number == 'SET_1':
     cloud_wavelength = 0.500
     wav_loc = np.absolute(wavelength_grid-cloud_wavelength).argmin()
-elif opacity_files == 'SET_2':
+elif opacity_set_number == 'SET_2':
     cloud_wavelength = 2.3
     wav_loc = np.absolute(wavelength_grid-cloud_wavelength).argmin()
-elif opacity_files == 'SET_3':
+elif opacity_set_number == 'SET_3':
     cloud_wavelength = 2.3
     wav_loc = np.absolute(wavelength_grid-cloud_wavelength).argmin()
 else:
@@ -113,7 +130,7 @@ for q in range(len(planet_names)):
 
     # This is the path to the chemistry file
     # This assumes that 10x solar uses the 1x met chem tables, maybe a bad thing
-    if (opacity_files == "SET_1"):
+    if (opacity_set_number == "SET_1"):
         if (0.1  <= MET_X_SOLAR < 10.0):
             chemistry_file_path = "DATA/SET_1/ordered_1x_solar_metallicity_chem.dat"
         elif (10.0 <= MET_X_SOLAR < 99.0):
@@ -127,13 +144,13 @@ for q in range(len(planet_names)):
         else:
             print("Error in choosing which metallicy the chemistry file should be")
 
-    elif (opacity_files == "SET_2"):
+    elif (opacity_set_number == "SET_2"):
         if (0.1  <= MET_X_SOLAR < 10.0):
             chemistry_file_path = "DATA/SET_2/eos_solar_doppler.dat"
         else:
             print("Error in choosing which metallicy the chemistry file should be")
             exit(0)
-    elif (opacity_files == "SET_3"):
+    elif (opacity_set_number == "SET_3"):
         if (0.5  <= MET_X_SOLAR <= 2.0):
             chemistry_file_path = "DATA/SET_3/eos_solar_doppler_with_el.dat"
         else:
@@ -186,34 +203,36 @@ for q in range(len(planet_names)):
     STELLAR_TEMP = float(grab_input_data.read_planet_and_star_params(planet_name, "T* (K)"))
     R_STAR       = float(grab_input_data.read_planet_and_star_params(planet_name, "R* (R_sun)")) * 695700000
 
-    print("Planet characteristics")
-    print("These are the cloud types in order, and the corresponding amounts")
-    print ("KCl, ZnS, Na2S, MnS, Cr, SiO2, Mg2SiO4, VO, Ni, Fe, Ca2SiO4, CaTiO3, Al2O3")
-    print("MOLEF", MOLEF)
-    print("Gravity =  ",     grav)
-    print("Number of OOM = ", oom)
-    print("Gas Constant = ", gasconst)
-    print("Planet Radius = ", R_PLANET)
-    print("Orbital Period (days) = ", P_ROT)
-    print("MTLX = ", MTLX)
-    print("There are hazes? ", HAZES)
+    print("\n" + "="*60)
+    print("Planet Characteristics")
+    print("These are the cloud types in order, and the corresponding amounts:")
+    print("KCl, ZnS, Na2S, MnS, Cr, SiO2, Mg2SiO4, VO, Ni, Fe, Ca2SiO4, CaTiO3, Al2O3")
+    print("MOLEF:", MOLEF)
+    print("Gravity:", grav)
+    print("Number of OOM:", oom)
+    print("Gas Constant:", gasconst)
+    print("Planet Radius:", R_PLANET)
+    print("Orbital Period (days):", P_ROT)
+    print("MTLX:", MTLX)
+    print("Are there hazes?", HAZES)
     print(aerosol_layers, "cloud layers")
     print("Haze type:", HAZE_TYPE)
-    print("GCM Layers = ", INITIAL_NTAU)
-    print("Mean Molecular Weight", MEAN_MOLECULAR_WEIGHT)
-    print("")
-    print("Be careful to make sure that your chemistry file is correct!")
-    print("METALLICITY = ", MET_X_SOLAR)
-    print("chemistry file path = ", chemistry_file_path)
-    print("USING opacity set: ", opacity_files)
+    print("GCM Layers:", INITIAL_NTAU)
+    print("Mean Molecular Weight:", MEAN_MOLECULAR_WEIGHT)
+    print("\nBe careful to make sure that your chemistry file is correct!")
+    print("METALLICITY:", MET_X_SOLAR)
+    print("Chemistry file path:", chemistry_file_path)
+    print("Using opacity set:", opacity_set_number)
+    print("="*60 + "\n")
 
-    print("")
-    print("Star characteristics")
+    print("\n" + "="*60)
+    print("Star Characteristics")
     print("!!!!!   MAKE SURE TO CHECK THESE, IT IS HARD TO STRING MATCH  !!!!!!!")
     print("You matched", star_name, "on planet", planet_name)
-    print("Orbital Separation = ",ORB_SEP / 1.496e11)
-    print("Star Temp = ",STELLAR_TEMP)
-    print("Star Radius = ",R_STAR / 695700000)
+    print("Orbital Separation (in AU):", ORB_SEP / 1.496e11)
+    print("Star Temp:", STELLAR_TEMP)
+    print("Star Radius (in solar radii):", R_STAR / 695700000)
+    print("="*60 + "\n")
 
 
     # Are these used?
@@ -243,106 +262,50 @@ for q in range(len(planet_names)):
 
         return input_paths, inclination_strs, phase_strs
 
-
     def run_exo(input_paths, inclination_strs, phase_strs, doppler_val):
         """
-        This runs Eliza's code
+        This function orchestrates running Eliza's code for each provided input path,
+        modifying 'input.h' appropriately for each run based on dynamic parameters.
         """
-        inputs_file = 'input.h'
-        output_paths = []
+        replace_files(opacity_set_number)  # Prepare the base files (e.g., copy templates without 'template_' prefix)
 
-        # The output paths should be similar to the input paths
-        for file_path in input_paths:
-            output_paths.append('OUT/Spec_' + str(doppler_val) + '_' + file_path[10:-4])
+        # Generate output paths based on input paths and doppler value
+        output_paths = ['OUT/Spec_' + str(doppler_val) + '_' + path[10:-4] for path in input_paths]
 
-        # Each Run needs to have a specific input.h file
-        for i in range(len(input_paths)):
-            output_temp = output_paths[i]
-            input_temp  = input_paths[i]
+        for i, input_path in enumerate(input_paths):
+            # Construct modifications dictionary for this run
+            modifications = {
+                "<<output_file>>": "\"" + output_paths[i] + "\"",
+                "<<input_file>>": "\"" + input_path + "\"",
+                "<<doppler>>": str(doppler_val),
+                "<<inclination>>": inclination_strs[i],
+                "<<phase>>": phase_strs[i],
+                "<<CHEMISTRY_FILE>>": "\"" + chemistry_file_path + "\"",
+                "<<CLOUDS>>":str(CLOUDS),
+                "<<NTAU>>":str(NTAU),
+                "<<NLAT>>":str(NLAT),
+                "<<NLON>>":str(NLON),
+                "<<W0_VAL>>":str(W0_VAL),
+                "<<G0_VAL>>":str(G0_VAL),
+                "<<GRAVITY_SI>>":str(grav),
+                "<<R_PLANET>>":str(R_PLANET),
+                "<<ORB_SEP>>":str(ORB_SEP),
+                "<<STELLAR_TEMP>>":str(STELLAR_TEMP),
+                "<<R_STAR>>":str(R_STAR),
+                "<<P_ROT>>":str(P_ROT),
+                "<<MEAN_MOLECULAR_WEIGHT>>":str(MEAN_MOLECULAR_WEIGHT),
+                "<<HAZE_TYPE>>":"\"" + HAZE_TYPE +"\"",
+                "<<HAZES>>": str(1) if HAZES else str(0),
+                }
 
-            lock_file_path = 'file_lock.lock'
-            with open(lock_file_path, 'a') as lock_file:  # Use 'a' mode
-                # Acquire the lock
-                fcntl.flock(lock_file, fcntl.LOCK_EX)
+            # Call the function to modify 'input.h' for this run
+            modify_input_h(opacity_set_number, modifications)
 
-                # This will copy all the files that need to be changed over with different opac versions
-                setup_opac_versions.replace_files(opacity_files, MET_X_SOLAR)
+            # Update the input.h file for the species desired
+            insert_opacity_definitions('input.h', 'DATA/' + opacity_set_number, opacity_species)
 
-                # Copy the template for inputs
-                try:
-                    copyfile('template_inputs.h', inputs_file)
-                except IOError as e:
-                    print("Unable to copy file. %s" % e)
-                    exit(1)
-                except:
-                    print("Unexpected error:", sys.exc_info())
-                    exit(1)
-
-                # Read in the file
-                with open(inputs_file, 'r') as file :
-                    filedata = file.read()
-
-            # Replace the input and output paths
-            filedata = filedata.replace("<<output_file>>", "\"" + output_temp + str(W0_VAL) + str(G0_VAL) + "\"")
-            filedata = filedata.replace("<<input_file>>", "\"" + input_temp + "\"")
-            filedata = filedata.replace("<<doppler>>", str(doppler_val))
-            filedata = filedata.replace("<<inclination>>", inclination_strs[i])
-            filedata = filedata.replace("<<phase>>", phase_strs[i])
-            filedata = filedata.replace("<<CHEMISTRY_FILE>>", "\"" + chemistry_file_path + "\"")
-
-
-            # Prepare to add opacity file definitions
-            files_in_directory = os.listdir('DATA/' + opacity_files + '/')
-            opacity_files_list = [file for file in files_in_directory if file.startswith("opac")]
-            #opacity_files_list = opacity_files_list[:1]
-
-            # Find the position of #endif in filedata to insert the new lines before it
-            endif_position = filedata.rfind("#endif")
-
-            for opacity_file in opacity_files_list:
-                # Skip files that contain 'CIA' in their name
-                if "CIA" in opacity_file:
-                    continue
-
-                # Remove 'opac' prefix and '.dat' suffix
-                molecule_name = opacity_file[4:-4]
-                new_line = f'#define {molecule_name}_FILE   "DATA/SET_1/{opacity_file}"\n'
-
-                # Insert the new line before the #endif marker
-                filedata = filedata[:endif_position] + new_line + filedata[endif_position:]
-
-                # Update the endif_position to account for the length of the newly added line
-                endif_position += len(new_line)
-
-            # After finishing the loop, filedata will have all the new lines added just before #endif
-            # Now write the modified content back to the inputs_file
-            with open(inputs_file, 'w') as file:
-                file.write(filedata)
-
-            filedata = filedata.replace("<<CLOUDS>>", str(CLOUDS))
-            filedata = filedata.replace("<<NTAU>>", str(NTAU))
-            filedata = filedata.replace("<<NLAT>>", str(NLAT))
-            filedata = filedata.replace("<<NLON>>", str(NLON))
-            filedata = filedata.replace("<<W0_VAL>>", str(W0_VAL))
-            filedata = filedata.replace("<<G0_VAL>>", str(G0_VAL))
-            filedata = filedata.replace("<<GRAVITY_SI>>", str(grav))
-            filedata = filedata.replace("<<R_PLANET>>",     str(R_PLANET))
-            filedata = filedata.replace("<<ORB_SEP>>",      str(ORB_SEP))
-            filedata = filedata.replace("<<STELLAR_TEMP>>", str(STELLAR_TEMP))
-            filedata = filedata.replace("<<R_STAR>>",       str(R_STAR))
-            filedata = filedata.replace("<<P_ROT>>",        str(P_ROT))
-
-            filedata = filedata.replace("<<MEAN_MOLECULAR_WEIGHT>>", str(MEAN_MOLECULAR_WEIGHT))
-
-            filedata = filedata.replace("<<HAZE_TYPE>>", "\"" + HAZE_TYPE +"\"")
-            if (HAZES == True):
-                filedata = filedata.replace("<<HAZES>>", str(1))
-            else:
-                filedata = filedata.replace("<<HAZES>>", str(0))
-
-            # Write the file out again
-            with open(inputs_file, 'w') as file:
-                file.write(filedata)
+            # Modify totalopac.c
+            modify_totalopac(opacity_set_number, opacity_species)
 
             try:
                 # Run Eliza's code
@@ -355,14 +318,9 @@ for q in range(len(planet_names)):
 
                 execution_command = f"./{file_name}"
                 subprocess.run(execution_command, shell=True, check=True)
-
             except subprocess.CalledProcessError as e:
                 # Throw an error
                 print(f"An error occurred while executing a subprocess: {e}")
-            finally:
-                # Release the lock
-                if lock_file and not lock_file.closed:
-                    fcntl.flock(lock_file, fcntl.LOCK_UN)
         return None
 
 
@@ -370,7 +328,6 @@ for q in range(len(planet_names)):
     output_paths = []
     inclination_strs = []
     phase_strs = []
-
 
     STEP_ONE = False
     STEP_TWO = False
@@ -414,6 +371,22 @@ for q in range(len(planet_names)):
 
 
     print('Finished running', planet_name)
+
+
+def cleanup_lock_files():
+    """
+    Cleans up any files with 'lock' in their name in the current directory.
+    """
+    try:
+        lock_files = [f for f in os.listdir('.') if 'lock' in f]
+        for lock_file in lock_files:
+            os.remove(lock_file)
+            print(f"Removed lock file: {lock_file}")
+    except Exception as e:
+        print(f"An error occurred while cleaning up lock files: {e}")
+
+# Call the function to clean up lock files
+cleanup_lock_files()
 
 #uncomment this out if you would like the files to automatically delete the bonus files that are created
 #Clean_suite.automaticclean(__file__)

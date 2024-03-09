@@ -3,12 +3,6 @@
 #ifndef __OPAC_H__
 #define __OPAC_H__
 
-/* Variables for opacity
- *
- * Sara Seager
- * Last modified: Eliza Miller-Ricci June 25, 2007
- */
-
 /* --- Opacity structure -------------------------------------------- */
 struct Opac { 
   int NP, NT;
@@ -20,30 +14,31 @@ struct Opac {
 /* --- Chemistry structure ------------------------------------------ */
 
 struct Chem {
-  double **total,
-                  **el,
-                  **H,
-                  **H2,
-                  **He,
-                  **C2H2,
-                  **CH4,
-                  **CO,
-                  **CO2,
-                  **H2O,
-                  **H2S,
-                  **HCN,
-                  **K,
-                  **Na,
-                  **NH3,
-                  **PH3,
-                  **TiO,
-                  **VO,
-                  **FeH,
-                  **Ar,
-                  **N2,
-                  **O2,
-                  **map_abund,
-                  **rho_k_T, **mu;
+  double  **total,
+          **el,
+          **H,
+          **H2,
+          **He,
+          **C2H2,
+          **CH4,
+          **CO,
+          **CO2,
+          **H2O,
+          **H2S,
+          **HCN,
+          **K,
+          **Na,
+          **NH3,
+          **PH3,
+          **TiO,
+          **VO,
+          **FeH,
+          **Ar,
+          **N2,
+          **O2,
+          **map_abund,
+          **rho_k_T,
+          **mu;
   double *P, *T;
 };
 
