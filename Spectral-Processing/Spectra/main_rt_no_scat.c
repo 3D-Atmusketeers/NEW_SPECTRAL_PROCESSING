@@ -19,9 +19,7 @@ void RT_Emit_3D(double PHASE);
 
 /* ------- begin ---------------- main --------------------------- */
 
-
 int main(){
-    
     PHASE = 0.0;
     double phase_step = 360. / N_PHASE;
     
@@ -43,7 +41,6 @@ int main(){
         
         PHASE += phase_step;
         printf("\n");
-        
     }
   return 0;
 }
