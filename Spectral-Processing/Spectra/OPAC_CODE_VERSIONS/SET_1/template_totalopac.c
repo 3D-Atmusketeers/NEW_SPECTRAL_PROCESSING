@@ -50,6 +50,7 @@ void TotalOpac() {
   double **opac_CIA_H2H2, **opac_CIA_H2He, **opac_CIA_H2H, **opac_CIA_H2CH4, **opac_CIA_CH4Ar,
          **opac_CIA_CH4CH4, **opac_CIA_CO2CO2, **opac_CIA_HeH, **opac_CIA_N2CH4, **opac_CIA_N2H2,
          **opac_CIA_N2N2, **opac_CIA_O2CO2, **opac_CIA_O2N2, **opac_CIA_O2O2, **opac_CIA_Hel;
+  double *t_CIA, *lambda_CIA, **opac_CIA;
   int i, j, k, a, b, dum;
   char filename[65];
 
@@ -71,7 +72,12 @@ void TotalOpac() {
   opac_CIA_O2N2 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
   opac_CIA_O2O2 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
   opac_CIA_Hel = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
- 
+
+
+  t_CIA = dvector(0, 18);
+  lambda_CIA = dvector(0, 999);
+  opac_CIA = dmatrix(0, 19, 0, 999);
+
   /* Read Chemistry Table */
   ReadChemTable();
   printf("ReadChemTable done\n");
@@ -84,6 +90,16 @@ void TotalOpac() {
       opac.mu[j][k] = MU;
     }
   }
+
+  /* Fill in scattering coefficients */
+  opacscat.kappa = malloc(NLAMBDA*sizeof(double));
+  for(i=0; i<NLAMBDA; i++){
+    opacscat.kappa[i] = malloc(NPRESSURE*sizeof(double));
+    for(j=0; j<NPRESSURE; j++){
+      opacscat.kappa[i][j] = malloc(NTEMP*sizeof(double));
+    }
+  }
+
 
 
   // Fill in the opacities for each species
@@ -125,16 +141,28 @@ void TotalOpac() {
     }
   }
   printf("CIA: %e   %e\n", atmos.lambda[NLAMBDA-1], opac_CIA_H2H2[NTEMP-1][NLAMBDA-1]);
- 
-  opacCIA.kappa = calloc(NLAMBDA, sizeof(double));
-  for(i=0; i<NLAMBDA; i++){
-    opacCIA.kappa[i] = calloc(NPRESSURE, sizeof(double));
-    for(j=0; j<NPRESSURE; j++){
-      opacCIA.kappa[i][j] = calloc(NTEMP, sizeof(double));
-    }
+
+  // Allocate memory for opacCIA.kappa
+  opacCIA.kappa = (double ***)malloc(NLAMBDA * sizeof(double **));
+  if (opacCIA.kappa == NULL) {
+      printf("Failed to allocate memory for opacCIA.kappa (outer dimension)\n");
+      // Handle the error appropriately, e.g., return or exit the function
   }
-  
-  
+  for (i = 0; i < NLAMBDA; i++) {
+      opacCIA.kappa[i] = (double **)malloc(NPRESSURE * sizeof(double *));
+      if (opacCIA.kappa[i] == NULL) {
+          printf("Failed to allocate memory for opacCIA.kappa[%d] (middle dimension)\n", i);
+          // Handle the error appropriately, e.g., free previously allocated memory and return or exit the function
+      }
+      for (j = 0; j < NPRESSURE; j++) {
+          opacCIA.kappa[i][j] = (double *)malloc(NTEMP * sizeof(double));
+          if (opacCIA.kappa[i][j] == NULL) {
+              printf("Failed to allocate memory for opacCIA.kappa[%d][%d] (inner dimension)\n", i, j);
+              // Handle the error appropriately, e.g., free previously allocated memory and return or exit the function
+          }
+      }
+  }
+
   for (i=0; i<NLAMBDA; i++){
     for (j=0; j<NPRESSURE; j++){
       for (k=0; k<NTEMP; k++){
@@ -213,11 +241,9 @@ void TotalOpac() {
       }
     }
   }
-
   fclose(f1);
-	
-  /* Rayleigh scattering */
 
+  /* Rayleigh scattering */
   /* (Polarizabilities from the CRC Handbook) */
 
   for (i=0; i<NLAMBDA; i++)
@@ -283,10 +309,15 @@ void TotalOpac() {
 
   // Do a final summation over the species
 
+
+
   
   // Free not needed opacity structures and chemistry table
 
 
+  FreeOpacTable(opacCIA);
+  FreeOpacTable(opacscat);
+  FreeChemTable();
 
   free_dmatrix(opac_CIA_H2H2, 0, NTEMP-1, 0, NLAMBDA-1);
   free_dmatrix(opac_CIA_H2He, 0, NTEMP-1, 0, NLAMBDA-1);
