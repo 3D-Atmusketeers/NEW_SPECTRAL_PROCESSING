@@ -1,22 +1,14 @@
 #!/usr/bin/env python
-from shutil import copyfile
+import numpy as np
 from sys import exit
 import os
-import numpy as np
 import run_grid
 import altitude_regridding
 import add_clouds
 import convert_fort_files
-import time
 import re
-import shutil
-import setup_opac_versions
 import subprocess
-import tempfile
-from filelock import FileLock
 import grab_input_data
-import fcntl
-import sys
 from setup_opac_versions import replace_files, modify_input_h, insert_opacity_definitions, modify_totalopac
 
 #import Clean_suite
@@ -290,8 +282,6 @@ for q in range(len(planet_names)):
             # Modify totalopac.c
             modify_totalopac(opacity_species)
 
-            exit(0)
-
             try:
                 # Run Eliza's code
                 subprocess.run('make rt_emission_aerosols.exe', shell=True, check=True)
@@ -358,20 +348,20 @@ for q in range(len(planet_names)):
     print('Finished running', planet_name)
 
 
-def cleanup_lock_files():
+def cleanup_lock_and_exe_files():
     """
-    Cleans up any files with 'lock' in their name in the current directory.
+    Cleans up any files with 'lock' in their name or ending with '.exe' in the current directory.
     """
     try:
-        lock_files = [f for f in os.listdir('.') if 'lock' in f]
-        for lock_file in lock_files:
-            os.remove(lock_file)
-            print(f"Removed lock file: {lock_file}")
+        files_to_remove = [f for f in os.listdir('.') if 'lock' in f or f.endswith('.exe')]
+        for file in files_to_remove:
+            os.remove(file)
+            print(f"Removed file: {file}")
     except Exception as e:
-        print(f"An error occurred while cleaning up lock files: {e}")
+        print(f"An error occurred while cleaning up files: {e}")
 
 # Call the function to clean up lock files
-cleanup_lock_files()
+cleanup_lock_and_exe_files()
 
 #uncomment this out if you would like the files to automatically delete the bonus files that are created
 #Clean_suite.automaticclean(__file__)

@@ -108,6 +108,7 @@ void TotalOpac() {
 
   /* Fill in collision-induced opacities */
   f1 = fopen(CIA_FILE, "r");
+  //f1 = fopen("DATA/SET_1/opacCIA_low_temp.dat", "r");
 
   if(f1 == NULL){
     printf("\n totalopac.c:\nError opening CIA file: -- No such file or directory\n\n");
