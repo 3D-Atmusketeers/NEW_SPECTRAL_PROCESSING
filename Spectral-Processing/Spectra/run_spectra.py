@@ -61,7 +61,7 @@ smoothing = True
 
 # These are the planet files that you need to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-soot-50clouds-100met-REDO"]
+planet_names = ["GJ1214b-none-0clouds-1met"]
 opacity_set_number = 'SET_1'
 
 # Construct the path to the directory
@@ -92,18 +92,11 @@ print("-" * 60)
 print(f"Selected Species: {opacity_species}")
 print("="*60 + "\n")
 
-
 # Set the wavelength to evaluate the clouds at for plotting!
 # This could be put in a better place I think
 wavelength_grid = np.loadtxt('SCATTERING_DATA/wavelength_array_for_cloud_scattering_data_in_microns.txt')
 if opacity_set_number == 'SET_1':
     cloud_wavelength = 0.500
-    wav_loc = np.absolute(wavelength_grid-cloud_wavelength).argmin()
-elif opacity_set_number == 'SET_2':
-    cloud_wavelength = 2.3
-    wav_loc = np.absolute(wavelength_grid-cloud_wavelength).argmin()
-elif opacity_set_number == 'SET_3':
-    cloud_wavelength = 2.3
     wav_loc = np.absolute(wavelength_grid-cloud_wavelength).argmin()
 else:
     print("YOU NEED TO SET WHICH OPACITY SET YOU'RE USING")
@@ -132,11 +125,8 @@ for q in range(len(planet_names)):
     MET_X_SOLAR    = 10.0 ** grab_input_data.get_input_data(path, runname, "fort.7","METALLICITY")
     HAZES = grab_input_data.get_input_data(path, runname, "fort.7", "HAZES")[0] == 'T'
     MOLEF          = grab_input_data.get_input_data(path, runname, "fort.7","MOLEF")
+    HAZE_TYPE = next((s for s in ['soot', 'soot_2xpi0', 'sulfur', 'tholin'] if s in runname.lower()), 'None')
 
-    print('MAKE SURE TO FIX THIS!!!!!!!!!!!!!!!!!!')
-    print('MAKE SURE TO FIX THIS!!!!!!!!!!!!!!!!!!')
-    print('MAKE SURE TO FIX THIS!!!!!!!!!!!!!!!!!!')
-    HAZE_TYPE      = 'soot'
 
     GAS_CONSTANT_R = 8.314462618
     MEAN_MOLECULAR_WEIGHT = np.round((GAS_CONSTANT_R/gasconst) * 1000, 4)
@@ -145,30 +135,9 @@ for q in range(len(planet_names)):
     # This assumes that 10x solar uses the 1x met chem tables, maybe a bad thing
     if (opacity_set_number == "SET_1"):
         if (0.1  <= MET_X_SOLAR < 10.0):
-            chemistry_file_path = "DATA/SET_1/ordered_1x_solar_metallicity_chem.dat"
-        elif (10.0 <= MET_X_SOLAR < 99.0):
-            chemistry_file_path = "DATA/SET_1/ordered_30x_solar_metallicity_chem.dat"
-        elif (99.0 <= MET_X_SOLAR < 150.0):
-            chemistry_file_path = "DATA/SET_1/ordered_100x_solar_metallicity_chem.dat"
-        elif (150.0  <= MET_X_SOLAR < 2000.0):
-            chemistry_file_path = "DATA/SET_1/ordered_300x_solar_metallicity_chem.dat"
-        elif (2000.0  <= MET_X_SOLAR < 4000.0):
-            chemistry_file_path = "DATA/SET_1/ordered_3000x_solar_metallicity_chem.dat"
+            chemistry_file_path = "DATA/ordered_1x_solar_metallicity_chem.dat"
         else:
             print("Error in choosing which metallicy the chemistry file should be")
-
-    elif (opacity_set_number == "SET_2"):
-        if (0.1  <= MET_X_SOLAR < 10.0):
-            chemistry_file_path = "DATA/SET_2/eos_solar_doppler.dat"
-        else:
-            print("Error in choosing which metallicy the chemistry file should be")
-            exit(0)
-    elif (opacity_set_number == "SET_3"):
-        if (0.5  <= MET_X_SOLAR <= 2.0):
-            chemistry_file_path = "DATA/SET_3/eos_solar_doppler_with_el.dat"
-        else:
-            print("Error in choosing which metallicy the chemistry file should be")
-            exit(0)
     else:
         print("Error in choosing the chemistry file!")
 
@@ -280,7 +249,8 @@ for q in range(len(planet_names)):
         This function orchestrates running Eliza's code for each provided input path,
         modifying 'input.h' appropriately for each run based on dynamic parameters.
         """
-        replace_files(opacity_set_number)  # Prepare the base files (e.g., copy templates without 'template_' prefix)
+        # Prepare the base files (e.g., copy templates without 'template_' prefix)
+        replace_files(opacity_set_number)  
 
         # Generate output paths based on input paths and doppler value
         output_paths = ['OUT/Spec_' + str(doppler_val) + '_' + path[10:-4] for path in input_paths]
@@ -312,13 +282,15 @@ for q in range(len(planet_names)):
                 }
 
             # Call the function to modify 'input.h' for this run
-            modify_input_h(opacity_set_number, modifications)
+            modify_input_h(modifications, opacity_set_number)
 
             # Update the input.h file for the species desired
             insert_opacity_definitions('input.h', 'DATA/' + opacity_set_number, opacity_species)
 
             # Modify totalopac.c
-            modify_totalopac(opacity_set_number, opacity_species)
+            modify_totalopac(opacity_species)
+
+            exit(0)
 
             try:
                 # Run Eliza's code

@@ -4,23 +4,20 @@ from shutil import copyfile
 import shutil
 import sys
 
-def replace_files(opacity_files):
-    lock_file_path = f'file_lock_{opacity_files}.lock'
+
+def replace_files(opacity_set_number):
+    lock_file_path = f'file_lock_{opacity_set_number}.lock'
     with open(lock_file_path, 'w') as lock_file:
         # Acquire the lock
         fcntl.flock(lock_file, fcntl.LOCK_EX)
 
         # Define the source directory path
-        src_directory_path = os.path.join('OPAC_CODE_VERSIONS', opacity_files)
-
-        # List and print files in the source directory for debugging
-        src_files = os.listdir(src_directory_path)
+        src_directory_path = 'OPACITY_CODE_TEMPLATES'
 
         # Define template files expected to be replaced
         template_files_to_replace = [
             "template_opac.h", "template_input.h", "template_readchemtable.c",
-            "template_readopactable.c", "template_totalopac.c"
-        ]
+            "template_readopactable.c", "template_totalopac.c"]
 
         # Loop through each template file to replace
         for template_file in template_files_to_replace:
@@ -40,15 +37,16 @@ def replace_files(opacity_files):
                     print(f"Error: Source file {src_path} does not exist!")
                     continue
 
-                #print(f"Copying {src_path} to {dst_path}")
                 shutil.copy(src_path, dst_path)
+
             except Exception as e:
                 print(f"Unable to copy file from {src_path} to {dst_path}. Error: {e}")
 
         # Release the lock
         fcntl.flock(lock_file, fcntl.LOCK_UN)
 
-def modify_input_h(opacity_files, modifications):
+
+def modify_input_h(modifications, opacity_set_number):
     inputs_file = 'input.h'
     lock_file_path = 'file_lock.lock'
 
@@ -58,7 +56,7 @@ def modify_input_h(opacity_files, modifications):
 
         # Copy the template for inputs as the basis for modifications
         try:
-            template_input_path = os.path.join('OPAC_CODE_VERSIONS', opacity_files, 'template_input.h')
+            template_input_path = os.path.join('OPACITY_CODE_TEMPLATES', 'template_input.h')
             copyfile(template_input_path, inputs_file)
             #print(f"Copied template_input.h to {inputs_file}")
         except IOError as e:
@@ -71,16 +69,27 @@ def modify_input_h(opacity_files, modifications):
         # Read in the file
         try:
             with open(inputs_file, 'r') as file:
-                filedata = file.read()
+                lines = file.readlines()
+
+            # Find the index of the line containing #endif, then insert the CIA_FILE definition before it
+            endif_index = next((i for i, line in enumerate(lines) if '#endif' in line), None)
+            cia_file_line = f'#define CIA_FILE "DATA/{opacity_set_number}/opacCIA_lotemp_isaac.dat"\n'
+            
+            if endif_index is not None:
+                lines.insert(endif_index, cia_file_line)
+            else:
+                # If #endif is not found, append the line at the end
+                lines.append(cia_file_line)
 
             # Perform replacements based on modifications dictionary
+            filedata = ''.join(lines)
             for placeholder, value in modifications.items():
                 filedata = filedata.replace(placeholder, value)
 
             # Write the modified content back to the input file
             with open(inputs_file, 'w') as file:
                 file.write(filedata)
-            #print("input.h has been successfully modified.")
+            #print("input.h has been successfully modified with CIA_FILE definition.")
         except IOError as e:
             print(f"Error while modifying {inputs_file}: {e}")
             sys.exit(1)
@@ -133,7 +142,7 @@ def insert_opacity_definitions(filepath, directory, opacity_species):
 
 import fcntl
 
-def modify_totalopac(opacity_files, species_to_include):
+def modify_totalopac(species_to_include):
     totalopac_path = 'totalopac.c'
     lock_file_path = 'file_lock_totalopac.lock'
 

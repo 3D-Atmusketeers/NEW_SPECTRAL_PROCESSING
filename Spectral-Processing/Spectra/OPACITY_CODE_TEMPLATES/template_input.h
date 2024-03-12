@@ -23,11 +23,11 @@ Defines input values and files for 3-D emission spectra
 #define NLAT  <<NLAT>>                           /* Number of latitude points in 3-D  grid */
 #define NLON  <<NLON>>                           /* Number of longitude points in 3-D grid */
 
-#define NTEMP 30                           /* Number of temperature points in grid   */
-#define NLAMBDA 2598                       /* Number of wavelength points in grid [4616/2598]   */
+#define NTEMP 49                           /* Number of temperature points in grid   */
+#define NLAMBDA 11215                       /* Number of wavelength points in grid [4616/2598]   */
 
 // This is the Npressure for low res
-#define NPRESSURE 17    /* Number of pressure points in grid   [13/17]   */
+#define NPRESSURE 28    
 
 #define W0_VAL <<W0_VAL>>
 #define G0_VAL <<G0_VAL>>
@@ -37,11 +37,11 @@ Defines input values and files for 3-D emission spectra
 #define INPUT_PHASE <<phase>>              /* Planet inclination in degrees           */
 #define G <<GRAVITY_SI>>                   /* Planet surface gravity                 */
 
-#define R_PLANET <<R_PLANET>>                 /* Planet radius at base of atmosphere      */
-#define ORB_SEP <<ORB_SEP>>                  // This is some distance
-#define STELLAR_TEMP <<STELLAR_TEMP>>                // Stellar Blackbody temperature
-#define R_STAR <<R_STAR>>                    /* Stellar radius                         */
-#define P_ROT  <<P_ROT>>                        /* Rotation period in days (= P_ORB for tidally locked planet)    */
+#define R_PLANET <<R_PLANET>>              /* Planet radius at base of atmosphere      */
+#define ORB_SEP <<ORB_SEP>>                // This is some distance
+#define STELLAR_TEMP <<STELLAR_TEMP>>      // Stellar Blackbody temperature
+#define R_STAR <<R_STAR>>                  /* Stellar radius                         */
+#define P_ROT  <<P_ROT>>                   /* Rotation period in days (= P_ORB for tidally locked planet)    */
 #define HAZE_TYPE <<HAZE_TYPE>>
 #define HAZES <<HAZES>>
 #define R_VEL 0.0                          /* Radial Velocity                        */
@@ -50,18 +50,10 @@ Defines input values and files for 3-D emission spectra
                                            /* FORMAT=2 -> large opacity table        */
 
 #define ABUND_TRACK_IND 2 /* if test visualize, the index of the mapped species in the EOS file */
-#define CHEM_FILE_NCOLS 17
-
+#define CHEM_FILE_NCOLS 23
 
 /* Opacities for spectra */
 #define CHEM_FILE   <<CHEMISTRY_FILE>>
-#define CH4_FILE    "DATA/SET_3/opacCH4_hires.dat"
-#define CO2_FILE    "DATA/SET_3/opacCO2_hires.dat"
-#define CO_FILE     "DATA/SET_3/opacCO_hires.dat"
-#define H2O_FILE    "DATA/SET_3/opacH2O_hires.dat"
-#define NH3_FILE    "DATA/SET_3/opacNH3_hires.dat"
-#define O2_FILE     "DATA/SET_3/opacO2_hires.dat"
-#define O3_FILE     "DATA/SET_3/opacO3_hires.dat"
 
 #endif /* !__INPUT_H__ */
 
