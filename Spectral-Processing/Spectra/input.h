@@ -55,7 +55,7 @@ Defines input values and files for 3-D emission spectra
 /* Opacities for spectra */
 #define CHEM_FILE   "DATA/ordered_1x_solar_metallicity_chem.dat"
 
-#define CIA_FILE "DATA/SET_1/opacCIA_lotemp_isaac.dat"
+#define CIA_FILE "DATA/SET_1/opacCIA_low_temp.dat"
 #define TiO_FILE   "DATA/SET_1/opacTiO.dat"
 #define CO_FILE   "DATA/SET_1/opacCO.dat"
 #define FeH_FILE   "DATA/SET_1/opacFeH.dat"

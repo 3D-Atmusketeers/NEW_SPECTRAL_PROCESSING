@@ -73,7 +73,7 @@ def modify_input_h(modifications, opacity_set_number):
 
             # Find the index of the line containing #endif, then insert the CIA_FILE definition before it
             endif_index = next((i for i, line in enumerate(lines) if '#endif' in line), None)
-            cia_file_line = f'#define CIA_FILE "DATA/{opacity_set_number}/opacCIA_lotemp_isaac.dat"\n'
+            cia_file_line = f'#define CIA_FILE "DATA/{opacity_set_number}/opacCIA_low_temp.dat"\n'
             
             if endif_index is not None:
                 lines.insert(endif_index, cia_file_line)
