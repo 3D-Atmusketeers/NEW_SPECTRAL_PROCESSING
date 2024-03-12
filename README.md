@@ -1,119 +1,86 @@
 # Spectral-Processing
 
-*************************************************
-************       USER GUIDE        ************
-*************************************************
-This is a guide for how to use the files here
+## User Guide
 
-Recently, Isaac and Alex have changed how to run the post processing. It is now much easier and faster. 
+This guide outlines how to use the code for creating emission spectra. The process has been simplified and optimized by Isaac and Alex.
 
+## Before Running
 
-*************************************************
-*********         Before Running      **********
-*************************************************
+Before initiating the processing, ensure that the necessary data files are in place. These files are too large for GitHub storage but have been made available on Turbo.
 
-The code needs some data files to run that are too big to keep in github. Isaac put these on Turbo
-Running download_all_data_files_from_turbo.py should get you the files
-Look at the bottom of the file in files_to_download to see which ones its grabbing
+- Run `download_all_data_files_from_turbo.py` to download the required files. Check the `files_to_download` list at the bottom of this script to see which files are being retrieved.
+- Once downloaded, move the `SET_X` data folder to `Spectra/DATA`, and the `SCATTERING_DATA` to `Spectra/SCATTERING_DATA`.
+- Place all the General Circulation Models (GCMs) you wish to process in the `GCM-OUTPUT` directory.
+- Set 1 should be medium resolution, and Set 2 should be high resolution
 
-Once the files are downloaded, move the SET_X of data to Spectra/DATA, and move the SCATTERING_DATA to Spectra/SCATTERING_DATA
+## How to Run
 
-Also, make sure to put all the GCMs that you want to run in GCM-OUTPUT
+The spectral processing suite is initiated with `run_entire_suite.py`, which can be started by executing `sbatch Run_all_sbatch` in the terminal. It usually needs at least 24 hours for runtime depending on the number of phases. Its mostly parallel.
 
-*************************************************
-************         HOW TO RUN      ************
-*************************************************
+The code can also be run on a single core with run_spectra.py
+This is easier than running on greatlakes, so do this unless you need a lot of models run.
 
-Spectral-Processing/run_entire_suite.py
-    This will run the entire suite
+The suite comprises three main steps:
 
-    The entire post processing suite will run by typing 'sbatch Run_all_sbatch' in your command line. A good go to for runtime is at least 24 hours. 
-    The benefit is that it is very fast to get everything in parallel, and now everything is run by one click of the button. 
-    
-    Be sure to specify which phases you want run in run_entire_suite.py . 
-	
-    There are three parts to the post processing —altitude regridding, init files, and the final calculations. 
-    STEP_ONE: Altitude regridding takes around an hour and submits one job. It creates 4 files for every planet and places them in /PLANET_MODELS/ . 
-    STEP_TWO: The init files are placed in /Spectra/DATA/ . It will create a separate init file for every phase you run. These take around 20 minutes. 
-    STEP_THREE: Finally, the ending calculations will be placed in /Spectra/OUT/ . There will be two data files for each phase ran. These can take 12 hours depending on the cloudiness of your model. 
-    All three above steps are run at the same time. The code will automatically determine if the altitude regridding and the init files need to be made. This means that if you want to redo them, be sure to delete / move the existing files out. It will not overwrite files in /PLANET_MODELS/ or /Spectra/DATA/ . 
+1. **Altitude Regridding**: Takes about an hour per job, puts models in `/PLANET_MODELS/`.
+2. **Init Files Creation**: Generates initialization files for each phase in `/Spectra/DATA/`, taking roughly 5 minutes.
+3. **Final Calculations**: Outputs are saved in `/Spectra/OUT/`, with two files per phase. This step may take up to 6 hours per model
 
-    The main part of the program that this is calling is Spectra/run_spectra.py
-    This will run all the subprograms for regridding, interpolating, and finally running the post-processing
+These steps are executed serially. The suite checks if altitude regridding and init files are present before proceeding, ensuring no overwrites in `/PLANET_MODELS/` or `/Spectra/DATA/`. To regenerate these files, you must manually remove or relocate the existing ones.
 
-    Some things to keep in mind
-        NLAT: The final number of layers the model will have, try 250 or 500
-        opacity_files: Which set of opacity files you're using
+The suite leverages `Spectra/run_spectra.py` to perform regridding, interpolation, and post-processing. Important parameters include `NLAT` (the final number of model layers, recommend 250 or 500) and `opacity_files` (the set of opacity files in use). The `fort.7` file provides all necessary model information.
 
-    The code will grab all necessary information from the fort.7 . 
+For cloud-dependent wavelength properties adjustments, modifications in `run_spectra.py` are necessary.
 
-    Also, if you care about getting the cloud dependent wavelength properties, you do have to set that in run_spectra.py
-    This is only for specific visualization stuff, not the general postprocessing
+As a user, PLEASE CHECK THAT THE OUTPUT VARIABLES ARE CORRECT!!!!
 
+## Visualizations
 
-Visualizations/create_all_figures.py
-    This will create all the figures that I've so far coded up
+Run `create_all_figures.py` to generate all coded figures. Post-processing may leave empty folders, which should be cleaned up manually.
 
-After all of this the empty folders will probably need to be deleted.
+## Folders Overview
 
-*************************************************
-************         FOLDERS        *************
-*************************************************
+- `Figures`: Contains generated figures.
+- `Visualizations`: Stores visualization code.
+- `FINISHED_SPECTRA`: Destination for completed spectral outputs.
+- `GCM-OUTPUT`: Input folder for GCM outputs.
+- `PLANET_MODELS`: Stores regridded GCMs and interpolation results.
+- `Spectra`: Main processing directory; avoid placing raw data here.
 
-First, there are several folders:
-- Figures            || The figures
-- Visualizations     || The code for making the figures
-- FINISHED_SPECTRA   || This is where all the finished output spectra should go
-- GCM-OUTPUT         || This is where all the GCM outputs from the RM-GCM should go
-- PLANET_MODELS      || This is where all the regridded GCMS and interpolations go
-- Spectra            || This is the main folder where the spectral procressing happens. DON'T PUT DATA HERE
+## File Naming
 
+The post-processing automatically extracts necessary information from `fort.7`, removing the need for specific naming conventions for GCM outputs. Ensure different planet titles to prevent data overwrites. The output printed to the terminal provides a summary of processed data.
 
-*************************************************
-************     FILE NAMING       **************
-*************************************************
+## Opacity Versions and Additional Files
 
-The new version of the post processing grabs all necessary information from the fort.7 . This means that specific naming conventions for the GCM-OUTPUT subfolders are no longer necessary. 
+The suite supports various resolution and temperature regimes, necessitating appropriate EOS, opacity files, and additional data files for comprehensive atmospheric modeling. While swapping out these files for different simulations is straightforward, extensive modifications to the codebase to accommodate new versions are not recommended. The relevant files are organized within the `OPAC_CODE_VERSIONS` and `DATA` directories, and further distinctions are made between different types of files:
 
-However, it is important that planets are titled differently to prevent overwriting data output files. 
+- `SET_1`: Medium Resolution Opacity files for general-purpose simulations.
+- `SET_3`: High-resolution files for detailed analysis.
 
-Most importantly, check that the data output that is printed to the terminal matches what you want!
-It will print out all the important characterists!
+### CIA Files
+
+The CIA (Collisionally Induced Absorption) files are crucial for providing the opacity data related to molecular interactions that are not captured by line transitions alone. These files account for the absorption caused by collisions between atmospheric molecules, contributing significantly to the overall opacity in dense, cooler parts of an atmosphere. CIA files are specific to each set of opacity files and reside within the corresponding `SET_X` directories under `OPAC_CODE_VERSIONS`.
+
+### Chem Files
+
+Chem files detail the atmospheric abundances of various molecules and elements. Unlike the CIA files, chem files are shared between opacity sets. These files are located in a common directory accessible to all opacity sets.
+
+### Rayleigh Scattering
+
+In addition to the opacities provided by the EOS, CIA, and line data files, Rayleigh scattering is another source of opacity considered by the suite.
+
+When updating or adding new data sets, please ensure this README is kept current with the latest file organization and opacity set descriptions.
 
 
-*************************************************
-********      OPACITY VERSIONS              *****
-*************************************************
+## Notes
 
-This code can work for a number of different resolution and temperature regimes.
-However, this requires swapping out the EOS and opacity files, as well as changing the code itself to read in these.
-I don't think that this is a good idea, but it would be a huge amount of work to change it.
-In the meantime, the code will simply swap out the files that need to be changed.
-These files are in OPAC_CODE_VERSIONS and the different opac and EOS files are in DATA
+Running the suite generates numerous files in `/Spectra/`, typical for parallel phase processing. To clean up, execute `Clean_suite.py` to remove unnecessary files. Be aware that numerous Slurm files will also be created.
 
-The files are broken up into the following sets:
-SET_1: The low temp files for GJ1214b 
-SET_2: The files for HD189 + HD209. These are pretty standard hot jupiter files
-SET_3: The high res files, identical to SET_2 but high res
+Currently, the suite cannot process multiple planetary systems simultaneously due to varying stellar parameters required for each run. `run_spectra` allows for single-core planet processing, whereas `set_up_spectra_folders.py` enables concurrent processing of multiple planets, though this method involves significant data duplication.
 
-AS YOU ADD STUFF TO THESE SETS PLEASE UPDATE THIS README!!!!
+### Required Files
 
-*************************************************
-************          NOTES         *************
-*************************************************
+- `fort.26`, `fort.50`, `fort.7`, `fort.62`
 
-In /Spectra/ , there will be (6 * number of phases + 2) number of files created. This is normal and is required for running the phases in parallel. You can easily delete them by running Clean_suite.py (by typing 'python3 Clean_suite.py' in command line). There will also be many slurm files created. Sorry. 
-
-The code currently can NOT do more than one planet system at a time. This is because star radius and effective temp and
-stuff like that needs to be changed per run.
-
-The run_spectra will allow you to run planets on a single core.
-However, if you want to run lots of planets at once, use set_up_spectra_folders.py
-This will run everything at once. It is very powerful, but will copy over huge amounts of data, so be careful.
-
-Files that are needed:
-fort.26, fort.50, fort.7, fort.62
-
-IMPORTANT NOTE:
-set_up_spectra_folders WILL copy over folders and stuff, but you will have to reorganize once everything is run
-that way everything goes to the right place
+**Important**: `set_up_spectra_folders` automates folder and file management but requires post-run reorganization to ensure proper file placement.
