@@ -26,18 +26,18 @@ int main(){
     int i;
     
     for(i=0; i<N_PHASE; i++){
-        printf("Phase: %06.2f\n", PHASE);
+        //printf("Phase: %06.2f\n", PHASE);
         
         TotalOpac();
 
-        printf("TotalOpac done\n");
+        //printf("TotalOpac done\n");
 
         ReadTP_3D();
 
-        printf("ReadTP done\n");
+        //printf("ReadTP done\n");
 
         RT_Emit_3D(PHASE);
-        printf("RT_Emit done\n");
+        //printf("RT_Emit done\n");
         
         PHASE += phase_step;
         printf("\n");

@@ -58,7 +58,7 @@ planet_names = ["GJ1214b-none-0clouds-1met"]
 # The options are lowres and hires
 # Isaac Malsky is still working on highres
 opacity_set_id = 'Low-Res'
-NLAMBDA = 10000 if opacity_set_id == 'Low-Res' else 250000
+NLAMBDA = 36891 if opacity_set_id == 'Low-Res' else 250000
 
 # Construct the path to the directory
 opacity_files_directory = os.path.join('DATA', opacity_set_id)
@@ -140,9 +140,11 @@ for q in range(len(planet_names)):
         print("Error in choosing the chemistry file!")
         exit(0)
 
-    print ("*************************************")
-    print ("*************************************")
-    print ("RUNNING: " + planet_name)
+    print("\n" + "="*40)
+    print("====== RUNNING SIMULATION ======")
+    print(f"Planet Name: {planet_name}")
+    print("="*40 + "\n")
+
 
 
     # Check if the substring 'soot_2xpi0' is in HAZE_TYPE
@@ -186,43 +188,40 @@ for q in range(len(planet_names)):
 
     print("\n" + "="*60)
     print("Planet Characteristics")
-    print("These are the cloud types in order, and the corresponding amounts:")
-    print("KCl, ZnS, Na2S, MnS, Cr, SiO2, Mg2SiO4, VO, Ni, Fe, Ca2SiO4, CaTiO3, Al2O3")
-    print("MOLEF:", MOLEF)
-    print("Gravity:", grav)
-    print("Number of OOM:", oom)
-    print("Gas Constant:", gasconst)
-    print("Planet Radius:", R_PLANET)
-    print("Orbital Period (days):", P_ROT)
-    print("MTLX:", MTLX)
-    print("Are there hazes?", HAZES)
-    print(aerosol_layers, "cloud layers")
-    print("Haze type:", HAZE_TYPE)
-    print("GCM Layers:", INITIAL_NTAU)
-    print("Mean Molecular Weight:", MEAN_MOLECULAR_WEIGHT)
+    print("Cloud Types in Order with Corresponding Amounts:")
+    cloud_types = "KCl, ZnS, Na2S, MnS, Cr, SiO2, Mg2SiO4, VO, Ni, Fe, Ca2SiO4, CaTiO3, Al2O3"
+    print(f"Cloud Types: {cloud_types}")
+    print(f"MOLEF: {MOLEF}")
+    print(f"Gravity: {grav} m/s^2")
+    print(f"Number of Orders of Magnitude (OOM): {oom}")
+    print(f"Gas Constant: {gasconst} J/(K*mol)")
+    print(f"Planet Radius: {R_PLANET} km")
+    print(f"Orbital Period: {P_ROT} days")
+    print(f"Metallicity (MTLX): {MTLX}")
+    print(f"Hazes Present: {'Yes' if HAZES else 'No'}")
+    print(f"{aerosol_layers} Cloud Layers")
+    print(f"Haze Type: {HAZE_TYPE}")
+    print(f"GCM Layers: {INITIAL_NTAU}")
+    print(f"Mean Molecular Weight: {MEAN_MOLECULAR_WEIGHT} u")
     print("\nBe careful to make sure that your chemistry file is correct!")
-    print("METALLICITY:", MET_X_SOLAR)
-    print("Chemistry file path:", chemistry_file_path)
-    print("Using opacity set:", opacity_set_id)
+    print(f"Metallicity relative to solar (METALLICITY): {MET_X_SOLAR}")
+    print(f"Chemistry File Path: {chemistry_file_path}")
+    print(f"Using Opacity Set: {opacity_set_id}")
     print("="*60 + "\n")
 
     print("\n" + "="*60)
     print("Star Characteristics")
     print("!!!!!   MAKE SURE TO CHECK THESE, IT IS HARD TO STRING MATCH  !!!!!!!")
-    print("You matched", star_name, "on planet", planet_name)
-    print("Orbital Separation (in AU):", ORB_SEP / 1.496e11)
-    print("Star Temp:", STELLAR_TEMP)
-    print("Star Radius (in solar radii):", R_STAR / 695700000)
+    print(f"You matched '{star_name}' on planet '{planet_name}'")
+    print(f"Orbital Separation: {ORB_SEP / 1.496e11:.2f} AU")
+    print(f"Star Temp: {STELLAR_TEMP} K")
+    print(f"Star Radius: {R_STAR / 695700000:.2f} Solar Radii")
     print("="*60 + "\n")
 
 
     # Are these used?
     surfp = 100 #surface pressure, in bars
     tgr   = 1500 #temperature at 100 bars
-
-    print ("*************************************")
-    print ("*************************************")
-    print ("")
 
     # This is specifically for the regridding
     # You can change the grid density
@@ -292,7 +291,8 @@ for q in range(len(planet_names)):
 
             try:
                 # Run Eliza's code
-                subprocess.run('make rt_emission_aerosols.exe', shell=True, check=True)
+                subprocess.run('make rt_emission_aerosols.exe',
+                               shell=True, check=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 file_name = f"rt_emission_aerosols_{planet_name}_phase_{phase_strs[i]}.exe"
                 os.rename('rt_emission_aerosols.exe', file_name)
 

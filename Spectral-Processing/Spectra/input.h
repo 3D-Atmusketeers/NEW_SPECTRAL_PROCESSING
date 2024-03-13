@@ -24,7 +24,7 @@ Defines input values and files for 3-D emission spectra
 #define NLON  96                           /* Number of longitude points in 3-D grid */
 
 #define NTEMP 49                           /* Number of temperature points in grid   */
-#define NLAMBDA 10000                       /* Number of wavelength points in grid [4616/2598]   */
+#define NLAMBDA 36891                       /* Number of wavelength points in grid [4616/2598]   */
 
 // This is the Npressure for low res
 #define NPRESSURE 28    
