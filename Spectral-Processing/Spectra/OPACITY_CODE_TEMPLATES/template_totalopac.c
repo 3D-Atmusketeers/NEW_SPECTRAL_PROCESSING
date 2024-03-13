@@ -80,7 +80,7 @@ void TotalOpac() {
 
   /* Read Chemistry Table */
   ReadChemTable();
-  printf("ReadChemTable done\n");
+  //printf("ReadChemTable done\n");
 
   /* Fill in mean molecular weight (mu) values */
   opac.mu = dmatrix(0, NPRESSURE-1, 0, NTEMP-1);
@@ -104,6 +104,13 @@ void TotalOpac() {
 
   // Fill in the opacities for each species
 
+
+  printf("\n==== Debugging H2O Opacities ====\n");
+  printf("\tAt lambda index 0, pressure index 0, and temperature index 0:\n");
+  printf("\tTemperature: %lf K\n", opacH2O.T[0]);
+  printf("\tPressure: %le Pa\n", opacH2O.P[0]);
+  printf("\tAbundance: %le\n", opacH2O.abundance[0][0]);
+  printf("=================================\n\n");
 
 
   /* Fill in collision-induced opacities */
@@ -146,7 +153,7 @@ void TotalOpac() {
   }
 
 
-  printf("\n==== Debug Information for Lambda and Hel Columns ====\n");
+  printf("\n==== Debug Information for Collisional Opacities ====\n");
   printf("Lambda Range: %e to %e\n", atmos.lambda[0], atmos.lambda[NLAMBDA-1]);
   printf("First 4 Lambdas: %e, %e, %e, %e\n", atmos.lambda[0], atmos.lambda[1], atmos.lambda[2], atmos.lambda[3]);
   printf("Hel Opacity for First Temperature at First 4 Lambdas:\n");
@@ -156,10 +163,6 @@ void TotalOpac() {
   printf("\tLambda 4: %0.7e\n", opac_CIA_Hel[0][3]);
   printf("\tLambda 5: %0.7e\n", opac_CIA_Hel[0][4]);
   printf("=====================================================\n\n");
-
-
-  printf("Stopping here\n");
-  exit(0);
 
   // Allocate memory for opacCIA.kappa
   opacCIA.kappa = (double ***)malloc(NLAMBDA * sizeof(double **));

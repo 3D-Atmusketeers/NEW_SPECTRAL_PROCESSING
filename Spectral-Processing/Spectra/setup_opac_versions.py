@@ -188,8 +188,8 @@ def modify_totalopac(species_to_include):
                     f"    }}\n",
                     f"  }}\n",
                     f"  strcpy(filename, {species}_FILE);\n",
-                    f"  ReadOpacTable(opac{species}, filename);\n",
-                    f"  printf(\"Read {species} Opacity done\\n\");\n\n"
+                    f"  ReadOpacTable(opac{species}, filename);\n"
+                    #f"  printf(\"Read {species} Opacity done\\n\");\n\n"
                 ]
                 lines.insert(index_to_add_fill_opacities + 1, "".join(species_lines))
 

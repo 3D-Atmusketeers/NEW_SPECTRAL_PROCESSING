@@ -60,6 +60,11 @@ planet_names = ["GJ1214b-none-0clouds-1met"]
 opacity_set_id = 'Low-Res'
 NLAMBDA = 36891 if opacity_set_id == 'Low-Res' else 250000
 
+# Specify the wavelength range that you'd like to calculate
+# Put everything in SI
+WAVELENGTH_START = 5.0e-6
+WAVELENGTH_END   = 6.0e-6
+
 # Construct the path to the directory
 opacity_files_directory = os.path.join('DATA', opacity_set_id)
 
@@ -82,6 +87,7 @@ if missing_species:
 
 # Use only a subset of the available species
 opacity_species = required_species
+
 
 print("\n" + "="*60)
 print("WARNING: Using a limited subset of available species!")
@@ -141,7 +147,7 @@ for q in range(len(planet_names)):
         exit(0)
 
     print("\n" + "="*40)
-    print("====== RUNNING SIMULATION ======")
+    print("======== RUNNING SIMULATION ========")
     print(f"Planet Name: {planet_name}")
     print("="*40 + "\n")
 
@@ -188,34 +194,34 @@ for q in range(len(planet_names)):
 
     print("\n" + "="*60)
     print("Planet Characteristics")
-    print("Cloud Types in Order with Corresponding Amounts:")
+    print("\tCloud Types in Order with Corresponding Amounts:")
     cloud_types = "KCl, ZnS, Na2S, MnS, Cr, SiO2, Mg2SiO4, VO, Ni, Fe, Ca2SiO4, CaTiO3, Al2O3"
-    print(f"Cloud Types: {cloud_types}")
-    print(f"MOLEF: {MOLEF}")
-    print(f"Gravity: {grav} m/s^2")
-    print(f"Number of Orders of Magnitude (OOM): {oom}")
-    print(f"Gas Constant: {gasconst} J/(K*mol)")
-    print(f"Planet Radius: {R_PLANET} km")
-    print(f"Orbital Period: {P_ROT} days")
-    print(f"Metallicity (MTLX): {MTLX}")
-    print(f"Hazes Present: {'Yes' if HAZES else 'No'}")
-    print(f"{aerosol_layers} Cloud Layers")
-    print(f"Haze Type: {HAZE_TYPE}")
-    print(f"GCM Layers: {INITIAL_NTAU}")
-    print(f"Mean Molecular Weight: {MEAN_MOLECULAR_WEIGHT} u")
-    print("\nBe careful to make sure that your chemistry file is correct!")
-    print(f"Metallicity relative to solar (METALLICITY): {MET_X_SOLAR}")
-    print(f"Chemistry File Path: {chemistry_file_path}")
-    print(f"Using Opacity Set: {opacity_set_id}")
+    print(f"\tCloud Types: {cloud_types}")
+    print(f"\tMOLEF: {MOLEF}")
+    print(f"\tGravity: {grav} m/s^2")
+    print(f"\tNumber of Orders of Magnitude (OOM): {oom}")
+    print(f"\tGas Constant: {gasconst} J/(K*mol)")
+    print(f"\tPlanet Radius: {R_PLANET} km")
+    print(f"\tOrbital Period: {P_ROT} days")
+    print(f"\tMetallicity (MTLX): {MTLX}")
+    print(f"\tHazes Present: {'Yes' if HAZES else 'No'}")
+    print(f"\t{aerosol_layers} Cloud Layers")
+    print(f"\tHaze Type: {HAZE_TYPE}")
+    print(f"\tGCM Layers: {INITIAL_NTAU}")
+    print(f"\tMean Molecular Weight: {MEAN_MOLECULAR_WEIGHT}")
+
+    print("\nOpacity and Chemistry information")
+    print(f"\tMetallicity relative to solar (METALLICITY): {MET_X_SOLAR}")
+    print(f"\tChemistry File Path: {chemistry_file_path}")
+    print(f"\tUsing Opacity Set: {opacity_set_id}")
     print("="*60 + "\n")
 
     print("\n" + "="*60)
     print("Star Characteristics")
-    print("!!!!!   MAKE SURE TO CHECK THESE, IT IS HARD TO STRING MATCH  !!!!!!!")
-    print(f"You matched '{star_name}' on planet '{planet_name}'")
-    print(f"Orbital Separation: {ORB_SEP / 1.496e11:.2f} AU")
-    print(f"Star Temp: {STELLAR_TEMP} K")
-    print(f"Star Radius: {R_STAR / 695700000:.2f} Solar Radii")
+    print(f"\tYou matched '{star_name}' on planet '{planet_name}'")
+    print(f"\tOrbital Separation: {ORB_SEP / 1.496e11:.2f} AU")
+    print(f"\tStar Temp: {STELLAR_TEMP} K")
+    print(f"\tStar Radius: {R_STAR / 695700000:.2f} Solar Radii")
     print("="*60 + "\n")
 
 
