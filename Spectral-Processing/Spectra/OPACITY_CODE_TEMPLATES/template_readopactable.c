@@ -107,8 +107,7 @@ void ReadOpacTable(struct Opac opac, char *filename) {
     }
 
     fclose(f1);
-    printf("opac %e %e %e\n", atmos.lambda[NLAMBDA-1], opac.P[0], 
-	   opac.T[0]);
+    //printf("opac %e %e %e\n", atmos.lambda[NLAMBDA-1], opac.P[0], opac.T[0]);
     break;
   }
 
