@@ -24,7 +24,7 @@ Defines input values and files for 3-D emission spectra
 #define NLON  96                           /* Number of longitude points in 3-D grid */
 
 #define NTEMP 49                           /* Number of temperature points in grid   */
-#define NLAMBDA 11215                       /* Number of wavelength points in grid [4616/2598]   */
+#define NLAMBDA 10000                       /* Number of wavelength points in grid [4616/2598]   */
 
 // This is the Npressure for low res
 #define NPRESSURE 28    
@@ -50,25 +50,13 @@ Defines input values and files for 3-D emission spectra
                                            /* FORMAT=2 -> large opacity table        */
 
 #define ABUND_TRACK_IND 2 /* if test visualize, the index of the mapped species in the EOS file */
-#define CHEM_FILE_NCOLS 23
+#define CHEM_FILE_NCOLS 47
 
 /* Opacities for spectra */
-#define CHEM_FILE   "DATA/ordered_1x_solar_metallicity_chem.dat"
+#define CHEM_FILE   "DATA/fastchem_grid_allspecies_ions_lotemp_Z_solar_C_O_solar.dat"
 
-#define CIA_FILE "DATA/SET_1/opacCIA_low_temp.dat"
-#define TiO_FILE   "DATA/SET_1/opacTiO.dat"
-#define CO_FILE   "DATA/SET_1/opacCO.dat"
-#define FeH_FILE   "DATA/SET_1/opacFeH.dat"
-#define H2S_FILE   "DATA/SET_1/opacH2S.dat"
-#define NH3_FILE   "DATA/SET_1/opacNH3.dat"
-#define CH4_FILE   "DATA/SET_1/opacCH4.dat"
-#define HCN_FILE   "DATA/SET_1/opacHCN.dat"
-#define CO2_FILE   "DATA/SET_1/opacCO2.dat"
-#define VO_FILE   "DATA/SET_1/opacVO.dat"
-#define H2O_FILE   "DATA/SET_1/opacH2O.dat"
-#define K_FILE   "DATA/SET_1/opacK.dat"
-#define Na_FILE   "DATA/SET_1/opacNa.dat"
-#define C2H2_FILE   "DATA/SET_1/opacC2H2.dat"
+#define CIA_FILE "DATA/Low-Res/opacCIA.dat"
+#define H2O_FILE   "DATA/Low-Res/opacH2O.dat"
 #endif /* !__INPUT_H__ */
 
 /* ------- end ---------------------------- input.h  ----------------- */

@@ -54,17 +54,22 @@ smoothing = True
 # These are the planet files that you need to run the code
 # They should be pretty big files, and don't include the .txt with the names here
 planet_names = ["GJ1214b-none-0clouds-1met"]
-opacity_set_number = 'SET_1'
+
+# The options are lowres and hires
+# Isaac Malsky is still working on highres
+opacity_set_id = 'Low-Res'
+NLAMBDA = 10000 if opacity_set_id == 'Low-Res' else 250000
 
 # Construct the path to the directory
-opacity_files_directory = os.path.join('DATA', opacity_set_number)
+opacity_files_directory = os.path.join('DATA', opacity_set_id)
 
 # Adjust the list comprehension to parse filenames
 opacity_species = [file[4:-4] for file in os.listdir(opacity_files_directory)
                    if file.startswith("opac") and "CIA" not in file and file.endswith(".dat")]
 
+
 # Check if H2O, CO, and CO2 are included
-required_species = ["H2O", "CO", "CO2"]
+required_species = ["H2O"]
 missing_species = [species for species in required_species if species not in opacity_species]
 
 if missing_species:
@@ -76,7 +81,7 @@ if missing_species:
     quit()
 
 # Use only a subset of the available species
-#opacity_species = required_species
+opacity_species = required_species
 
 print("\n" + "="*60)
 print("WARNING: Using a limited subset of available species!")
@@ -87,7 +92,7 @@ print("="*60 + "\n")
 # Set the wavelength to evaluate the clouds at for plotting!
 # This could be put in a better place I think
 wavelength_grid = np.loadtxt('SCATTERING_DATA/wavelength_array_for_cloud_scattering_data_in_microns.txt')
-if opacity_set_number == 'SET_1':
+if opacity_set_id == 'Low-Res':
     cloud_wavelength = 0.500
     wav_loc = np.absolute(wavelength_grid-cloud_wavelength).argmin()
 else:
@@ -125,13 +130,15 @@ for q in range(len(planet_names)):
 
     # This is the path to the chemistry file
     # This assumes that 10x solar uses the 1x met chem tables, maybe a bad thing
-    if (opacity_set_number == "SET_1"):
+    if (opacity_set_id == "Low-Res"):
         if (0.1  <= MET_X_SOLAR < 10.0):
-            chemistry_file_path = "DATA/ordered_1x_solar_metallicity_chem.dat"
+            chemistry_file_path = "DATA/fastchem_grid_allspecies_ions_lotemp_Z_solar_C_O_solar.dat"
         else:
             print("Error in choosing which metallicy the chemistry file should be")
+            exit(0)
     else:
         print("Error in choosing the chemistry file!")
+        exit(0)
 
     print ("*************************************")
     print ("*************************************")
@@ -196,7 +203,7 @@ for q in range(len(planet_names)):
     print("\nBe careful to make sure that your chemistry file is correct!")
     print("METALLICITY:", MET_X_SOLAR)
     print("Chemistry file path:", chemistry_file_path)
-    print("Using opacity set:", opacity_set_number)
+    print("Using opacity set:", opacity_set_id)
     print("="*60 + "\n")
 
     print("\n" + "="*60)
@@ -242,7 +249,7 @@ for q in range(len(planet_names)):
         modifying 'input.h' appropriately for each run based on dynamic parameters.
         """
         # Prepare the base files (e.g., copy templates without 'template_' prefix)
-        replace_files(opacity_set_number)  
+        replace_files(opacity_set_id)
 
         # Generate output paths based on input paths and doppler value
         output_paths = ['OUT/Spec_' + str(doppler_val) + '_' + path[10:-4] for path in input_paths]
@@ -260,6 +267,7 @@ for q in range(len(planet_names)):
                 "<<NTAU>>":str(NTAU),
                 "<<NLAT>>":str(NLAT),
                 "<<NLON>>":str(NLON),
+                "<<NLAMBDA>>":str(NLAMBDA),
                 "<<W0_VAL>>":str(W0_VAL),
                 "<<G0_VAL>>":str(G0_VAL),
                 "<<GRAVITY_SI>>":str(grav),
@@ -274,10 +282,10 @@ for q in range(len(planet_names)):
                 }
 
             # Call the function to modify 'input.h' for this run
-            modify_input_h(modifications, opacity_set_number)
+            modify_input_h(modifications, opacity_set_id)
 
             # Update the input.h file for the species desired
-            insert_opacity_definitions('input.h', 'DATA/' + opacity_set_number, opacity_species)
+            insert_opacity_definitions('input.h', 'DATA/' + opacity_set_id, opacity_species)
 
             # Modify totalopac.c
             modify_totalopac(opacity_species)

@@ -89,9 +89,9 @@ chem.total = malloc(NPRESSURE*sizeof(double));
     chem.H2S[i] = malloc(NTEMP*sizeof(double));
 
 
-  chem.Ca+ = malloc(NPRESSURE*sizeof(double));
+  chem.Ca_plus = malloc(NPRESSURE*sizeof(double));
   for(i=0; i<NPRESSURE; i++)
-    chem.Ca+[i] = malloc(NTEMP*sizeof(double));
+    chem.Ca_plus[i] = malloc(NTEMP*sizeof(double));
 
 
   chem.VO = malloc(NPRESSURE*sizeof(double));
@@ -109,9 +109,9 @@ chem.total = malloc(NPRESSURE*sizeof(double));
     chem.N[i] = malloc(NTEMP*sizeof(double));
 
 
-  chem.Fe+ = malloc(NPRESSURE*sizeof(double));
+  chem.Fe_plus = malloc(NPRESSURE*sizeof(double));
   for(i=0; i<NPRESSURE; i++)
-    chem.Fe+[i] = malloc(NTEMP*sizeof(double));
+    chem.Fe_plus[i] = malloc(NTEMP*sizeof(double));
 
 
   chem.H2 = malloc(NPRESSURE*sizeof(double));
@@ -327,11 +327,11 @@ chem.total = malloc(NPRESSURE*sizeof(double));
       k = ReadChemLine(f1, i, j, k, chem.CrH);
       k = ReadChemLine(f1, i, j, k, chem.He);
       k = ReadChemLine(f1, i, j, k, chem.H2S);
-      k = ReadChemLine(f1, i, j, k, chem.Ca+);
+      k = ReadChemLine(f1, i, j, k, chem.Ca_plus);
       k = ReadChemLine(f1, i, j, k, chem.VO);
       k = ReadChemLine(f1, i, j, k, chem.SiH4);
       k = ReadChemLine(f1, i, j, k, chem.N);
-      k = ReadChemLine(f1, i, j, k, chem.Fe+);
+      k = ReadChemLine(f1, i, j, k, chem.Fe_plus);
       k = ReadChemLine(f1, i, j, k, chem.H2);
       k = ReadChemLine(f1, i, j, k, chem.TiO);
       k = ReadChemLine(f1, i, j, k, chem.Fe);
@@ -393,10 +393,20 @@ chem.total = malloc(NPRESSURE*sizeof(double));
   fclose(f1);
 
 
-  //printf("Read in chemtable\n");
+  printf("\n==== Debug Information ====\n");
+  printf("Read in chemtable.\n");
+  printf("Printing out an example:\n");
+  printf("\tTemperature Range: %.2f to %.2f\n", chem.T[0], chem.T[NTEMP-1]);
+  printf("\tPressure Range: %.2f to %.2f\n", chem.P[0], chem.P[NPRESSURE-1]);
+  printf("\tCH4 abundance at a pressure of %.2f and a temperature of %.2f : %.4e\n", chem.P[0], chem.T[0], chem.CH4[0][0]);
+  printf("================================\n\n");
+
+
   //printf("Chemistry: \nP_0\t%e \nT_0\t%e \ntotal00 \t%e \ntotal11 \t%e \nH2 \t%e \nH \t%e \nHe \t%e \nH2O \t%e \nCH4 \t%e \nCO \t%e \nCO2 \t%e \n",
-	// chem.P[0], chem.T[0], chem.total[0][0], chem.total[1][1],chem.H2[0][0], chem.H[0][0],
-	// chem.He[0][0], chem.H2O[0][0], chem.CH4[0][0],chem.CO[0][0], chem.CO2[0][0]);
+  //	 chem.P[0], chem.T[0], chem.total[0][0], chem.total[1][1],chem.H2[0][0], chem.H[0][0],
+  //	 chem.He[0][0], chem.H2O[0][0], chem.CH4[0][0],chem.CO[0][0], chem.CO2[0][0]);
+
+  exit(0);
 
   return;
 
@@ -405,7 +415,6 @@ chem.total = malloc(NPRESSURE*sizeof(double));
 
 /* ------- start ------------ FreeChemTable.c -------------------- */
 
-/* Added: free Fe, Fe+ */
 void FreeChemTable()
 {
   free(chem.P);
@@ -417,11 +426,11 @@ void FreeChemTable()
   free(chem.CrH);
   free(chem.He);
   free(chem.H2S);
-  free(chem.Ca+);
+  free(chem.Ca_plus);
   free(chem.VO);
   free(chem.SiH4);
   free(chem.N);
-  free(chem.Fe+);
+  free(chem.Fe_plus);
   free(chem.H2);
   free(chem.TiO);
   free(chem.Fe);
