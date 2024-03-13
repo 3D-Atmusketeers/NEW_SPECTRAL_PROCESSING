@@ -132,7 +132,7 @@ def insert_opacity_definitions(filepath, directory, opacity_species):
                 # Truncate the file in case the new content is shorter than the old
                 file.truncate()
 
-            print(f"File '{filepath}' updated successfully.")
+            #print(f"File '{filepath}' updated successfully.")
 
         finally:
             # Release the lock
@@ -234,7 +234,7 @@ def modify_totalopac(species_to_include):
             with open(totalopac_path, 'w') as file:
                 file.writelines(lines)
 
-            print(f"'{totalopac_path}' has been successfully modified.")
+            #print(f"'{totalopac_path}' has been successfully modified.")
 
         except Exception as e:
             print(f"Error modifying '{totalopac_path}': {e}")

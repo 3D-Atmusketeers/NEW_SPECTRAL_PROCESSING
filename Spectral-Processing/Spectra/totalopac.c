@@ -140,6 +140,8 @@ void TotalOpac() {
   opacCIA.P = dvector(0, NPRESSURE-1);
   opacCIA.Plog10 = dvector(0, NPRESSURE-1);
 
+
+
   for(i=0; i<NTEMP; i++){
     fscanf(f1, "%le", &opacCIA.T[i]);
   }
@@ -164,7 +166,19 @@ void TotalOpac() {
                                                                                     &opac_CIA_O2O2[k][i]);
     }
   }
-  printf("CIA: %e   %e %e\n", atmos.lambda[0], atmos.lambda[NLAMBDA-1], opac_CIA_H2H2[NTEMP-1][NLAMBDA-1]);
+
+
+  printf("\n==== Debug Information for Lambda and Hel Columns ====\n");
+  printf("Lambda Range: %e to %e\n", atmos.lambda[0], atmos.lambda[NLAMBDA-1]);
+  printf("First 4 Lambdas: %e, %e, %e, %e\n", atmos.lambda[0], atmos.lambda[1], atmos.lambda[2], atmos.lambda[3]);
+  printf("Hel Opacity for First Temperature at First 4 Lambdas:\n");
+  printf("\tLambda 1: %0.7e\n", opac_CIA_Hel[0][0]);
+  printf("\tLambda 2: %0.7e\n", opac_CIA_Hel[0][1]);
+  printf("\tLambda 3: %0.7e\n", opac_CIA_Hel[0][2]);
+  printf("\tLambda 4: %0.7e\n", opac_CIA_Hel[0][3]);
+  printf("\tLambda 5: %0.7e\n", opac_CIA_Hel[0][4]);
+  printf("=====================================================\n\n");
+
 
   printf("Stopping here\n");
   exit(0);

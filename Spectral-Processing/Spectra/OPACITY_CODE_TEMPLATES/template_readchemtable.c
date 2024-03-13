@@ -393,20 +393,14 @@ chem.total = malloc(NPRESSURE*sizeof(double));
   fclose(f1);
 
 
-  printf("\n==== Debug Information ====\n");
+  printf("\n==== Debug Chem Information ====\n");
   printf("Read in chemtable.\n");
   printf("Printing out an example:\n");
   printf("\tTemperature Range: %.2f to %.2f\n", chem.T[0], chem.T[NTEMP-1]);
   printf("\tPressure Range: %.2f to %.2f\n", chem.P[0], chem.P[NPRESSURE-1]);
   printf("\tCH4 abundance at a pressure of %.2f and a temperature of %.2f : %.4e\n", chem.P[0], chem.T[0], chem.CH4[0][0]);
+
   printf("================================\n\n");
-
-
-  //printf("Chemistry: \nP_0\t%e \nT_0\t%e \ntotal00 \t%e \ntotal11 \t%e \nH2 \t%e \nH \t%e \nHe \t%e \nH2O \t%e \nCH4 \t%e \nCO \t%e \nCO2 \t%e \n",
-  //	 chem.P[0], chem.T[0], chem.total[0][0], chem.total[1][1],chem.H2[0][0], chem.H[0][0],
-  //	 chem.He[0][0], chem.H2O[0][0], chem.CH4[0][0],chem.CO[0][0], chem.CO2[0][0]);
-
-  exit(0);
 
   return;
 
