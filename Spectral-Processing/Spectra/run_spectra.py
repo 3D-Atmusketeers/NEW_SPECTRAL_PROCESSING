@@ -10,6 +10,7 @@ import re
 import subprocess
 import grab_input_data
 from setup_opac_versions import replace_files, modify_input_h, insert_opacity_definitions, modify_totalopac
+from get_wavelength_grid import find_closest_wavelength_indices
 
 #import Clean_suite
 
@@ -64,6 +65,10 @@ NLAMBDA = 36891 if opacity_set_id == 'Low-Res' else 250000
 # Put everything in SI
 WAVELENGTH_START = 5.0e-6
 WAVELENGTH_END   = 6.0e-6
+
+NLAMBDA_START, NLAMBDA_END = find_closest_wavelength_indices(opacity_set_id, WAVELENGTH_START, WAVELENGTH_END)
+print(NLAMBDA_START, NLAMBDA_END)
+exit()
 
 # Construct the path to the directory
 opacity_files_directory = os.path.join('DATA', opacity_set_id)
