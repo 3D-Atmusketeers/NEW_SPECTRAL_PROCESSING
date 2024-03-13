@@ -107,8 +107,8 @@ void TotalOpac() {
 
 
   /* Fill in collision-induced opacities */
-  f1 = fopen(CIA_FILE, "r");
-  //f1 = fopen("DATA/SET_1/opacCIA_low_temp.dat", "r");
+  //f1 = fopen(CIA_FILE, "r");
+  f1 = fopen("DATA/Low-Res/opacCIA.dat", "r");
 
   if(f1 == NULL){
     printf("\n totalopac.c:\nError opening CIA file: -- No such file or directory\n\n");
@@ -142,7 +142,10 @@ void TotalOpac() {
                                                                                     &opac_CIA_O2O2[k][i]);
     }
   }
-  printf("CIA: %e   %e\n", atmos.lambda[NLAMBDA-1], opac_CIA_H2H2[NTEMP-1][NLAMBDA-1]);
+  printf("CIA: %e   %e %e\n", atmos.lambda[0], atmos.lambda[NLAMBDA-1], opac_CIA_H2H2[NTEMP-1][NLAMBDA-1]);
+
+  printf("Stopping here\n");
+  exit(0);
 
   // Allocate memory for opacCIA.kappa
   opacCIA.kappa = (double ***)malloc(NLAMBDA * sizeof(double **));
@@ -177,56 +180,41 @@ void TotalOpac() {
         chem.H2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
         chem.He[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
 
-
       opacCIA.kappa[i][j][k] += opac_CIA_H2H[k][i] *
         chem.H2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
         chem.H[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
-
 
       opacCIA.kappa[i][j][k] += opac_CIA_H2CH4[k][i] *
         chem.H2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
         chem.CH4[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
 
-
-      opacCIA.kappa[i][j][k] += opac_CIA_CH4Ar[k][i] *
-        chem.CH4[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
-        chem.Ar[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
-
-
       opacCIA.kappa[i][j][k] += opac_CIA_CH4CH4[k][i] *
         chem.CH4[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
         chem.CH4[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
-
 
       opacCIA.kappa[i][j][k] += opac_CIA_CO2CO2[k][i] *
         chem.CO2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
         chem.CO2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
 
-
       opacCIA.kappa[i][j][k] += opac_CIA_HeH[k][i] *
         chem.He[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
         chem.H[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
-
 
       opacCIA.kappa[i][j][k] += opac_CIA_N2CH4[k][i] *
         chem.N2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
         chem.CH4[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
 
-
       opacCIA.kappa[i][j][k] += opac_CIA_N2H2[k][i] *
         chem.N2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
         chem.H2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
-
 
       opacCIA.kappa[i][j][k] += opac_CIA_N2N2[k][i] *
         chem.N2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
         chem.N2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
 
-
       opacCIA.kappa[i][j][k] += opac_CIA_O2CO2[k][i] *
         chem.O2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
         chem.CO2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
-
 
       opacCIA.kappa[i][j][k] += opac_CIA_O2N2[k][i] *
         chem.O2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
@@ -235,7 +223,6 @@ void TotalOpac() {
       opacCIA.kappa[i][j][k] += opac_CIA_O2O2[k][i] *
         chem.O2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]) *
         chem.O2[j][k] * opacH2O.P[j] / (KBOLTZMANN * opacH2O.T[k]);
-
 
       opacCIA.kappa[i][j][k] += opac_CIA_Hel[k][i] *
 	       chem.H[j][k] * chem.P[j] / (KBOLTZMANN * chem.T[k]) *  
@@ -302,11 +289,11 @@ void TotalOpac() {
   }
 
   for (k=0; k<NTEMP; k++)
-    opac.T[k] = opacCO2.T[k];
+    opac.T[k] = opacH2O.T[k];
 
   for (j=0; j<NPRESSURE; j++) {
-    opac.P[j] = opacCO2.P[j];
-    opac.Plog10[j] = opacCO2.Plog10[j];
+    opac.P[j] = opacH2O.P[j];
+    opac.Plog10[j] = opacH2O.Plog10[j];
   }
 
   // Do a final summation over the species
