@@ -9,9 +9,11 @@ This guide outlines how to use the code for creating emission spectra. The proce
 Before initiating the processing, ensure that the necessary data files are in place. These files are too large for GitHub storage but have been made available on Turbo.
 
 - Run `download_all_data_files_from_turbo.py` to download the required files. Check the `files_to_download` list at the bottom of this script to see which files are being retrieved.
-- Once downloaded, move the `SET_X` data folder to `Spectra/DATA`, and the `SCATTERING_DATA` to `Spectra/SCATTERING_DATA`.
+- Once downloaded, move the opacity and chemistry and aerosol scattering data to the correct location
+- The chemistry file should go in the DATA folder
+- The opacity data (including the CIA opacities) should go in a folder withing DATA, called Low-Res or High-Res
+- The scattering data should go in the SCATTERING_DATA folder, the same level as the DATA folder
 - Place all the General Circulation Models (GCMs) you wish to process in the `GCM-OUTPUT` directory.
-- Set 1 should be medium resolution, and Set 2 should be high resolution
 
 ## How to Run
 
