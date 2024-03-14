@@ -58,7 +58,7 @@ planet_names = ["GJ1214b-none-0clouds-1met"]
 # The options are lowres and hires
 # Isaac Malsky is still working on highres
 opacity_set_id = 'High-Res'
-NLAMBDA = 36891 if opacity_set_id == 'Low-Res' else 250000
+NLAMBDA = 36891 if opacity_set_id == 'Low-Res' else 205246
 
 # Specify the wavelength range that you'd like to calculate
 # If values aren't given, or if they're negative -1 for both
