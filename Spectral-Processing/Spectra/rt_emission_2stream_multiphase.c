@@ -1198,7 +1198,6 @@ int RT_Emit_3D(double PHASE)
     }
     printf("solid %f\n", solid);
 
-    //for(i=0; i<NLAMBDA; i++)
     for(i=LAMBDA_START; i<LAMBDA_END; i++)
     {
         // Get the points on the wavelength grids
