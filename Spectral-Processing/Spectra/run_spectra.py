@@ -62,13 +62,11 @@ opacity_set_id = 'Low-Res'
 NLAMBDA = 36891 if opacity_set_id == 'Low-Res' else 250000
 
 # Specify the wavelength range that you'd like to calculate
-# Put everything in SI
-WAVELENGTH_START = 5.0e-6
-WAVELENGTH_END   = 6.0e-6
-
-NLAMBDA_START, NLAMBDA_END = find_closest_wavelength_indices(opacity_set_id, WAVELENGTH_START, WAVELENGTH_END)
-print(NLAMBDA_START, NLAMBDA_END)
-exit()
+# If values aren't given, or if they're negative -1 for both
+# Then it will calculate the entire grid
+LAMBDA_START, LAMBDA_END, START_WAVELENGTH, END_WAVELENGTH = find_closest_wavelength_indices(opacity_set_id,
+                                                           WAVELENGTH_START_APPROX=5.0e-6,
+                                                           WAVELENGTH_END_APPROX=5.1e-6)
 
 # Construct the path to the directory
 opacity_files_directory = os.path.join('DATA', opacity_set_id)
@@ -227,7 +225,7 @@ for q in range(len(planet_names)):
     print(f"\tOrbital Separation: {ORB_SEP / 1.496e11:.2f} AU")
     print(f"\tStar Temp: {STELLAR_TEMP} K")
     print(f"\tStar Radius: {R_STAR / 695700000:.2f} Solar Radii")
-    print("="*60 + "\n")
+    print("="*60 + "\n\n")
 
 
     # Are these used?
@@ -278,6 +276,8 @@ for q in range(len(planet_names)):
                 "<<NLAT>>":str(NLAT),
                 "<<NLON>>":str(NLON),
                 "<<NLAMBDA>>":str(NLAMBDA),
+                "<<LAMBDA_START>>":str(LAMBDA_START),
+                "<<LAMBDA_END>>":str(LAMBDA_END),
                 "<<W0_VAL>>":str(W0_VAL),
                 "<<G0_VAL>>":str(G0_VAL),
                 "<<GRAVITY_SI>>":str(grav),
@@ -375,7 +375,7 @@ def cleanup_lock_and_exe_files():
         files_to_remove = [f for f in os.listdir('.') if 'lock' in f or f.endswith('.exe')]
         for file in files_to_remove:
             os.remove(file)
-            print(f"Removed file: {file}")
+            #print(f"Removed file: {file}")
     except Exception as e:
         print(f"An error occurred while cleaning up files: {e}")
 
