@@ -58,15 +58,19 @@ planet_names = ["GJ1214b-none-0clouds-1met"]
 
 # The options are lowres and hires
 # Isaac Malsky is still working on highres
-opacity_set_id = 'Low-Res'
+opacity_set_id = 'High-Res'
 NLAMBDA = 36891 if opacity_set_id == 'Low-Res' else 250000
 
 # Specify the wavelength range that you'd like to calculate
 # If values aren't given, or if they're negative -1 for both
 # Then it will calculate the entire grid
+WAVELENGTH_START_APPROX=1e-6
+WAVELENGTH_END_APPROX=2e-6
+full_wavelength_range=False
 LAMBDA_START, LAMBDA_END, START_WAVELENGTH, END_WAVELENGTH = find_closest_wavelength_indices(opacity_set_id,
-                                                           WAVELENGTH_START_APPROX=5.0e-6,
-                                                           WAVELENGTH_END_APPROX=5.1e-6)
+                                                                                             full_wavelength_range,
+                                                                                             WAVELENGTH_START_APPROX,
+                                                                                             WAVELENGTH_END_APPROX)
 
 # Construct the path to the directory
 opacity_files_directory = os.path.join('DATA', opacity_set_id)
