@@ -11,7 +11,6 @@ import subprocess
 import grab_input_data
 from setup_opac_versions import replace_files, modify_input_h, insert_opacity_definitions, modify_totalopac
 from get_wavelength_grid import find_closest_wavelength_indices
-
 #import Clean_suite
 
 # Phases in degrees, inclination in radians (sorry)
@@ -327,8 +326,8 @@ for q in range(len(planet_names)):
     inclination_strs = []
     phase_strs = []
 
-    STEP_ONE = False
-    STEP_TWO = False
+    STEP_ONE = True
+    STEP_TWO = True
     STEP_THREE = True
 
     if STEP_ONE:
