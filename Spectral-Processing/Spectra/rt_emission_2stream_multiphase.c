@@ -1198,7 +1198,8 @@ int RT_Emit_3D(double PHASE)
     }
     printf("solid %f\n", solid);
 
-    for(i=0; i<NLAMBDA; i++)
+    //for(i=0; i<NLAMBDA; i++)
+    for(i=LAMBDA_START; i<LAMBDA_END; i++)
     {
         // Get the points on the wavelength grids
         wavelength_microns = atmos.lambda[i] * 1e6;
@@ -1664,7 +1665,7 @@ int RT_Emit_3D(double PHASE)
 
         if(i % 100 == 0)
         {
-            printf("%d out of %d lines (phase: %06.2f)\n", i, NLAMBDA, PHASE);
+            printf("%d out of %d lines (phase: %06.2f)\n", i, LAMBDA_END - LAMBDA_START, PHASE);
         }
 
         fprintf(finished_output_file, "%10.8le %le %le\n", atmos.lambda[i], flux_pl[i] * PI/solid, flux_reflected[i] * PI/solid);

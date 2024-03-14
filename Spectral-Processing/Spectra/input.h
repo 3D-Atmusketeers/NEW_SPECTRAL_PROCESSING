@@ -25,8 +25,8 @@ Defines input values and files for 3-D emission spectra
 
 #define NTEMP 49                              /* Number of temperature points in grid   */
 #define NLAMBDA 36891                   /* Number of wavelength points in grid [4616/2598]   */
-#define NLAMBDA_START <<NLAMBDA_START>>       /*The start of the lambda index you want to calculate*/
-#define NLAMBDA_END <<NLAMBDA_END>>           /*The end of the lambda index you want to calculate*/
+#define LAMBDA_START 23027       /*The start of the lambda index you want to calculate*/
+#define LAMBDA_END 23419           /*The end of the lambda index you want to calculate*/
 
 // This is the Npressure for low res
 #define NPRESSURE 28    
