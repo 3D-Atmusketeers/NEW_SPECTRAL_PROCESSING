@@ -1,5 +1,3 @@
-#below it imports the compiled fortran subroutine as a python module
-#import fortrantopythonfile as fp
 import re
 import pandas as pd
 import numpy as np
@@ -106,65 +104,58 @@ def create_dict():
     fort7dict['PHI_LON'] = fp.cloudy.phi_lon.tolist()
     return fort7dict
 
+import re
+
 def get_input_data(path, runname, input_file, input_param):
-    # define the input_param and the regex pattern for numbers and booleans
-    pattern = r"\b" + input_param + r"\s*=\s*(.*?)\s*(?:$|\||&)"
+    full_path = f"{path}{runname}/{input_file}"
 
-    # define the regex pattern for strings
-    string_pattern = r"\b" + input_param + r"\s*=\s*'([^']*)'"
+    try:
+        with open(full_path, "r") as f:
+            text = f.readlines()
+    except FileNotFoundError:
+        print(f"Error: The file {full_path} was not found.")
+        raise
+    except Exception as e:
+        print(f"Unexpected error opening {full_path}: {e}")
+        raise
 
-    # compile the regex patterns
-    regex = re.compile(pattern)
-    string_regex = re.compile(string_pattern)
+    found = False
 
-    # open the file and read its contents
-    with open(path + runname + "/" + input_file, "r") as f:
-        text = f.readlines()
-
-    # find all the matches in the text
     for line in text:
-        # skip lines that contain an exclamation point
-        if "!" in line:
+        if "!" in line:  # Skip commented lines.
             continue
 
-        # find matches for strings first
-        string_matches = string_regex.findall(line)
+        # Check for string matches first.
+        string_pattern = rf"\b{input_param}\s*=\s*'([^']*)'"
+        string_matches = re.findall(string_pattern, line)
         if string_matches:
             return string_matches[0]
 
-        # find matches for numbers and booleans
-        matches = regex.findall(line)
-
+        # Then, check for numbers and booleans.
+        pattern = rf"\b{input_param}\s*=\s*(.*?)\s*(?:$|\||&)"
+        matches = re.findall(pattern, line)
         for match in matches:
-            # extract the values from the match, including scientific notation
-            if (input_param == 'RADEA'):
+            found = True
+            if input_param == 'RADEA':
                 values = re.findall(r"[+\-]?[^A-Za-z]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)", match)
             else:
                 values = re.findall(r"[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?", match)
 
             if len(values) == 0:
-                # define the regex pattern
-                pattern = r"\b(T|F|True|False)\b"
-
-                # compile the regex pattern
-                bool_regex = re.compile(pattern)
-
-                # find all the matches in the string
-                bool_match = bool_regex.findall(line)
-                return bool_match
-
+                bool_pattern = r"\b(T|F|True|False)\b"
+                bool_match = re.findall(bool_pattern, line)
+                if bool_match:
+                    return bool_match[0].title()  # Return 'True' or 'False'
             elif len(values) == 1:
-                values = [float(i) for i in values]
-
-                # if there is only one number, return it
-                return values[0]
+                return float(values[0])
             else:
-                values = [float(i) for i in values]
+                return [float(i) for i in values]
 
-                # if there are multiple values, return the list
-                return values
-
-    return None
+    if not found:
+        print(f"Warning: '{input_param}' not found in {full_path}.")
+        # Decide here if you want to raise an exception or return a default value.
+        raise ValueError(f"Parameter '{input_param}' not found in {full_path}.")
+        exit()
 
 
 
