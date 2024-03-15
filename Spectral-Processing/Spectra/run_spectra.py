@@ -53,11 +53,46 @@ smoothing = True
 
 # These are the planet files that you need to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-none-0clouds-1met"]
+planet_names = ['GJ1214b-none-0clouds-100met',
+'GJ1214b-soot-25clouds-100met',
+'GJ1214b-soot-50clouds-100met',
+'GJ1214b-none-0clouds-1met',
+'GJ1214b-soot-25clouds-1met',
+'GJ1214b-soot-50clouds-1met',
+'GJ1214b-none-0clouds-30met',
+'GJ1214b-soot-25clouds-30met',
+'GJ1214b-soot-50clouds-30met',
+'GJ1214b-none-25clouds-100met',
+'GJ1214b-soot_2xpi0-0clouds-100met',
+'GJ1214b-tholin-0clouds-100met',
+'GJ1214b-none-25clouds-1met',
+'GJ1214b-soot_2xpi0-0clouds-1met',
+'GJ1214b-tholin-0clouds-1met',
+'GJ1214b-none-25clouds-30met',
+'GJ1214b-soot_2xpi0-0clouds-30met',
+'GJ1214b-tholin-0clouds-30met',
+'GJ1214b-none-50clouds-100met',
+'GJ1214b-soot_2xpi0-25clouds-100met',
+'GJ1214b-tholin-25clouds-100met',
+'GJ1214b-none-50clouds-1met',
+'GJ1214b-soot_2xpi0-25clouds-1met',
+'GJ1214b-tholin-25clouds-1met',
+'GJ1214b-none-50clouds-30met',
+'GJ1214b-soot_2xpi0-25clouds-30met',
+'GJ1214b-tholin-25clouds-30met',
+'GJ1214b-soot-0clouds-100met',
+'GJ1214b-soot_2xpi0-50clouds-100met',
+'GJ1214b-tholin-50clouds-100met',
+'GJ1214b-soot-0clouds-1met',
+'GJ1214b-soot_2xpi0-50clouds-1met',
+'GJ1214b-tholin-50clouds-1met',
+'GJ1214b-soot-0clouds-30met',
+'GJ1214b-soot_2xpi0-50clouds-30met',
+'GJ1214b-tholin-50clouds-30met']
 
 # The options are lowres and hires
 # Isaac Malsky is still working on highres
-opacity_set_id = 'High-Res'
+opacity_set_id = 'Low-Res'
 NLAMBDA = 36891 if opacity_set_id == 'Low-Res' else 205246
 
 # Specify the wavelength range that you'd like to calculate
@@ -151,6 +186,8 @@ for q in range(len(planet_names)):
     else:
         print("Error in choosing the chemistry file!")
         exit(0)
+
+    #chemistry_file_path = "DATA/fastchem_grid_allspecies_ions_lotemp_Z_solar_C_O_solar.dat"
 
     print("\n" + "="*40)
     print("======== RUNNING SIMULATION ========")
@@ -326,9 +363,9 @@ for q in range(len(planet_names)):
     inclination_strs = []
     phase_strs = []
 
-    STEP_ONE = True
-    STEP_TWO = True
-    STEP_THREE = True
+    STEP_ONE = False
+    STEP_TWO = False
+    STEP_THREE = False
 
     if STEP_ONE:
         # Convert the fort files to the correct format
@@ -383,7 +420,7 @@ def cleanup_lock_and_exe_files():
         print(f"An error occurred while cleaning up files: {e}")
 
 # Call the function to clean up lock files
-cleanup_lock_and_exe_files()
+#cleanup_lock_and_exe_files()
 
 #uncomment this out if you would like the files to automatically delete the bonus files that are created
 #Clean_suite.automaticclean(__file__)
