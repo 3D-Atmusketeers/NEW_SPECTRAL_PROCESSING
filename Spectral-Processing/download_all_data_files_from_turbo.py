@@ -48,8 +48,8 @@ def download_and_process_files(remote_user, remote_host, files):
 
 # List of files to download
 files_to_download = [
-    "/nfs/turbo/lsa-erausche/Post-Processing-Data-Files/SET_1.zip",
-    "/nfs/turbo/lsa-erausche/Post-Processing-Data-Files/SCATTERING_DATA.zip"
+#    "/nfs/turbo/lsa-erausche/Post-Processing-Data-Files/SET_1.zip",
+#    "/nfs/turbo/lsa-erausche/Post-Processing-Data-Files/SCATTERING_DATA.zip"
 ]
 
 # Prompt for username

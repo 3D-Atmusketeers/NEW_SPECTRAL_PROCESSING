@@ -54,7 +54,8 @@ smoothing = True
 
 # These are the planet files that you need to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ['GJ1214b-none-0clouds-100met',
+planet_names = ['GJ1214b-none-0clouds-1met',
+                'GJ1214b-none-0clouds-100met',
                 'GJ1214b-soot-25clouds-100met',
                 'GJ1214b-soot-50clouds-100met',
                 'GJ1214b-none-0clouds-1met',
@@ -175,28 +176,12 @@ for q in range(len(planet_names)):
     MEAN_MOLECULAR_WEIGHT = np.round((GAS_CONSTANT_R/gasconst) * 1000, 4)
 
     # This is the path to the chemistry file
-    # This assumes that 10x solar uses the 1x met chem tables, maybe a bad thing
-    """
-    if (opacity_set_id == "Low-Res"):
-        if (0.1  <= MET_X_SOLAR < 10.0):
-            chemistry_file_path = "DATA/fastchem_grid_allspecies_ions_lotemp_Z_solar_C_O_solar.dat"
-        else:
-            print("Error in choosing which metallicy the chemistry file should be")
-            exit(0)
-    else:
-        print("Error in choosing the chemistry file!")
-        exit(0)
-    """
-    closest_file = find_closest_chemistry_file(MET_X_SOLAR)
-    print('Exiting here')
-    exit(0)
+    chemistry_file_path = find_closest_chemistry_file(MET_X_SOLAR)
 
     print("\n" + "="*40)
     print("======== RUNNING SIMULATION ========")
     print(f"Planet Name: {planet_name}")
     print("="*40 + "\n")
-
-
 
     # Check if the substring 'soot_2xpi0' is in HAZE_TYPE
     if 'soot_2xpi0' in HAZE_TYPE:
