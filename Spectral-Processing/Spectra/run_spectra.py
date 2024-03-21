@@ -11,6 +11,7 @@ import subprocess
 import grab_input_data
 from setup_opac_versions import replace_files, modify_input_h, insert_opacity_definitions, modify_totalopac
 from get_wavelength_grid import find_closest_wavelength_indices
+from chemistry_file_selector import find_closest_chemistry_file
 #import Clean_suite
 
 # Phases in degrees, inclination in radians (sorry)
@@ -54,41 +55,41 @@ smoothing = True
 # These are the planet files that you need to run the code
 # They should be pretty big files, and don't include the .txt with the names here
 planet_names = ['GJ1214b-none-0clouds-100met',
-'GJ1214b-soot-25clouds-100met',
-'GJ1214b-soot-50clouds-100met',
-'GJ1214b-none-0clouds-1met',
-'GJ1214b-soot-25clouds-1met',
-'GJ1214b-soot-50clouds-1met',
-'GJ1214b-none-0clouds-30met',
-'GJ1214b-soot-25clouds-30met',
-'GJ1214b-soot-50clouds-30met',
-'GJ1214b-none-25clouds-100met',
-'GJ1214b-soot_2xpi0-0clouds-100met',
-'GJ1214b-tholin-0clouds-100met',
-'GJ1214b-none-25clouds-1met',
-'GJ1214b-soot_2xpi0-0clouds-1met',
-'GJ1214b-tholin-0clouds-1met',
-'GJ1214b-none-25clouds-30met',
-'GJ1214b-soot_2xpi0-0clouds-30met',
-'GJ1214b-tholin-0clouds-30met',
-'GJ1214b-none-50clouds-100met',
-'GJ1214b-soot_2xpi0-25clouds-100met',
-'GJ1214b-tholin-25clouds-100met',
-'GJ1214b-none-50clouds-1met',
-'GJ1214b-soot_2xpi0-25clouds-1met',
-'GJ1214b-tholin-25clouds-1met',
-'GJ1214b-none-50clouds-30met',
-'GJ1214b-soot_2xpi0-25clouds-30met',
-'GJ1214b-tholin-25clouds-30met',
-'GJ1214b-soot-0clouds-100met',
-'GJ1214b-soot_2xpi0-50clouds-100met',
-'GJ1214b-tholin-50clouds-100met',
-'GJ1214b-soot-0clouds-1met',
-'GJ1214b-soot_2xpi0-50clouds-1met',
-'GJ1214b-tholin-50clouds-1met',
-'GJ1214b-soot-0clouds-30met',
-'GJ1214b-soot_2xpi0-50clouds-30met',
-'GJ1214b-tholin-50clouds-30met']
+                'GJ1214b-soot-25clouds-100met',
+                'GJ1214b-soot-50clouds-100met',
+                'GJ1214b-none-0clouds-1met',
+                'GJ1214b-soot-25clouds-1met',
+                'GJ1214b-soot-50clouds-1met',
+                'GJ1214b-none-0clouds-30met',
+                'GJ1214b-soot-25clouds-30met',
+                'GJ1214b-soot-50clouds-30met',
+                'GJ1214b-none-25clouds-100met',
+                'GJ1214b-soot_2xpi0-0clouds-100met',
+                'GJ1214b-tholin-0clouds-100met',
+                'GJ1214b-none-25clouds-1met',
+                'GJ1214b-soot_2xpi0-0clouds-1met',
+                'GJ1214b-tholin-0clouds-1met',
+                'GJ1214b-none-25clouds-30met',
+                'GJ1214b-soot_2xpi0-0clouds-30met',
+                'GJ1214b-tholin-0clouds-30met',
+                'GJ1214b-none-50clouds-100met',
+                'GJ1214b-soot_2xpi0-25clouds-100met',
+                'GJ1214b-tholin-25clouds-100met',
+                'GJ1214b-none-50clouds-1met',
+                'GJ1214b-soot_2xpi0-25clouds-1met',
+                'GJ1214b-tholin-25clouds-1met',
+                'GJ1214b-none-50clouds-30met',
+                'GJ1214b-soot_2xpi0-25clouds-30met',
+                'GJ1214b-tholin-25clouds-30met',
+                'GJ1214b-soot-0clouds-100met',
+                'GJ1214b-soot_2xpi0-50clouds-100met',
+                'GJ1214b-tholin-50clouds-100met',
+                'GJ1214b-soot-0clouds-1met',
+                'GJ1214b-soot_2xpi0-50clouds-1met',
+                'GJ1214b-tholin-50clouds-1met',
+                'GJ1214b-soot-0clouds-30met',
+                'GJ1214b-soot_2xpi0-50clouds-30met',
+                'GJ1214b-tholin-50clouds-30met']
 
 # The options are lowres and hires
 # Isaac Malsky is still working on highres
@@ -98,8 +99,8 @@ NLAMBDA = 36891 if opacity_set_id == 'Low-Res' else 205246
 # Specify the wavelength range that you'd like to calculate
 # If values aren't given, or if they're negative -1 for both
 # Then it will calculate the entire grid
-WAVELENGTH_START_APPROX=1e-6
-WAVELENGTH_END_APPROX=2e-6
+WAVELENGTH_START_APPROX=2e-6
+WAVELENGTH_END_APPROX=15e-6
 full_wavelength_range=False
 LAMBDA_START, LAMBDA_END, START_WAVELENGTH, END_WAVELENGTH = find_closest_wavelength_indices(opacity_set_id,
                                                                                              full_wavelength_range,
@@ -112,7 +113,6 @@ opacity_files_directory = os.path.join('DATA', opacity_set_id)
 # Adjust the list comprehension to parse filenames
 opacity_species = [file[4:-4] for file in os.listdir(opacity_files_directory)
                    if file.startswith("opac") and "CIA" not in file and file.endswith(".dat")]
-
 
 # Check if H2O, CO, and CO2 are included
 required_species = ["H2O"]
@@ -127,8 +127,7 @@ if missing_species:
     quit()
 
 # Use only a subset of the available species
-opacity_species = required_species
-
+#opacity_species = required_species
 
 print("\n" + "="*60)
 print("WARNING: Using a limited subset of available species!")
@@ -177,6 +176,7 @@ for q in range(len(planet_names)):
 
     # This is the path to the chemistry file
     # This assumes that 10x solar uses the 1x met chem tables, maybe a bad thing
+    """
     if (opacity_set_id == "Low-Res"):
         if (0.1  <= MET_X_SOLAR < 10.0):
             chemistry_file_path = "DATA/fastchem_grid_allspecies_ions_lotemp_Z_solar_C_O_solar.dat"
@@ -186,8 +186,10 @@ for q in range(len(planet_names)):
     else:
         print("Error in choosing the chemistry file!")
         exit(0)
-
-    #chemistry_file_path = "DATA/fastchem_grid_allspecies_ions_lotemp_Z_solar_C_O_solar.dat"
+    """
+    closest_file = find_closest_chemistry_file(MET_X_SOLAR)
+    print('Exiting here')
+    exit(0)
 
     print("\n" + "="*40)
     print("======== RUNNING SIMULATION ========")
