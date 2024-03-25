@@ -54,43 +54,7 @@ smoothing = True
 
 # These are the planet files that you need to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ['GJ1214b-none-0clouds-1met',
-                'GJ1214b-none-0clouds-100met',
-                'GJ1214b-soot-25clouds-100met',
-                'GJ1214b-soot-50clouds-100met',
-                'GJ1214b-none-0clouds-1met',
-                'GJ1214b-soot-25clouds-1met',
-                'GJ1214b-soot-50clouds-1met',
-                'GJ1214b-none-0clouds-30met',
-                'GJ1214b-soot-25clouds-30met',
-                'GJ1214b-soot-50clouds-30met',
-                'GJ1214b-none-25clouds-100met',
-                'GJ1214b-soot_2xpi0-0clouds-100met',
-                'GJ1214b-tholin-0clouds-100met',
-                'GJ1214b-none-25clouds-1met',
-                'GJ1214b-soot_2xpi0-0clouds-1met',
-                'GJ1214b-tholin-0clouds-1met',
-                'GJ1214b-none-25clouds-30met',
-                'GJ1214b-soot_2xpi0-0clouds-30met',
-                'GJ1214b-tholin-0clouds-30met',
-                'GJ1214b-none-50clouds-100met',
-                'GJ1214b-soot_2xpi0-25clouds-100met',
-                'GJ1214b-tholin-25clouds-100met',
-                'GJ1214b-none-50clouds-1met',
-                'GJ1214b-soot_2xpi0-25clouds-1met',
-                'GJ1214b-tholin-25clouds-1met',
-                'GJ1214b-none-50clouds-30met',
-                'GJ1214b-soot_2xpi0-25clouds-30met',
-                'GJ1214b-tholin-25clouds-30met',
-                'GJ1214b-soot-0clouds-100met',
-                'GJ1214b-soot_2xpi0-50clouds-100met',
-                'GJ1214b-tholin-50clouds-100met',
-                'GJ1214b-soot-0clouds-1met',
-                'GJ1214b-soot_2xpi0-50clouds-1met',
-                'GJ1214b-tholin-50clouds-1met',
-                'GJ1214b-soot-0clouds-30met',
-                'GJ1214b-soot_2xpi0-50clouds-30met',
-                'GJ1214b-tholin-50clouds-30met']
+planet_names = ['GJ1214b-none-0clouds-1met']
 
 # The options are lowres and hires
 # Isaac Malsky is still working on highres
@@ -352,7 +316,7 @@ for q in range(len(planet_names)):
 
     STEP_ONE = False
     STEP_TWO = False
-    STEP_THREE = False
+    STEP_THREE = True
 
     if STEP_ONE:
         # Convert the fort files to the correct format

@@ -56,7 +56,7 @@ struct Chem {
           **SO2,
           **HF,
           **O,
-          **HO,
+          **OH,
           **Mg,
           **H,
           **HCN,
