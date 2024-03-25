@@ -31,6 +31,13 @@ Spectral-Processing/Spectra/OUT/*.lock
 Spectral-Processing/Spectra/*fortfiles
 Spectral-Processing/Spectra/*.lock
 
+# Ignore the _pycache__ directory within Spectral-Processing/Spectra/
+Spectral-Processing/Spectra/_pycache__/
+Spectral-Processing/Spectra/*.o
+
+# Ignore a specific file
+Spectral-Processing/Spectra/input.h
+
 
 # Keep the folders
 !Spectral-Processing/FINISHED_SPECTRA/.gitkeep
