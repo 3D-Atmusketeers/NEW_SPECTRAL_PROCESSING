@@ -39,7 +39,7 @@ struct Chem {
           **SH,
           **SiO,
           **CaO,
-          **AlH1,
+          **AlH,
           **Na,
           **O3,
           **AlO,
