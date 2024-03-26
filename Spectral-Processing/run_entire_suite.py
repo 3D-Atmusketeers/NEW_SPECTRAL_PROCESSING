@@ -13,7 +13,7 @@ clean_spectra_directory()
 
 #phases in degrees, inclinations in radians (sorry, alex still hasn't fixed this)
 phases = [0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0, 195.0, 210.0, 225.0, 240.0, 255.0, 270.0, 285.0, 300.0, 315.0, 330.0, 345.0]
-#phases = [0.0, 15.0]
+
 # An inclination of 0 corresponds to edge on
 
 inclinations = [0.0]
