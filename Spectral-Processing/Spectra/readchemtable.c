@@ -264,9 +264,9 @@ chem.total = malloc(NPRESSURE*sizeof(double));
     chem.O[i] = malloc(NTEMP*sizeof(double));
 
 
-  chem.HO = malloc(NPRESSURE*sizeof(double));
+  chem.OH = malloc(NPRESSURE*sizeof(double));
   for(i=0; i<NPRESSURE; i++)
-    chem.HO[i] = malloc(NTEMP*sizeof(double));
+    chem.OH[i] = malloc(NTEMP*sizeof(double));
 
 
   chem.Mg = malloc(NPRESSURE*sizeof(double));
@@ -362,7 +362,7 @@ chem.total = malloc(NPRESSURE*sizeof(double));
       k = ReadChemLine(f1, i, j, k, chem.SO2);
       k = ReadChemLine(f1, i, j, k, chem.HF);
       k = ReadChemLine(f1, i, j, k, chem.O);
-      k = ReadChemLine(f1, i, j, k, chem.HO);
+      k = ReadChemLine(f1, i, j, k, chem.OH);
       k = ReadChemLine(f1, i, j, k, chem.Mg);
       k = ReadChemLine(f1, i, j, k, chem.H);
       k = ReadChemLine(f1, i, j, k, chem.HCN);
@@ -455,7 +455,7 @@ void FreeChemTable()
   free(chem.SO2);
   free(chem.HF);
   free(chem.O);
-  free(chem.HO);
+  free(chem.OH);
   free(chem.Mg);
   free(chem.H);
   free(chem.HCN);

@@ -54,7 +54,7 @@ smoothing = True
 
 # These are the planet files that you need to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ['GJ1214b-none-0clouds-1met']
+planet_names = ["GJ1214b-none-0clouds-1met"]
 
 # The options are lowres and hires
 # Isaac Malsky is still working on highres
@@ -91,8 +91,11 @@ if missing_species:
     # Stop the code here to prevent further execution
     quit()
 
-# Use only a subset of the available species
-#opacity_species = required_species
+##################################################
+######        SET THE OPAC SPECIES        ########
+##################################################
+#opacity_species = ['H2O',  'CO', 'CO2', 'CH4']
+
 
 print("\n" + "="*60)
 print("WARNING: Using a limited subset of available species!")

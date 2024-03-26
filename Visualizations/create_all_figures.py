@@ -29,22 +29,14 @@ import cross_correlation
 import scienceplots
 plt.style.use('science.mplstyle')
 #plt.style.use('astrophysics.mplstyle')
-
 #plt.style.use(['science','nature'])
-
 
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
-
+planet_names = ['GJ1214b-none-0clouds-1met']
 
 #inclination needs to be a string in radians (sorry)
 inclination = '0.00'
-
-
-planet_names = ["GJ1214b-soot-50clouds-100met-REDO"]
-
-
-#planet_names = ["GJ1214b-none-0clouds-100met", "GJ1214b-none-50clouds-100met", "GJ1214b-soot-0clouds-100met"]
 
 # Set the opacity files to use
 opacity_files = 'SET_1'
@@ -121,24 +113,21 @@ else:
 
 
 # Plot the ptc curves
-pressure_temperature_condensation_curves.plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
+#pressure_temperature_condensation_curves.plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
 
 
 # Plot other planet characteristics
-aerosol_maps.plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, cloud_wavelength)
-aerosol_profiles.plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
-wind_maps.plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
-wind_isobars.plot_wind_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes=False, extra_pressure_level_bar=0.01)
+#aerosol_maps.plot_aerosol_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude, cloud_wavelength)
+#aerosol_profiles.plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
+#wind_maps.plot_wind_maps(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
+#wind_isobars.plot_wind_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes=False, extra_pressure_level_bar=0.01)
 
 
 # Plotting the emission maps
 #emission_maps_pressure.plot_emission_maps(planet_names, nlat, nlon)
 #emission_maps_temperature.plot_emission_maps(planet_names, nlat, nlon)
-
 #basemap_hemispheric_projections.plot_observer_projection(planet_names, nlat, nlon,planet_radii, pressure_in_mbar=10)
-                                                         
 #cross_correlation.plot_cross_correlations(planet_names, num_phases=24)
-                                            
 
 # Plot the spectra
 #planet_name = planet_names[0]
@@ -155,7 +144,7 @@ wind_isobars.plot_wind_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength,
 #spectra.plot_spectra_simple(planet_names, num_phases=4, inclination)
 
 
-"""
+
 for filter_name in ['None']:
     if filter_name != 'None':
         print()
@@ -163,31 +152,34 @@ for filter_name in ['None']:
 
         #spectra.plot_filters(planet_names, transmission_filter_name=filter_name, inclination)
 
-
     spectra.plot_fp_spectra(planet_names,num_phases=4,
                             transmission_filter_name=filter_name,
                             wav_subset=[5e-6, 12e-6],
+                            resolution=1000,
+                            INC_STRING=inclination)
 
     spectra.plot_fp_fs_spectra(planet_names,
                                 planet_radii,
                                 num_phases=4,
                                 transmission_filter_name=filter_name,
                                 wav_subset=[0,100],
-                                resolution=100)
-    
+                                resolution=1000,
+                                INC_STRING=inclination)
+
     spectra.plot_fp_phase_curves(planet_names,
                             planet_name_char_len,
                             num_phases=24,
                             transmission_filter_name=filter_name,
-                            wav_subset=[0, 100])
+                            wav_subset=[0, 100],
+                            INC_STRING=inclination)
 
     spectra.plot_fp_fs_phase_curves(planet_names,
                             planet_name_char_len,
                             planet_radii,
                             num_phases=24,
                             transmission_filter_name=filter_name,
-                            wav_subset=[0, 100])
-"""
+                            wav_subset=[0, 100],
+                            INC_STRING=inclination)
 
 # Notes
 # if the transmission filter name is set to 'None', then it will plot the full spectrum

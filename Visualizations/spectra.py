@@ -907,9 +907,9 @@ def plot_fp_fs_spectra(planet_names, planet_radii, num_phases, transmission_filt
                          ).to_csv('OUTPUT_DATA/Fp_Fs_Spectra_{}_Spectra_{}.txt'.format(str(i * rot_val), planet_name), sep=' ')
 
         # Figure legend
-        ax.set_ylim(1, 1399)
+        #ax.set_ylim(1, 1399)
         ax.minorticks_on()  # This enables minor ticks
-        ax.set_xlim(1, max(planet_spectra.wavelength * 1e6))
+        #ax.set_xlim(1, max(planet_spectra.wavelength * 1e6))
         ax.legend(fontsize=12, loc=(0, 1.03), ncol=5, mode='expand', title='Orbital Phase', title_fontsize=18)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
         ax.set_ylabel(r'F$_p$/F$_s$ (ppm)')  # (W m$^{-2}$)
