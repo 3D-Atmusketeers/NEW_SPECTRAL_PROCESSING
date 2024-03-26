@@ -80,7 +80,7 @@ opacity_species = [file[4:-4] for file in os.listdir(opacity_files_directory)
                    if file.startswith("opac") and "CIA" not in file and file.endswith(".dat")]
 
 # Check if H2O, CO, and CO2 are included
-required_species = ["H2O"]
+required_species = ["H2O", "CO", "CO2", "CH4", "SO2", "SiO", "Na", "K"]
 missing_species = [species for species in required_species if species not in opacity_species]
 
 if missing_species:
