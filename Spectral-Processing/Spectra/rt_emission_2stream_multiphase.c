@@ -124,7 +124,7 @@ int RT_Emit_3D(double PHASE)
     double ***v_los_3D;
 
     FILE *input_file1;
-    input_file1 = fopen("SCATTERING_DATA/pressure_array_for_cloud_scattering_data_in_pascals.txt", "r");
+    input_file1 = fopen("DATA/Aerosol_Data/pressure_array_for_cloud_scattering_data_in_pascals.txt", "r");
 
     //read file into array
     static double pressure_array_for_cloud_scattering_data_in_pascals[500];
@@ -135,7 +135,7 @@ int RT_Emit_3D(double PHASE)
 
 
     FILE *input_file2;
-    input_file2 = fopen("SCATTERING_DATA/wavelength_array_for_cloud_scattering_data_in_microns.txt", "r");
+    input_file2 = fopen("DATA/Aerosol_Data/wavelength_array_for_cloud_scattering_data_in_microns.txt", "r");
 
     //read file into array
     static double wavelength_array_for_cloud_scattering_data_in_microns[500];
@@ -146,7 +146,7 @@ int RT_Emit_3D(double PHASE)
 
 
     FILE *input_file3;
-    input_file3 = fopen("SCATTERING_DATA/pressure_array_for_haze_scattering_data_in_pascals.txt", "r");
+    input_file3 = fopen("DATA/Aerosol_Data/pressure_array_for_haze_scattering_data_in_pascals.txt", "r");
 
     //read file into array
     static double pressure_array_for_haze_scattering_data_in_pascals[100];
@@ -157,7 +157,7 @@ int RT_Emit_3D(double PHASE)
 
 
     FILE *input_file4;
-    input_file4 = fopen("SCATTERING_DATA/wavelength_array_for_haze_scattering_data_in_microns.txt", "r");
+    input_file4 = fopen("DATA/Aerosol_Data/wavelength_array_for_haze_scattering_data_in_microns.txt", "r");
 
     //read file into array
     static double wavelength_array_for_haze_scattering_data_in_microns[500];
@@ -170,57 +170,57 @@ int RT_Emit_3D(double PHASE)
     char haze_path_gg[1000];
     char haze_path_pi0[1000];
 
-    const char KCl_wav_gg_file[]    = "SCATTERING_DATA/KCl_wav_gg.txt";
-    const char KCl_wav_pi0_file[]   = "SCATTERING_DATA/KCl_wav_pi0.txt";
-    const char KCl_wav_qext_file[]  = "SCATTERING_DATA/KCl_wav_qext.txt";
+    const char KCl_wav_gg_file[]    = "DATA/Aerosol_Data/KCl_wav_gg.txt";
+    const char KCl_wav_pi0_file[]   = "DATA/Aerosol_Data/KCl_wav_pi0.txt";
+    const char KCl_wav_qext_file[]  = "DATA/Aerosol_Data/KCl_wav_qext.txt";
 
-    const char ZnS_wav_gg_file[]    = "SCATTERING_DATA/ZnS_wav_gg.txt";
-    const char ZnS_wav_pi0_file[]   = "SCATTERING_DATA/ZnS_wav_pi0.txt";
-    const char ZnS_wav_qext_file[]  = "SCATTERING_DATA/ZnS_wav_qext.txt";
+    const char ZnS_wav_gg_file[]    = "DATA/Aerosol_Data/ZnS_wav_gg.txt";
+    const char ZnS_wav_pi0_file[]   = "DATA/Aerosol_Data/ZnS_wav_pi0.txt";
+    const char ZnS_wav_qext_file[]  = "DATA/Aerosol_Data/ZnS_wav_qext.txt";
 
-    const char Na2S_wav_gg_file[]    = "SCATTERING_DATA/Na2S_wav_gg.txt";
-    const char Na2S_wav_pi0_file[]   = "SCATTERING_DATA/Na2S_wav_pi0.txt";
-    const char Na2S_wav_qext_file[]  = "SCATTERING_DATA/Na2S_wav_qext.txt";
+    const char Na2S_wav_gg_file[]    = "DATA/Aerosol_Data/Na2S_wav_gg.txt";
+    const char Na2S_wav_pi0_file[]   = "DATA/Aerosol_Data/Na2S_wav_pi0.txt";
+    const char Na2S_wav_qext_file[]  = "DATA/Aerosol_Data/Na2S_wav_qext.txt";
 
-    const char MnS_wav_gg_file[]    = "SCATTERING_DATA/MnS_wav_gg.txt";
-    const char MnS_wav_pi0_file[]   = "SCATTERING_DATA/MnS_wav_pi0.txt";
-    const char MnS_wav_qext_file[]  = "SCATTERING_DATA/MnS_wav_qext.txt";
+    const char MnS_wav_gg_file[]    = "DATA/Aerosol_Data/MnS_wav_gg.txt";
+    const char MnS_wav_pi0_file[]   = "DATA/Aerosol_Data/MnS_wav_pi0.txt";
+    const char MnS_wav_qext_file[]  = "DATA/Aerosol_Data/MnS_wav_qext.txt";
 
-    const char Cr_wav_gg_file[]    = "SCATTERING_DATA/Cr_wav_gg.txt";
-    const char Cr_wav_pi0_file[]   = "SCATTERING_DATA/Cr_wav_pi0.txt";
-    const char Cr_wav_qext_file[]  = "SCATTERING_DATA/Cr_wav_qext.txt";
+    const char Cr_wav_gg_file[]    = "DATA/Aerosol_Data/Cr_wav_gg.txt";
+    const char Cr_wav_pi0_file[]   = "DATA/Aerosol_Data/Cr_wav_pi0.txt";
+    const char Cr_wav_qext_file[]  = "DATA/Aerosol_Data/Cr_wav_qext.txt";
 
-    const char SiO2_wav_gg_file[]    = "SCATTERING_DATA/SiO2_wav_gg.txt";
-    const char SiO2_wav_pi0_file[]   = "SCATTERING_DATA/SiO2_wav_pi0.txt";
-    const char SiO2_wav_qext_file[]  = "SCATTERING_DATA/SiO2_wav_qext.txt";
+    const char SiO2_wav_gg_file[]    = "DATA/Aerosol_Data/SiO2_wav_gg.txt";
+    const char SiO2_wav_pi0_file[]   = "DATA/Aerosol_Data/SiO2_wav_pi0.txt";
+    const char SiO2_wav_qext_file[]  = "DATA/Aerosol_Data/SiO2_wav_qext.txt";
 
-    const char Mg2SiO4_wav_gg_file[]   = "SCATTERING_DATA/Mg2SiO4_wav_gg.txt";
-    const char Mg2SiO4_wav_pi0_file[]  = "SCATTERING_DATA/Mg2SiO4_wav_pi0.txt";
-    const char Mg2SiO4_wav_qext_file[] = "SCATTERING_DATA/Mg2SiO4_wav_qext.txt";
+    const char Mg2SiO4_wav_gg_file[]   = "DATA/Aerosol_Data/Mg2SiO4_wav_gg.txt";
+    const char Mg2SiO4_wav_pi0_file[]  = "DATA/Aerosol_Data/Mg2SiO4_wav_pi0.txt";
+    const char Mg2SiO4_wav_qext_file[] = "DATA/Aerosol_Data/Mg2SiO4_wav_qext.txt";
 
-    const char VO_wav_gg_file[]    = "SCATTERING_DATA/VO_wav_gg.txt";
-    const char VO_wav_pi0_file[]   = "SCATTERING_DATA/VO_wav_pi0.txt";
-    const char VO_wav_qext_file[]  = "SCATTERING_DATA/VO_wav_qext.txt";
+    const char VO_wav_gg_file[]    = "DATA/Aerosol_Data/VO_wav_gg.txt";
+    const char VO_wav_pi0_file[]   = "DATA/Aerosol_Data/VO_wav_pi0.txt";
+    const char VO_wav_qext_file[]  = "DATA/Aerosol_Data/VO_wav_qext.txt";
 
-    const char Ni_wav_gg_file[]    = "SCATTERING_DATA/Ni_wav_gg.txt";
-    const char Ni_wav_pi0_file[]   = "SCATTERING_DATA/Ni_wav_pi0.txt";
-    const char Ni_wav_qext_file[]  = "SCATTERING_DATA/Ni_wav_qext.txt";
+    const char Ni_wav_gg_file[]    = "DATA/Aerosol_Data/Ni_wav_gg.txt";
+    const char Ni_wav_pi0_file[]   = "DATA/Aerosol_Data/Ni_wav_pi0.txt";
+    const char Ni_wav_qext_file[]  = "DATA/Aerosol_Data/Ni_wav_qext.txt";
 
-    const char Fe_wav_gg_file[]    = "SCATTERING_DATA/Fe_wav_gg.txt";
-    const char Fe_wav_pi0_file[]   = "SCATTERING_DATA/Fe_wav_pi0.txt";
-    const char Fe_wav_qext_file[]  = "SCATTERING_DATA/Fe_wav_qext.txt";
+    const char Fe_wav_gg_file[]    = "DATA/Aerosol_Data/Fe_wav_gg.txt";
+    const char Fe_wav_pi0_file[]   = "DATA/Aerosol_Data/Fe_wav_pi0.txt";
+    const char Fe_wav_qext_file[]  = "DATA/Aerosol_Data/Fe_wav_qext.txt";
 
-    const char CaSiO4_wav_gg_file[]    = "SCATTERING_DATA/CaSiO4_wav_gg.txt";
-    const char CaSiO4_wav_pi0_file[]   = "SCATTERING_DATA/CaSiO4_wav_pi0.txt";
-    const char CaSiO4_wav_qext_file[]  = "SCATTERING_DATA/CaSiO4_wav_qext.txt";
+    const char CaSiO4_wav_gg_file[]    = "DATA/Aerosol_Data/CaSiO4_wav_gg.txt";
+    const char CaSiO4_wav_pi0_file[]   = "DATA/Aerosol_Data/CaSiO4_wav_pi0.txt";
+    const char CaSiO4_wav_qext_file[]  = "DATA/Aerosol_Data/CaSiO4_wav_qext.txt";
 
-    const char CaTiO3_wav_gg_file[]    = "SCATTERING_DATA/CaTiO3_wav_gg.txt";
-    const char CaTiO3_wav_pi0_file[]   = "SCATTERING_DATA/CaTiO3_wav_pi0.txt";
-    const char CaTiO3_wav_qext_file[]  = "SCATTERING_DATA/CaTiO3_wav_qext.txt";
+    const char CaTiO3_wav_gg_file[]    = "DATA/Aerosol_Data/CaTiO3_wav_gg.txt";
+    const char CaTiO3_wav_pi0_file[]   = "DATA/Aerosol_Data/CaTiO3_wav_pi0.txt";
+    const char CaTiO3_wav_qext_file[]  = "DATA/Aerosol_Data/CaTiO3_wav_qext.txt";
 
-    const char Al2O3_wav_gg_file[]    = "SCATTERING_DATA/Al2O3_wav_gg.txt";
-    const char Al2O3_wav_pi0_file[]   = "SCATTERING_DATA/Al2O3_wav_pi0.txt";
-    const char Al2O3_wav_qext_file[]  = "SCATTERING_DATA/Al2O3_wav_qext.txt";
+    const char Al2O3_wav_gg_file[]    = "DATA/Aerosol_Data/Al2O3_wav_gg.txt";
+    const char Al2O3_wav_pi0_file[]   = "DATA/Aerosol_Data/Al2O3_wav_pi0.txt";
+    const char Al2O3_wav_qext_file[]  = "DATA/Aerosol_Data/Al2O3_wav_qext.txt";
 
     static double haze_wav_gg[100][500];
     static double haze_wav_pi0[100][500];
@@ -242,15 +242,15 @@ int RT_Emit_3D(double PHASE)
     }
     else
     {
-        strcpy(haze_path_tau, "SCATTERING_DATA/haze_");
+        strcpy(haze_path_tau, "DATA/Aerosol_Data/haze_");
         strcat(haze_path_tau, HAZE_TYPE);
         strcat(haze_path_tau, "_wav_tauperbar.txt");
 
-        strcpy(haze_path_gg, "SCATTERING_DATA/haze_");
+        strcpy(haze_path_gg, "DATA/Aerosol_Data/haze_");
         strcat(haze_path_gg, HAZE_TYPE);
         strcat(haze_path_gg, "_wav_gg.txt");
 
-        strcpy(haze_path_pi0, "SCATTERING_DATA/haze_");
+        strcpy(haze_path_pi0, "DATA/Aerosol_Data/haze_");
         strcat(haze_path_pi0, HAZE_TYPE);
         strcat(haze_path_pi0, "_wav_pi0.txt");
 

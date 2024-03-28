@@ -65,7 +65,7 @@ NLAMBDA = 36891 if opacity_set_id == 'Low-Res' else 205246
 # If values aren't given, or if they're negative -1 for both
 # Then it will calculate the entire grid
 WAVELENGTH_START_APPROX=2e-6
-WAVELENGTH_END_APPROX=15e-6
+WAVELENGTH_END_APPROX=2.001e-6
 full_wavelength_range=False
 LAMBDA_START, LAMBDA_END, START_WAVELENGTH, END_WAVELENGTH = find_closest_wavelength_indices(opacity_set_id,
                                                                                              full_wavelength_range,
@@ -94,7 +94,7 @@ if missing_species:
 ##################################################
 ######        SET THE OPAC SPECIES        ########
 ##################################################
-#opacity_species = ['H2O',  'CO', 'CO2', 'CH4']
+opacity_species = ['H2O']
 
 
 print("\n" + "="*60)
