@@ -39,9 +39,6 @@ Spectral-Processing/Spectra/*.o
 Spectral-Processing/Spectra/input.h
 
 
-
-
-
 # Keep the folders
 !Spectral-Processing/FINISHED_SPECTRA/.gitkeep
 !Spectral-Processing/GCM-OUTPUT/.gitkeep
