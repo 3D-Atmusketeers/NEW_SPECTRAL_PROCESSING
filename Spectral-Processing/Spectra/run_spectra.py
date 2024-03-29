@@ -54,7 +54,7 @@ smoothing = True
 
 # These are the planet files that you need to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-none-0clouds-1met"]
+planet_names = ["GJ1214b-none-50clouds-1met"]
 
 # The options are lowres and hires
 # Isaac Malsky is still working on highres
@@ -105,7 +105,13 @@ print("="*60 + "\n")
 
 # Set the wavelength to evaluate the clouds at for plotting!
 # This could be put in a better place I think
-wavelength_grid = np.loadtxt('SCATTERING_DATA/wavelength_array_for_cloud_scattering_data_in_microns.txt')
+cloud_file = 'DATA/Aerosol_Data/wavelength_array_for_cloud_scattering_data_in_microns.txt'
+if os.path.exists(cloud_file):
+    wavelength_grid = np.loadtxt(cloud_file)
+else:
+    print("Warning: You're missing the cloud files that should be in DATA/Aerosol_Data")
+    exit()
+
 if opacity_set_id == 'Low-Res':
     cloud_wavelength = 0.500
     wav_loc = np.absolute(wavelength_grid-cloud_wavelength).argmin()

@@ -283,7 +283,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
 
     G = grav
 
-    pressure_array_for_cloud_DATA/Aerosol_Data_in_pascals = np.loadtxt('DATA/Aerosol_Data/pressure_array_for_cloud_DATA/Aerosol_Data_in_pascals.txt')
+    pressure_array_for_cloud_scattering_data_in_pascals = np.loadtxt('DATA/Aerosol_Data/pressure_array_for_cloud_scattering_data_in_pascals.txt')
 
     print ("Adding Clouds, no scattering params, this just fills in 0s unless MOLEF is specified")
     
@@ -305,7 +305,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
     haze_layer_index = [np.abs(haze_pressure_array_pascals - pres[i]*1e5).argmin() for i in range(len(pres))]
     
     CORFACT = np.array(CORFACT)[layer_index]
-    pressure_for_DATA/Aerosol_Data_loc = [np.abs(pressure_array_for_cloud_DATA/Aerosol_Data_in_pascals - pres[i]*1e5).argmin() for i in range(len(pres))]
+    pressure_for_scattering_data_loc = [np.abs(pressure_array_for_cloud_scattering_data_in_pascals - pres[i]*1e5).argmin() for i in range(len(pres))]
     df = df.sort_values(by=['lat','lon','pressure(bars)'])
     
     for cidx in range(13): # loop through species
@@ -328,7 +328,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
         
         ### Calculate the actual cloud properties
         tau = dpg * MOLEF[cidx]*3./4./particle_size/DENSITY[cidx]*FMOLW[cidx]*condfact*MTLX*CORFACT
-        tau_wl_dep = tau * QE_OPPR[cidx][pressure_for_DATA/Aerosol_Data_loc][:,wav_loc]
+        tau_wl_dep = tau * QE_OPPR[cidx][pressure_for_scattering_data_loc][:,wav_loc]
         
         ### Everywhere clouds exist (even partially), set scattering params
         tau2 = tau.copy()
