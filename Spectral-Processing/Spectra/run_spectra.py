@@ -54,7 +54,7 @@ smoothing = True
 
 # These are the planet files that you need to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-none-50clouds-1met"]
+planet_names = ["GJ1214b-soot-50clouds-30met"]
 
 # The options are lowres and hires
 # Isaac Malsky is still working on highres
@@ -66,7 +66,7 @@ NLAMBDA = 36891 if opacity_set_id == 'Low-Res' else 205246
 # Then it will calculate the entire grid
 WAVELENGTH_START_APPROX=2e-6
 WAVELENGTH_END_APPROX=2.001e-6
-full_wavelength_range=False
+full_wavelength_range=True
 LAMBDA_START, LAMBDA_END, START_WAVELENGTH, END_WAVELENGTH = find_closest_wavelength_indices(opacity_set_id,
                                                                                              full_wavelength_range,
                                                                                              WAVELENGTH_START_APPROX,
@@ -80,7 +80,7 @@ opacity_species = [file[4:-4] for file in os.listdir(opacity_files_directory)
                    if file.startswith("opac") and "CIA" not in file and file.endswith(".dat")]
 
 # Check if H2O, CO, and CO2 are included
-required_species = ["H2O", "CO", "CO2", "CH4", "SO2", "SiO", "Na", "K"]
+required_species = ["H2O"]
 missing_species = [species for species in required_species if species not in opacity_species]
 
 if missing_species:
