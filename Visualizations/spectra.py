@@ -337,7 +337,7 @@ def plot_planet_spectra_blackbody_comparison_hz(planet_names, black_body_tempera
 
             # Get the file path
 
-            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
+            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '00.00.dat'
 
             # Load in the planet spectra
             planet_spectra = pd.read_csv(file_path.format(str(i * rot_val)), header=None,
@@ -410,7 +410,7 @@ def plot_planet_spectra_blackbody_comparison_microns(planet_names, black_body_te
             rot_val = 360. / num_phases
 
             # Get the file path
-            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
+            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '00.00.dat'
 
             # Load in the planet spectra
             planet_spectra = pd.read_csv(file_path.format(str(i * rot_val)), header=None,
@@ -530,7 +530,7 @@ def plot_filters(planet_names, transmission_filter_name, INC_STRING):
 
     # Get the file path
 
-    file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_names[0] + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
+    file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_names[0] + '_phase_{}_inc_' + INC_STRING + '00.00.dat'
     spectra = pd.read_csv(
         file_path.format(
             str(0.0)),
@@ -575,7 +575,7 @@ def plot_spectra_simple(planet_names, num_phases, INC_STRING):
 
             # Get the file path
 
-            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
+            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '00.00.dat'
 
             # Load in the planet spectra
             planet_spectra = pd.read_csv(file_path.format(str(i * rot_val)), header=None,
@@ -590,7 +590,7 @@ def plot_spectra_simple(planet_names, num_phases, INC_STRING):
 
             # Replace the substring DOGRAY in planetnames with PICKET
             planet_name2 = planet_name.replace("DOGRAY", "PICKET")
-            file_path2 = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name2 + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
+            file_path2 = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name2 + '_phase_{}_inc_' + INC_STRING + '00.00.dat'
 
             # Load in the planet spectra
             planet_spectra2 = pd.read_csv(file_path2.format(str(i * rot_val)), header=None,
@@ -675,7 +675,7 @@ def plot_fp_fs_phase_curves(planet_names, planet_name_char_len, planet_radii, nu
             integrated_signal_star.append(0)
 
             # Get the file path
-            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
+            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '00.00.dat'
 
             # Load in the planet spectra
             planet_spectra = pd.read_csv(file_path.format(str(i * rot_val)), header=None,
@@ -706,9 +706,9 @@ def plot_fp_fs_phase_curves(planet_names, planet_name_char_len, planet_radii, nu
         pd.DataFrame({'Phase': np.arange(0, 360, rot_val), 'Fp_Fs_pmm': fp_fs_ratio * 1e6}
                      ).to_csv('OUTPUT_DATA/Fp_Fs_{}_Phase_Curves.txt'.format(planet_name), sep=' ')
 
-        if '1met' in planet_name.lower():
+        if 'DOGRAY' in planet_name.lower():
             linestyle_str='dashed'
-        elif '100met' in planet_name.lower():
+        elif 'PICKET' in planet_name.lower():
             linestyle_str='solid'
         else:
             linestyle_str='dotted'
@@ -725,9 +725,10 @@ def plot_fp_fs_phase_curves(planet_names, planet_name_char_len, planet_radii, nu
         phases = np.linspace(0, 345, num_phases) / 360
         ax.plot(phases, fp_fs_ratio * 1e6,
                 color=color_str,
-                linestyle=linestyle_str,
+                linestyle='solid',
                 linewidth=2,
                 label=planet_name)
+
 
     ax.set_xlim(min(phases), max(phases))
     ax.legend(fontsize=11, loc=(0, 1.03), ncol=3, mode='expand')
@@ -778,7 +779,7 @@ def plot_fp_phase_curves(planet_names, planet_name_char_len, num_phases,
 
             # Load in the planet spectra and convert to per microns
             # Get the file path
-            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
+            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '00.00.dat'
 
             # Load in the planet spectra
             planet_spectra = pd.read_csv(file_path.format(str(i * rot_val)), header=None,
@@ -874,7 +875,7 @@ def plot_fp_fs_spectra(planet_names, planet_radii, num_phases, transmission_filt
 
             # Get the file path
 
-            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
+            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '00.00.dat'
 
             # Load in the planet spectra
             planet_spectra = pd.read_csv(file_path.format(str(i * rot_val)), header=None,
@@ -909,7 +910,7 @@ def plot_fp_fs_spectra(planet_names, planet_radii, num_phases, transmission_filt
         # Figure legend
         #ax.set_ylim(1, 1399)
         ax.minorticks_on()  # This enables minor ticks
-        #ax.set_xlim(1, max(planet_spectra.wavelength * 1e6))
+        ax.set_xlim(5, 12)
         ax.legend(fontsize=12, loc=(0, 1.03), ncol=5, mode='expand', title='Orbital Phase', title_fontsize=18)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
         ax.set_ylabel(r'F$_p$/F$_s$ (ppm)')  # (W m$^{-2}$)
@@ -949,7 +950,7 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
             phase_degrees = rot_val * i
 
             # Get the file path
-            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '.00.0000.00.dat'
+            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '00.00.dat'
 
             # Load in the planet spectra
             planet_spectra = pd.read_csv(file_path.format(str(i * rot_val)), header=None,
@@ -994,8 +995,10 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
         ax.errorbar(df['Wavelength'], df['Fp_night'], yerr=[df['Low 1-sigma.1'], df['Up 1-sigma.1']],
              fmt='o-', label='Fp_night', capsize=2, linewidth=2)
         """
-        ax.set_xlim(5, 12)
-        ax.set_ylim(1, 1399)
+        ax.set_xscale('log')
+        ax.set_yscale('log')
+        ax.set_xlim(0.5, 12)
+        ax.set_ylim(1e3, 1e6)
         ax.minorticks_on()  # This enables minor ticks
         ax.legend(fontsize=12, loc=(0, 1.03), ncol=6, mode='expand', title='Orbital Phase', title_fontsize=18)
         ax.set_xlabel(r'Wavelength ($\mu$m)')

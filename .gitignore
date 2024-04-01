@@ -20,6 +20,7 @@ Visualizations/OUTPUT_DATA/*
 
 # Ignore some stuff in spectral processing
 Spectral-Processing/FINISHED_SPECTRA/*
+Spectral-Processing/FINISHED_SPECTRA*/*
 Spectral-Processing/GCM-OUTPUT/*
 Spectral-Processing/PLANET_MODELS/*
 Spectral-Processing/Spectra/DATA/*

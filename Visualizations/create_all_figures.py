@@ -33,23 +33,18 @@ plt.style.use('science.mplstyle')
 
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
-planet_names = ['GJ1214b-none-0clouds-1met']
+planet_names = ['HD209-DOGRAY',
+                'HD209-DOGRAY-NUC-CLOUDS-COMPACT',
+                'HD209-DOGRAY-NUC-CLOUDS',
+                'HD209-PICKET',
+                'HD209-PICKET-NUC-CLOUDS-COMPACT',
+                'HD209-PICKET-NUC-CLOUDS']
 
 #inclination needs to be a string in radians (sorry)
 inclination = '0.00'
 
-# Set the opacity files to use
-opacity_files = 'SET_1'
-if opacity_files == 'SET_1':
-    cloud_wavelength = 5.0
-elif opacity_files == 'SET_2':
-    cloud_wavelength = 2.3
-elif opacity_files == 'SET_3':
-    cloud_wavelength = 2.3
-else:
-    print("YOU NEED TO SET WHICH OPACITY SET YOU'RE USING")
-    exit(0)
-
+# Set the cloud wavelength to use in microns
+cloud_wavelength = 5.0
 
 # Get the number of GCMS
 num_gcms = len(planet_names)
@@ -154,32 +149,32 @@ for filter_name in ['None']:
 
     spectra.plot_fp_spectra(planet_names,num_phases=4,
                             transmission_filter_name=filter_name,
-                            wav_subset=[5e-6, 12e-6],
-                            resolution=1000,
-                            INC_STRING=inclination)
-
-    spectra.plot_fp_fs_spectra(planet_names,
-                                planet_radii,
-                                num_phases=4,
-                                transmission_filter_name=filter_name,
-                                wav_subset=[0,100],
-                                resolution=1000,
-                                INC_STRING=inclination)
-
-    spectra.plot_fp_phase_curves(planet_names,
-                            planet_name_char_len,
-                            num_phases=24,
-                            transmission_filter_name=filter_name,
                             wav_subset=[0, 100],
+                            resolution=100,
                             INC_STRING=inclination)
 
-    spectra.plot_fp_fs_phase_curves(planet_names,
-                            planet_name_char_len,
-                            planet_radii,
-                            num_phases=24,
-                            transmission_filter_name=filter_name,
-                            wav_subset=[0, 100],
-                            INC_STRING=inclination)
+    #spectra.plot_fp_fs_spectra(planet_names,
+    #                            planet_radii,
+    #                            num_phases=4,
+    #                            transmission_filter_name=filter_name,
+    #                            wav_subset=[5e-6,12e-6],
+    #                            resolution=1000,
+    #                            INC_STRING=inclination)
+
+    #spectra.plot_fp_phase_curves(planet_names,
+    #                        planet_name_char_len,
+    #                        num_phases=24,
+    #                        transmission_filter_name=filter_name,
+    #                        wav_subset=[0, 100],
+    #                        INC_STRING=inclination)
+
+    #spectra.plot_fp_fs_phase_curves(planet_names,
+    #                        planet_name_char_len,
+    #                        planet_radii,
+    #                        num_phases=24,
+    #                        transmission_filter_name=filter_name,
+    #                        wav_subset=[5e-6, 12e-6],
+    #                        INC_STRING=inclination)
 
 # Notes
 # if the transmission filter name is set to 'None', then it will plot the full spectrum
