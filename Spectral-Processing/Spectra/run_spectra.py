@@ -58,14 +58,14 @@ planet_names = ["GJ1214b-soot-50clouds-30met"]
 
 # The options are lowres and hires
 # Isaac Malsky is still working on highres
-opacity_set_id = 'Low-Res'
+opacity_set_id = 'High-Res'
 NLAMBDA = 36891 if opacity_set_id == 'Low-Res' else 205246
 
 # Specify the wavelength range that you'd like to calculate
 # If values aren't given, or if they're negative -1 for both
 # Then it will calculate the entire grid
 WAVELENGTH_START_APPROX=2e-6
-WAVELENGTH_END_APPROX=2.001e-6
+WAVELENGTH_END_APPROX=2.6e-6
 full_wavelength_range=True
 LAMBDA_START, LAMBDA_END, START_WAVELENGTH, END_WAVELENGTH = find_closest_wavelength_indices(opacity_set_id,
                                                                                              full_wavelength_range,
@@ -116,8 +116,8 @@ if opacity_set_id == 'Low-Res':
     cloud_wavelength = 0.500
     wav_loc = np.absolute(wavelength_grid-cloud_wavelength).argmin()
 else:
-    print("YOU NEED TO SET WHICH OPACITY SET YOU'RE USING")
-    exit(0)
+    cloud_wavelength = 2.00
+    wav_loc = np.absolute(wavelength_grid-cloud_wavelength).argmin()
 
 for q in range(len(planet_names)):
     print()
@@ -212,6 +212,7 @@ for q in range(len(planet_names)):
     print(f"\tHaze Type: {HAZE_TYPE}")
     print(f"\tGCM Layers: {INITIAL_NTAU}")
     print(f"\tMean Molecular Weight: {MEAN_MOLECULAR_WEIGHT}")
+    print(f"\tCloud wavelength (microns): {cloud_wavelength}")
 
     print("\nOpacity and Chemistry information")
     print(f"\tMetallicity relative to solar (METALLICITY): {MET_X_SOLAR}")
