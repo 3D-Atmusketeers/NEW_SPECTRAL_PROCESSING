@@ -105,7 +105,7 @@ void TotalOpac() {
   // Fill in the opacities for each species
 
   printf("=====================================================\n");
-  printf("\n==== Debugging H2O Opacities ====\n");
+  printf("\n==== Debugging H2O Opacities ====\n");0
   printf("\tAt lambda index 0, pressure index 0, and temperature index 0:\n");
   printf("\tTemperature: %lf K\n", opacH2O.T[0]);
   printf("\tPressure: %le Pa\n", opacH2O.P[0]);
@@ -114,8 +114,8 @@ void TotalOpac() {
 
 
   /* Fill in collision-induced opacities */
-  //f1 = fopen(CIA_FILE, "r");
-  f1 = fopen("DATA/Low-Res/opacCIA.dat", "r");
+  f1 = fopen(CIA_FILE, "r");
+  //f1 = fopen("DATA/High-Res/opacCIA.dat", "r");
 
   if(f1 == NULL){
     printf("\n totalopac.c:\nError opening CIA file: -- No such file or directory\n\n");
