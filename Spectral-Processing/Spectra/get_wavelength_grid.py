@@ -22,6 +22,10 @@ def find_closest_wavelength_indices(opacity_set_id, full_wavelength_range, WAVEL
 
     # Read the first column as wavelengths from the file
     df = pd.read_csv(file_path, header=None, usecols=[0])
+
+    # Get the number of lambda points in the wavelength files
+    NLAMBDA = len(df)
+
     wavelengths = df.iloc[:, 0]
 
     # Check if the specified wavelength range is within the dataset's bounds
@@ -48,4 +52,4 @@ def find_closest_wavelength_indices(opacity_set_id, full_wavelength_range, WAVEL
         END_WAVELENGTH = wavelengths.iloc[LAMBDA_END]
 
     # Return the calculated indices and wavelength values
-    return LAMBDA_START, LAMBDA_END + 1, START_WAVELENGTH, END_WAVELENGTH, LAMBDA_END + 1 - LAMBDA_START
+    return LAMBDA_START, LAMBDA_END + 1, START_WAVELENGTH, END_WAVELENGTH, NLAMBDA

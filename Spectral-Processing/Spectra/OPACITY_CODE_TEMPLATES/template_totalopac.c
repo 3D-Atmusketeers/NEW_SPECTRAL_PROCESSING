@@ -73,7 +73,6 @@ void TotalOpac() {
   opac_CIA_O2O2 = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
   opac_CIA_Hel = dmatrix(0, NTEMP-1, 0, NLAMBDA-1);
 
-
   t_CIA = dvector(0, 18);
   lambda_CIA = dvector(0, 999);
   opac_CIA = dmatrix(0, 19, 0, 999);
@@ -105,7 +104,7 @@ void TotalOpac() {
   // Fill in the opacities for each species
 
   printf("=====================================================\n");
-  printf("\n==== Debugging H2O Opacities ====\n");0
+  printf("\n==== Debugging H2O Opacities ====\n");
   printf("\tAt lambda index 0, pressure index 0, and temperature index 0:\n");
   printf("\tTemperature: %lf K\n", opacH2O.T[0]);
   printf("\tPressure: %le Pa\n", opacH2O.P[0]);

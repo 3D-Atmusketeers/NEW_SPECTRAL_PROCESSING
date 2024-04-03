@@ -63,9 +63,9 @@ opacity_set_id = 'High-Res'
 # Specify the wavelength range that you'd like to calculate
 # If values aren't given, or if they're negative -1 for both
 # Then it will calculate the entire grid
-WAVELENGTH_START_APPROX=2.310e-6
-WAVELENGTH_END_APPROX=2.315e-6
-full_wavelength_range=True
+WAVELENGTH_START_APPROX = 2.310e-6
+WAVELENGTH_END_APPROX = 2.315e-6
+full_wavelength_range = True
 LAMBDA_START, LAMBDA_END, START_WAVELENGTH, END_WAVELENGTH, NLAMBDA = find_closest_wavelength_indices(opacity_set_id,
                                                                                              full_wavelength_range,
                                                                                              WAVELENGTH_START_APPROX,
@@ -152,6 +152,8 @@ for q in range(len(planet_names)):
     print("======== RUNNING SIMULATION ========")
     print(f"Planet Name: {planet_name}")
     print(f"NLAMBDA: {NLAMBDA}")
+    print(f"STARTING WAVELENGTH: {START_WAVELENGTH}")
+    print(f"ENDING WAVELENGTH: {END_WAVELENGTH}")
     print("="*40 + "\n")
 
     # Check if the substring 'soot_2xpi0' is in HAZE_TYPE
@@ -363,7 +365,7 @@ for q in range(len(planet_names)):
                     run_exo(input_paths, inclination_strs, phase_strs, doppler_val)
 
 
-    print('Finished running', planet_name)
+    #print('Finished running', planet_name)
 
 
 def cleanup_lock_and_exe_files():
