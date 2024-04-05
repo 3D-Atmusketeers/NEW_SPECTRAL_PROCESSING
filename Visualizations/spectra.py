@@ -336,7 +336,6 @@ def plot_planet_spectra_blackbody_comparison_hz(planet_names, black_body_tempera
             rot_val = 360. / num_phases
 
             # Get the file path
-
             file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '00.00.dat'
 
             # Load in the planet spectra
@@ -950,18 +949,20 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
             phase_degrees = rot_val * i
 
             # Get the file path
-            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '00.00.dat'
+            #file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '00.00.dat'
+            file_path = '../Spectral-Processing/Spectra/OUT/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '00.00.dat'
+
 
             # Load in the planet spectra
             planet_spectra = pd.read_csv(file_path.format(str(i * rot_val)), header=None,
                                          delim_whitespace=True, names=['wavelength', 'flux', 'reflected'])
+            
             planet_spectra.flux = planet_spectra.flux * (3.0e8 / planet_spectra.wavelength ** 2) / 1e6
 
             # Reset the index
             planet_spectra = planet_spectra.reset_index(drop=True)
 
             # Call the function to get the filtered star and planet spectra
-
             planet_spectra, star_spectra = filter_spectra(planet_spectra, star_spectra, filt, transmission_filter_name, wav_subset, phase_degrees)
 
             if interp_function is None:
@@ -973,7 +974,7 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
 
             if resolution > 0:
                 flux = np.asarray(reduceSpectralResolution(list(planet_spectra.wavelength),list(flux),
-                                                                  R_low=resolution, R_high=None, lambda_mid=None, n=4))
+                                                           R_low=resolution, R_high=None, lambda_mid=None, n=4))
 
             ax.plot(planet_spectra.wavelength * 1e6,
                     flux,
@@ -995,15 +996,17 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
         ax.errorbar(df['Wavelength'], df['Fp_night'], yerr=[df['Low 1-sigma.1'], df['Up 1-sigma.1']],
              fmt='o-', label='Fp_night', capsize=2, linewidth=2)
         """
-        ax.set_xscale('log')
-        ax.set_yscale('log')
-        ax.set_xlim(0.5, 12)
-        ax.set_ylim(1e3, 1e6)
+        #ax.set_xscale('log')
+        #ax.set_yscale('log')
+        
+        #ax.set_xlim(0.54673, 0.547)
+        #ax.set_ylim(715000, 730000)
         ax.minorticks_on()  # This enables minor ticks
         ax.legend(fontsize=12, loc=(0, 1.03), ncol=6, mode='expand', title='Orbital Phase', title_fontsize=18)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
         ax.set_ylabel(r'F$_p$ (W/m$^2$/micron)')  # (W m$^{-2}$)
         plt.savefig('../Figures/Fp_Spectra_{}_{}.jpg'.format(planet_name, transmission_filter_name), dpi=200, bbox_inches='tight')
+
 
     return None
 

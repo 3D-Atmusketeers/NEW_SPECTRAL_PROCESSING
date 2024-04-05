@@ -54,7 +54,7 @@ smoothing = True
 
 # These are the planet files that you need to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-soot-50clouds-30met"]
+planet_names = ["HD189-DOGRAY-ALL-CLOUDS-COMPACT"]
 
 # The options are lowres and hires
 # Isaac Malsky is still working on highres
@@ -63,8 +63,8 @@ opacity_set_id = 'High-Res'
 # Specify the wavelength range that you'd like to calculate
 # If values aren't given, or if they're negative -1 for both
 # Then it will calculate the entire grid
-WAVELENGTH_START_APPROX = 2.310e-6
-WAVELENGTH_END_APPROX = 2.315e-6
+WAVELENGTH_START_APPROX = 0.54675e-6
+WAVELENGTH_END_APPROX = 0.5468e-6
 full_wavelength_range = True
 LAMBDA_START, LAMBDA_END, START_WAVELENGTH, END_WAVELENGTH, NLAMBDA = find_closest_wavelength_indices(opacity_set_id,
                                                                                              full_wavelength_range,
@@ -303,8 +303,7 @@ for q in range(len(planet_names)):
 
             try:
                 # Run Eliza's code
-                subprocess.run('make rt_emission_aerosols.exe',
-                               shell=True, check=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                subprocess.run('make rt_emission_aerosols.exe', shell=True, check=True)
                 file_name = f"rt_emission_aerosols_{planet_name}_phase_{phase_strs[i]}.exe"
                 os.rename('rt_emission_aerosols.exe', file_name)
 

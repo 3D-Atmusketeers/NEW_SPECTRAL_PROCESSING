@@ -29,6 +29,10 @@ double lint3D(double x1, double x2, double y1, double y2, double z1,
               double z2, double f1, double f2, double f3, double f4,
               double f5, double f6, double f7, double f8, double x,
               double y, double z);
+
+//FIX!!
+//double smooth_value(double wav_qext[500][500], int pressure_index, double wavelength_microns, double wavelength_array[500], int max_index);
+
 void Angles3d(double ds[], double theta[], double dtheta[], double lat);
 double Radius(double R_pl, double ds[]);
 double lint(double xa, double ya, double xb, double yb, double x);
@@ -1206,6 +1210,21 @@ int RT_Emit_3D(double PHASE)
         Locate(500, wavelength_array_for_haze_scattering_data_in_microns, wavelength_microns, &wavelength_index_hazes);
 
 
+        // Calculate the upper index and weights for clouds
+        int upper_index_clouds = (wavelength_index_clouds + 1 < num_cloud_wavelength_points) ? wavelength_index_clouds + 1 : wavelength_index_clouds;
+        double weight_lower_clouds = (wavelength_array_for_cloud_scattering_data_in_microns[upper_index_clouds] - wavelength_microns) / 
+                                     (wavelength_array_for_cloud_scattering_data_in_microns[upper_index_clouds] - wavelength_array_for_cloud_scattering_data_in_microns[wavelength_index_clouds]);
+        double weight_upper_clouds = 1.0 - weight_lower_clouds;
+
+        // Calculate the upper index and weights for hazes
+        int upper_index_hazes = (wavelength_index_hazes + 1 < num_haze_wavelength_points) ? wavelength_index_hazes + 1 : wavelength_index_hazes;
+        double weight_lower_hazes = (wavelength_array_for_haze_scattering_data_in_microns[upper_index_hazes] - wavelength_microns) / 
+                                    (wavelength_array_for_haze_scattering_data_in_microns[upper_index_hazes] - wavelength_array_for_haze_scattering_data_in_microns[wavelength_index_hazes]);
+        double weight_upper_hazes = 1.0 - weight_lower_hazes;
+
+
+
+
         for(l=0; l<NLAT; l++)
         {
             for(m=0; m<NLON; m++)
@@ -1414,20 +1433,64 @@ int RT_Emit_3D(double PHASE)
                             aero_kappa_pre_qext_interp_13  = lint2D(atmos.lon[c], atmos.lon[c+1], atmos.lat[o], atmos.lat[o+1], aero_kappa_pre_qext_13[o][c][j], aero_kappa_pre_qext_13[o][c+1][j], aero_kappa_pre_qext_13[o+1][c][j], aero_kappa_pre_qext_13[o+1][c+1][j], phi_lon_solid[l][m][j]-PHASE, theta_lat_solid[l][m][j]);
                             aero_kappa_pre_tau_haze_interp = lint2D(atmos.lon[c], atmos.lon[c+1], atmos.lat[o], atmos.lat[o+1], aero_kappa_pre_tau_haze[o][c][j],aero_kappa_pre_tau_haze[o][c+1][j],aero_kappa_pre_tau_haze[o+1][c][j],    aero_kappa_pre_tau_haze[o+1][c+1][j],    phi_lon_solid[l][m][j]-PHASE, theta_lat_solid[l][m][j]);
 
-                            aero_kappa_1    = aero_kappa_pre_qext_interp_1   * KCl_wav_qext[pressure_index_clouds][wavelength_index_clouds];
-                            aero_kappa_2    = aero_kappa_pre_qext_interp_2   * ZnS_wav_qext[pressure_index_clouds][wavelength_index_clouds];
-                            aero_kappa_3    = aero_kappa_pre_qext_interp_3   * Na2S_wav_qext[pressure_index_clouds][wavelength_index_clouds];
-                            aero_kappa_4    = aero_kappa_pre_qext_interp_4   * MnS_wav_qext[pressure_index_clouds][wavelength_index_clouds];
-                            aero_kappa_5    = aero_kappa_pre_qext_interp_5   * Cr_wav_qext[pressure_index_clouds][wavelength_index_clouds];
-                            aero_kappa_6    = aero_kappa_pre_qext_interp_6   * SiO2_wav_qext[pressure_index_clouds][wavelength_index_clouds];
-                            aero_kappa_7    = aero_kappa_pre_qext_interp_7   * Mg2SiO4_wav_qext[pressure_index_clouds][wavelength_index_clouds];
-                            aero_kappa_8    = aero_kappa_pre_qext_interp_8   * VO_wav_qext[pressure_index_clouds][wavelength_index_clouds];
-                            aero_kappa_9    = aero_kappa_pre_qext_interp_9   * Ni_wav_qext[pressure_index_clouds][wavelength_index_clouds];
-                            aero_kappa_10   = aero_kappa_pre_qext_interp_10  * Fe_wav_qext[pressure_index_clouds][wavelength_index_clouds];
-                            aero_kappa_11   = aero_kappa_pre_qext_interp_11  * CaSiO4_wav_qext[pressure_index_clouds][wavelength_index_clouds];
-                            aero_kappa_12   = aero_kappa_pre_qext_interp_12  * CaTiO3_wav_qext[pressure_index_clouds][wavelength_index_clouds];
-                            aero_kappa_13   = aero_kappa_pre_qext_interp_13  * Al2O3_wav_qext[pressure_index_clouds][wavelength_index_clouds];
-                            aero_kappa_haze = aero_kappa_pre_tau_haze_interp * haze_wav_tau[pressure_index_hazes][wavelength_index_hazes] * delta_pressure_bar;
+
+
+                            aero_kappa_1 = aero_kappa_pre_qext_interp_1 * 
+                                           (KCl_wav_qext[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                            KCl_wav_qext[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds);
+
+                            aero_kappa_2 = aero_kappa_pre_qext_interp_2 * 
+                                           (ZnS_wav_qext[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                            ZnS_wav_qext[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds);
+
+                            aero_kappa_3 = aero_kappa_pre_qext_interp_3 * 
+                                           (Na2S_wav_qext[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                            Na2S_wav_qext[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds);
+
+                            aero_kappa_4 = aero_kappa_pre_qext_interp_4 * 
+                                           (MnS_wav_qext[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                            MnS_wav_qext[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds);
+
+                            aero_kappa_5 = aero_kappa_pre_qext_interp_5 * 
+                                           (Cr_wav_qext[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                            Cr_wav_qext[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds);
+
+                            aero_kappa_6 = aero_kappa_pre_qext_interp_6 * 
+                                           (SiO2_wav_qext[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                            SiO2_wav_qext[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds);
+
+                            aero_kappa_7 = aero_kappa_pre_qext_interp_7 * 
+                                           (Mg2SiO4_wav_qext[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                            Mg2SiO4_wav_qext[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds);
+
+                            aero_kappa_8 = aero_kappa_pre_qext_interp_8 * 
+                                           (VO_wav_qext[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                            VO_wav_qext[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds);
+
+                            aero_kappa_9 = aero_kappa_pre_qext_interp_9 * 
+                                           (Ni_wav_qext[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                            Ni_wav_qext[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds);
+
+                            aero_kappa_10 = aero_kappa_pre_qext_interp_10 * 
+                                            (Fe_wav_qext[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                            Fe_wav_qext[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds);
+
+                            aero_kappa_11 = aero_kappa_pre_qext_interp_11 * 
+                                            (CaSiO4_wav_qext[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                            CaSiO4_wav_qext[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds);
+
+                            aero_kappa_12 = aero_kappa_pre_qext_interp_12 * 
+                                            (CaTiO3_wav_qext[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                            CaTiO3_wav_qext[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds);
+
+                            aero_kappa_13 = aero_kappa_pre_qext_interp_13 * 
+                                            (Al2O3_wav_qext[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                            Al2O3_wav_qext[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds);
+
+                            aero_kappa_haze = aero_kappa_pre_tau_haze_interp * 
+                                              (haze_wav_tau[pressure_index_hazes][wavelength_index_hazes] * weight_lower_hazes + 
+                                               haze_wav_tau[pressure_index_hazes][upper_index_hazes] * weight_upper_hazes) * 
+                                               delta_pressure_bar;
 
                             // So all the cloud wavelength values are not wavelength dependant in the output files
                             // This takes the optical depth and adds the wavelength and particle size dependant scattering
@@ -1462,37 +1525,69 @@ int RT_Emit_3D(double PHASE)
                                 weight_12 = aero_kappa_12 * temp_value;
                                 weight_13 = aero_kappa_13 * temp_value;
                                 weight_haze = aero_kappa_haze * temp_value;
+                                
 
-                                pi0_tot[l][m][j] =  (weight_1    * KCl_wav_pi0[pressure_index_clouds][wavelength_index_clouds]     + \
-                                                     weight_2    * ZnS_wav_pi0[pressure_index_clouds][wavelength_index_clouds]     + \
-                                                     weight_3    * Na2S_wav_pi0[pressure_index_clouds][wavelength_index_clouds]    + \
-                                                     weight_4    * MnS_wav_pi0[pressure_index_clouds][wavelength_index_clouds]     + \
-                                                     weight_5    * Cr_wav_pi0[pressure_index_clouds][wavelength_index_clouds]      + \
-                                                     weight_6    * SiO2_wav_pi0[pressure_index_clouds][wavelength_index_clouds]    + \
-                                                     weight_7    * Mg2SiO4_wav_pi0[pressure_index_clouds][wavelength_index_clouds] + \
-                                                     weight_8    * VO_wav_pi0[pressure_index_clouds][wavelength_index_clouds]      + \
-                                                     weight_9    * Ni_wav_pi0[pressure_index_clouds][wavelength_index_clouds]      + \
-                                                     weight_10   * Fe_wav_pi0[pressure_index_clouds][wavelength_index_clouds]      + \
-                                                     weight_11   * CaSiO4_wav_pi0[pressure_index_clouds][wavelength_index_clouds]  + \
-                                                     weight_12   * CaTiO3_wav_pi0[pressure_index_clouds][wavelength_index_clouds]  + \
-                                                     weight_13   * Al2O3_wav_pi0[pressure_index_clouds][wavelength_index_clouds]   + \
-                                                     weight_haze * haze_wav_pi0[pressure_index_hazes][wavelength_index_hazes]);
+                                pi0_tot[l][m][j] = 0;
+                                asym_tot[l][m][j] = 0;
 
 
-                                asym_tot[l][m][j] = (weight_1    * KCl_wav_gg[pressure_index_clouds][wavelength_index_clouds]       + \
-                                                     weight_2    * ZnS_wav_gg[pressure_index_clouds][wavelength_index_clouds]       + \
-                                                     weight_3    * Na2S_wav_gg[pressure_index_clouds][wavelength_index_clouds]      + \
-                                                     weight_4    * MnS_wav_gg[pressure_index_clouds][wavelength_index_clouds]       + \
-                                                     weight_5    * Cr_wav_gg[pressure_index_clouds][wavelength_index_clouds]        + \
-                                                     weight_6    * SiO2_wav_gg[pressure_index_clouds][wavelength_index_clouds]      + \
-                                                     weight_7    * Mg2SiO4_wav_gg[pressure_index_clouds][wavelength_index_clouds]   + \
-                                                     weight_8    * VO_wav_gg[pressure_index_clouds][wavelength_index_clouds]        + \
-                                                     weight_9    * Ni_wav_gg[pressure_index_clouds][wavelength_index_clouds]        + \
-                                                     weight_10   * Fe_wav_gg[pressure_index_clouds][wavelength_index_clouds]        + \
-                                                     weight_11   * CaSiO4_wav_gg[pressure_index_clouds][wavelength_index_clouds]    + \
-                                                     weight_12   * CaTiO3_wav_gg[pressure_index_clouds][wavelength_index_clouds]    + \
-                                                     weight_13   * Al2O3_wav_gg[pressure_index_clouds][wavelength_index_clouds]     + \
-                                                     weight_haze * haze_wav_gg[pressure_index_hazes][wavelength_index_hazes]);
+                                pi0_tot[l][m][j] =  (weight_1 * (KCl_wav_pi0[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                 KCl_wav_pi0[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_2 * (ZnS_wav_pi0[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                ZnS_wav_pi0[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_3 * (Na2S_wav_pi0[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                Na2S_wav_pi0[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_4 * (MnS_wav_pi0[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                MnS_wav_pi0[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_5 * (Cr_wav_pi0[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                Cr_wav_pi0[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_6 * (SiO2_wav_pi0[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                SiO2_wav_pi0[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_7 * (Mg2SiO4_wav_pi0[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                Mg2SiO4_wav_pi0[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_8 * (VO_wav_pi0[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                VO_wav_pi0[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_9 * (Ni_wav_pi0[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                Ni_wav_pi0[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_10 * (Fe_wav_pi0[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                 Fe_wav_pi0[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_11 * (CaSiO4_wav_pi0[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                 CaSiO4_wav_pi0[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_12 * (CaTiO3_wav_pi0[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                 CaTiO3_wav_pi0[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_13 * (Al2O3_wav_pi0[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                 Al2O3_wav_pi0[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_haze * (haze_wav_pi0[pressure_index_hazes][wavelength_index_hazes] * weight_lower_hazes + 
+                                                                   haze_wav_pi0[pressure_index_hazes][upper_index_hazes] * weight_upper_hazes));
+
+                                asym_tot[l][m][j] = (weight_1 * (KCl_wav_gg[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                KCl_wav_gg[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_2 * (ZnS_wav_gg[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                ZnS_wav_gg[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_3 * (Na2S_wav_gg[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                Na2S_wav_gg[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_4 * (MnS_wav_gg[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                MnS_wav_gg[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_5 * (Cr_wav_gg[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                Cr_wav_gg[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_6 * (SiO2_wav_gg[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                SiO2_wav_gg[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_7 * (Mg2SiO4_wav_gg[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                Mg2SiO4_wav_gg[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_8 * (VO_wav_gg[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                VO_wav_gg[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_9 * (Ni_wav_gg[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                Ni_wav_gg[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_10 * (Fe_wav_gg[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                Fe_wav_gg[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_11 * (CaSiO4_wav_gg[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                CaSiO4_wav_gg[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_12 * (CaTiO3_wav_gg[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                CaTiO3_wav_gg[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_13 * (Al2O3_wav_gg[pressure_index_clouds][wavelength_index_clouds] * weight_lower_clouds + 
+                                                                Al2O3_wav_gg[pressure_index_clouds][upper_index_clouds] * weight_upper_clouds) +
+                                                    weight_haze * (haze_wav_gg[pressure_index_hazes][wavelength_index_hazes] * weight_lower_hazes + 
+                                                                   haze_wav_gg[pressure_index_hazes][upper_index_hazes] * weight_upper_hazes));
                             }
                         }
                         // if clouds are turned off, need to set scattering params to zero

@@ -19,9 +19,9 @@ import aerosol_maps
 import aerosol_profiles
 import wind_maps
 import wind_isobars
-import emission_maps_pressure
-import emission_maps_temperature
-import basemap_hemispheric_projections
+#import emission_maps_pressure
+#import emission_maps_temperature
+#import basemap_hemispheric_projections
 
 import cross_correlation
 
@@ -33,12 +33,7 @@ plt.style.use('science.mplstyle')
 
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
-planet_names = ['HD209-DOGRAY',
-                'HD209-DOGRAY-NUC-CLOUDS-COMPACT',
-                'HD209-DOGRAY-NUC-CLOUDS',
-                'HD209-PICKET',
-                'HD209-PICKET-NUC-CLOUDS-COMPACT',
-                'HD209-PICKET-NUC-CLOUDS']
+planet_names = ['HD189-DOGRAY-ALL-CLOUDS-COMPACT']
 
 #inclination needs to be a string in radians (sorry)
 inclination = '0.00'
@@ -147,10 +142,10 @@ for filter_name in ['None']:
 
         #spectra.plot_filters(planet_names, transmission_filter_name=filter_name, inclination)
 
-    spectra.plot_fp_spectra(planet_names,num_phases=4,
+    spectra.plot_fp_spectra(planet_names,num_phases=1,
                             transmission_filter_name=filter_name,
                             wav_subset=[0, 100],
-                            resolution=100,
+                            resolution=0,
                             INC_STRING=inclination)
 
     #spectra.plot_fp_fs_spectra(planet_names,

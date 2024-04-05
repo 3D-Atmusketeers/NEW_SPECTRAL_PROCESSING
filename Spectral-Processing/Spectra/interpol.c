@@ -202,4 +202,27 @@ void Map1(double *xold, double *fold, int nold, double *xnew, double *fnew, int 
 	
 }
 
+
+/*
+double smooth_value(double wav_qext[500][500], int pressure_index, double wavelength_microns, double wavelength_array[500], int max_index) {
+    // Ensure max_index does not exceed array bounds
+    if (max_index > 500) max_index = 500;
+
+    int index;
+    Locate(max_index, wavelength_array, wavelength_microns, &index);
+
+    if (index >= max_index - 1) {
+        return wav_qext[pressure_index][index];
+    } else {
+        // Find the exact position of wavelength_microns between the two closest points
+        double lower_wavelength = wavelength_array[index];
+        double upper_wavelength = wavelength_array[index + 1];
+        double weight = (upper_wavelength - wavelength_microns) / (upper_wavelength - lower_wavelength);
+        double next_weight = 1.0 - weight;
+        return wav_qext[pressure_index][index] * weight + 
+               wav_qext[pressure_index][index + 1] * next_weight;
+    }
+}
+*/
+
 /* ------- end ------------------ Map1.c ------------------------- */
