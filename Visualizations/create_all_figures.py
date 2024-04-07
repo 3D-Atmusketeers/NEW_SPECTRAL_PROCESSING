@@ -33,7 +33,7 @@ plt.style.use('science.mplstyle')
 
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
-planet_names = ['HD189-DOGRAY-ALL-CLOUDS-COMPACT']
+planet_names = ['HD189-DOGRAY']
 
 #inclination needs to be a string in radians (sorry)
 inclination = '0.00'
@@ -142,7 +142,7 @@ for filter_name in ['None']:
 
         #spectra.plot_filters(planet_names, transmission_filter_name=filter_name, inclination)
 
-    spectra.plot_fp_spectra(planet_names,num_phases=1,
+    spectra.plot_fp_spectra(planet_names,num_phases=4,
                             transmission_filter_name=filter_name,
                             wav_subset=[0, 100],
                             resolution=0,
@@ -167,9 +167,9 @@ for filter_name in ['None']:
     #                        planet_name_char_len,
     #                        planet_radii,
     #                        num_phases=24,
-    #                        transmission_filter_name=filter_name,
-    #                        wav_subset=[5e-6, 12e-6],
-    #                        INC_STRING=inclination)
+     #                       transmission_filter_name=filter_name,
+     #                       wav_subset=[0, 100],
+     #                       INC_STRING=inclination)
 
 # Notes
 # if the transmission filter name is set to 'None', then it will plot the full spectrum

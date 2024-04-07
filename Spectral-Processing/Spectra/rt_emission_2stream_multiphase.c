@@ -1664,6 +1664,12 @@ int RT_Emit_3D(double PHASE)
                                CLIGHT / atmos.lambda[i] - CLIGHT / atmos.lambda[i+1], \
                                atmos.incident_frac[l][m][NTAU-10], dtau_em[l][m], intensity_vals);
 
+                    //for (j = kmin; j<NTAU; j++)
+                    //{
+                    //    printf("%d %le %le %le\n",j, pi0_tot[l][m][j], asym_tot[l][m][j], intensity_vals[1]);
+                    //}
+
+
                     // The first index is the thermal intensity, the second is the reflected light
                     intensity[l][m] = intensity_vals[0] + intensity_vals[1];
                     reflected_intensity[l][m] = intensity_vals[1];

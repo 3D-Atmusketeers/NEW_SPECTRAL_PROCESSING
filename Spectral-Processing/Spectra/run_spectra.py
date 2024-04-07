@@ -54,11 +54,11 @@ smoothing = True
 
 # These are the planet files that you need to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["HD189-DOGRAY-ALL-CLOUDS-COMPACT"]
+planet_names = ["HD189-DOGRAY"]
 
 # The options are lowres and hires
 # Isaac Malsky is still working on highres
-opacity_set_id = 'High-Res'
+opacity_set_id = 'Low-Res'
 
 # Specify the wavelength range that you'd like to calculate
 # If values aren't given, or if they're negative -1 for both
@@ -93,6 +93,7 @@ if missing_species:
 ##################################################
 ######        SET THE OPAC SPECIES        ########
 ##################################################
+opacity_species = ['H2O']
 
 print("\n" + "="*60)
 print("WARNING: Using a limited subset of available species!")

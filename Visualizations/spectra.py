@@ -949,9 +949,7 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
             phase_degrees = rot_val * i
 
             # Get the file path
-            #file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '00.00.dat'
-            file_path = '../Spectral-Processing/Spectra/OUT/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '00.00.dat'
-
+            file_path = '../Spectral-Processing/FINISHED_SPECTRA/Spec_0_' + planet_name + '_phase_{}_inc_' + INC_STRING + '00.00.dat'
 
             # Load in the planet spectra
             planet_spectra = pd.read_csv(file_path.format(str(i * rot_val)), header=None,
@@ -999,9 +997,10 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
         #ax.set_xscale('log')
         #ax.set_yscale('log')
         
-        #ax.set_xlim(0.54673, 0.547)
+        #ax.set_xlim(2.308, 2.314)
         #ax.set_ylim(715000, 730000)
         ax.minorticks_on()  # This enables minor ticks
+
         ax.legend(fontsize=12, loc=(0, 1.03), ncol=6, mode='expand', title='Orbital Phase', title_fontsize=18)
         ax.set_xlabel(r'Wavelength ($\mu$m)')
         ax.set_ylabel(r'F$_p$ (W/m$^2$/micron)')  # (W m$^{-2}$)

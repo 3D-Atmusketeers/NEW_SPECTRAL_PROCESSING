@@ -8,7 +8,7 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
                  double NU, double NU_BIN, double incident_frac, double *dtau_array, \
                  double intensity_vals[])
 {
-  double mu_1;        // Param for Quadrature or Hemispheric Mean constant
+  double mu_1;  // Param for Quadrature or Hemispheric Mean constant
   double mu_0;  // Incident angle of the solar beam
   double mu;    // Never used. The angle of the upwards intensity
 
@@ -46,6 +46,8 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
 
   // Scattering and atmosphere parameters
   double TEMPS[num_tau_layers - kmin + 2];
+
+  // Set the optical depths
   double TAUCS[num_tau_layers - kmin + 2];
   double TAULS[num_tau_layers - kmin + 1];
 
@@ -86,7 +88,7 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
   double B0[num_tau_layers - kmin + 2];
   double B1[num_tau_layers - kmin + 1];
   double TEMP[num_tau_layers - kmin + 1];
-  double DTAUS[num_tau_layers - kmin + 1];
+
 
   // Stuff for solving the blackbody equation
   double Bnu, twohnu3_c2, hc_Tkla;
@@ -126,6 +128,7 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
   double INTENSITY_DOWN[num_tau_layers - kmin + 2][num_gangle];
   double INTENSITY_UP[num_tau_layers - kmin + 2][num_gangle];
   double TMI[num_tau_layers - kmin + 1];
+  double FLUX_UP[num_tau_layers - kmin + 1];
 
   // Final values for long wave radiation
   double HEMISPHERIC_TWO_STREAM[num_tau_layers - kmin + 1];
@@ -141,7 +144,6 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
   double QUADRATURE_TWO_STREAM_TOP;
   double QUADRATURE_SOURCE_FNC_TOP;
 
-
   // Calculate the flux at the top of the atmosphere from the star
   temp_val_1 = (2.0 * h_constant * (NU * NU * NU)) / (CLIGHT * CLIGHT);
   temp_val_2 = exp(h_constant * NU / (bolz_constant * STELLAR_TEMP)) - 1.0;
@@ -149,9 +151,10 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
 
   // Get the flux at the surface of the atmosphere
   FLUX_SURFACE_HEMISPHERIC = 0;
-  FLUX_SURFACE_QUADRATURE = PI * STELLAR_BB * pow((R_STAR / ORB_SEP), 2.0);
+  FLUX_SURFACE_QUADRATURE = incident_frac * PI * STELLAR_BB * pow((R_STAR / ORB_SEP), 2.0);
 
-  mu_0 = cos(incident_frac);
+  mu_0 = 1.0;
+
   // Assign arrays for the characteristics of the atmosphere based on the input arrays
   TAUCS[0] = 0.0;
   for (J=0; J<NLAYER; J++)
@@ -159,8 +162,6 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
     W0[J] = w0_array[J+kmin-1];
     G0[J] = g0_array[J+kmin-1];
 
-
-    DTAUS[J]   = dtau_array[J+kmin-1];
     TAULS[J]   = dtau_array[J+kmin-1];
     TAUCS[J+1] = TAUCS[J]+dtau_array[J+kmin-1];
 
@@ -168,6 +169,8 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
 
     DIRECT_QUADRATURE[J]  = mu_0 * PI * FLUX_SURFACE_QUADRATURE * exp(-1.0 * (TAUCS[J] + TAULS[J]) / mu_0);
     DIRECT_HEMISPHERIC[J] = 0.0;
+
+    printf("%le %le %le %le %le\n", W0[J], G0[J], TAULS[J], TAUCS[J], TEMPS[J]);
   }
 
   TEMPS[NLAYER] = TEMPS[NLAYER - 1];
@@ -188,8 +191,6 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
   //***************************************************************************************
   //***************************************************************************************
   //***************************************************************************************
-
-
 
   //**************************************************
   //*               Long Wave Solution               *
@@ -454,9 +455,10 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
   for(J=0; J<NLAYER-1; J++)
   {
     L = 2*(J+1);
-    A[L] =  e2[J]   * e3[J]   - e1[J]   * e4[J];
-    B[L] =  e1[J] * e1[J+1]   - e3[J+1] * e3[J];
-    D[L] =  e3[J]   * e4[J+1] - e1[J]   * e2[J+1];
+    // HERE ARE THE ODD MATRIX ELEMENTS
+    A[L] =  e2[J] * e3[J]   - e1[J]   * e4[J];
+    B[L] =  e1[J] * e1[J+1] - e3[J+1] * e3[J];
+    D[L] =  e3[J] * e4[J+1] - e1[J]   * e2[J+1];
   }
 
   for(J=0; J<NLAYER-1; J++)
@@ -556,10 +558,14 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
 
   for(J=0; J<NLAYER; J++)
   {
-
     TMI[J] = ((1.0 / mu_1) * (Y[2*J]*(e1[J] + e3[J]) + \
              (Y[2*J+1] * (e2[J] + e4[J])) + CPB[J] + CMB[J]) + DIRECT_QUADRATURE[J]/mu_0);
-    QUADRATURE_TWO_STREAM[J] = TMI[J];
+
+    FLUX_UP[J] = Y[2*J]   * (exp(-LAMBDAS[J]*(TAULS[J]-0)) + (GAMMA[J]*exptrm_negative[J])) + \
+                 Y[2*J+1] * (exp(-LAMBDAS[J]*(TAULS[J]-0)) - (GAMMA[J]*exptrm_negative[J])) + \
+                 CPB[J];
+                 
+    QUADRATURE_TWO_STREAM[J] = FLUX_UP[J];
   }
 
   intensity_vals[0] = fabs(HEMISPHERIC_SOURCE_FNC[0]) / (PI);
