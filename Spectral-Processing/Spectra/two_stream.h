@@ -169,8 +169,6 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
 
     DIRECT_QUADRATURE[J]  = mu_0 * PI * FLUX_SURFACE_QUADRATURE * exp(-1.0 * (TAUCS[J] + TAULS[J]) / mu_0);
     DIRECT_HEMISPHERIC[J] = 0.0;
-
-    printf("%le %le %le %le %le\n", W0[J], G0[J], TAULS[J], TAUCS[J], TEMPS[J]);
   }
 
   TEMPS[NLAYER] = TEMPS[NLAYER - 1];
