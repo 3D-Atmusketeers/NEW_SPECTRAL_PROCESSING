@@ -30,10 +30,10 @@ def filter_spectra(planet_spectra, star_spectra, filt, transmission_filter_name,
     #planet_spectra = pd.read_csv(file_path.format(str(phase_degrees)), header=None, delim_whitespace=True, names=['wavelength', 'flux', 'reflected'])
     #planet_spectra.flux = planet_spectra.flux * (3.0e8 / planet_spectra.wavelength ** 2) / 1e6
 
-    if transmission_filter_name == 'MIRI':
-        # Only use the data points within the filter wavelength range that we want
-        planet_spectra = planet_spectra[(planet_spectra['wavelength'] > np.amin(filt.wav)) & (planet_spectra['wavelength'] < np.amax(filt.wav))]
-        star_spectra = star_spectra[(star_spectra['wavelength'] > np.amin(filt.wav)) & (star_spectra['wavelength'] < np.amax(filt.wav))]
+    #if transmission_filter_name == 'MIRI':
+    # Only use the data points within the filter wavelength range that we want
+    planet_spectra = planet_spectra[(planet_spectra['wavelength'] > np.amin(filt.wav)) & (planet_spectra['wavelength'] < np.amax(filt.wav))]
+    star_spectra = star_spectra[(star_spectra['wavelength'] > np.amin(filt.wav)) & (star_spectra['wavelength'] < np.amax(filt.wav))]
 
     # Cut off anything that is outside the wavelength range that you want
     planet_spectra = planet_spectra[(planet_spectra['wavelength'] > wav_subset[0]) & (planet_spectra['wavelength'] < wav_subset[1])]
@@ -705,13 +705,12 @@ def plot_fp_fs_phase_curves(planet_names, planet_name_char_len, planet_radii, nu
         pd.DataFrame({'Phase': np.arange(0, 360, rot_val), 'Fp_Fs_pmm': fp_fs_ratio * 1e6}
                      ).to_csv('OUTPUT_DATA/Fp_Fs_{}_Phase_Curves.txt'.format(planet_name), sep=' ')
 
-        if 'DOGRAY' in planet_name.lower():
-            linestyle_str='dashed'
-        elif 'PICKET' in planet_name.lower():
-            linestyle_str='solid'
+        if 'DOGRAY' in planet_name.upper():
+            linestyle_str = 'dashed'
+        elif 'PICKET' in planet_name.upper():
+            linestyle_str = 'solid'
         else:
-            linestyle_str='dotted'
-
+            linestyle_str = 'dotted'
 
         if k % 3 == 0:
             color_str='#70A5FF'
@@ -724,12 +723,26 @@ def plot_fp_fs_phase_curves(planet_names, planet_name_char_len, planet_radii, nu
         phases = np.linspace(0, 345, num_phases) / 360
         ax.plot(phases, fp_fs_ratio * 1e6,
                 color=color_str,
-                linestyle='solid',
+                linestyle=linestyle_str,
                 linewidth=2,
                 label=planet_name)
 
 
-    ax.set_xlim(min(phases), max(phases))
+    # Load the data
+    df = pd.read_csv('/home/imalsky/Documents/Spectra-Paper/DATA/HD189bo11.csv')
+
+    # Subtract 1 from 'phase' values that are greater than 1
+    df['phase'] = df['phase'].apply(lambda x: x - 1 if x > 1 else x)
+
+    # Prepare y_data
+    y_data = (df.bestfit_norm[::100] - 1) * 1e6
+
+    # Create the scatter plot
+    ax.scatter(df.phase[::100], y_data, s=1)
+    ax.set_ylim(0, 2500)
+
+
+    #ax.set_xlim(min(phases), max(phases))
     ax.legend(fontsize=11, loc=(0, 1.03), ncol=3, mode='expand')
     ax.set_xlabel('Orbital Phase')
     ax.set_ylabel(r'F$_p$/F$_s$ (ppm)')
@@ -977,7 +990,7 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
             ax.plot(planet_spectra.wavelength * 1e6,
                     flux,
                     color=my_colors(i / num_phases),
-                    linewidth=2.0,
+                    linewidth=1.0,
                     label=str(np.round(rot_val * i / 360., 3)))
 
             pd.DataFrame({'Wavelength (microns)': planet_spectra.wavelength * 1e6, 'Planet_Flux_micron': flux}
@@ -994,11 +1007,11 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
         ax.errorbar(df['Wavelength'], df['Fp_night'], yerr=[df['Low 1-sigma.1'], df['Up 1-sigma.1']],
              fmt='o-', label='Fp_night', capsize=2, linewidth=2)
         """
-        #ax.set_xscale('log')
-        #ax.set_yscale('log')
+        ax.set_xscale('log')
+        ax.set_yscale('log')
         
-        #ax.set_xlim(2.308, 2.314)
-        #ax.set_ylim(715000, 730000)
+        ax.set_xlim(0.5, 15)
+        ax.set_ylim(1e2, 1e6)
         ax.minorticks_on()  # This enables minor ticks
 
         ax.legend(fontsize=12, loc=(0, 1.03), ncol=6, mode='expand', title='Orbital Phase', title_fontsize=18)
@@ -1081,7 +1094,6 @@ def plot_blackbody_phase_curve(planet_name, planet_radii,num_phases,transmission
     # Divide out the two integrated signals
     fp_fs_ratio = (integrated_signal / integrated_signal_star - 1.0)
     
-    print(fp_fs_ratio)
     # Save the data
     #pd.DataFrame({'Phase': np.arange(0, 360, rot_val), 'Fp_Fs_pmm': fp_fs_ratio * 1e6}
     #                ).to_csv('OUTPUT_DATA/Blackbody_Phase_Curves.txt'.format, sep=' ')
