@@ -134,13 +134,18 @@ def get_input_data(path, runname, input_file, input_param):
         # Then, check for numbers and booleans.
         pattern = rf"\b{input_param}\s*=\s*(.*?)\s*(?:$|\||&)"
         matches = re.findall(pattern, line)
+
         for match in matches:
             found = True
             if input_param == 'RADEA':
                 values = re.findall(r"[+\-]?[^A-Za-z]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)", match)
+
+                if values == []:
+                    values = [float(match.strip(','))]
+
             else:
                 values = re.findall(r"[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?", match)
-
+            
             if len(values) == 0:
                 bool_pattern = r"\b(T|F|True|False)\b"
                 bool_match = re.findall(bool_pattern, line)

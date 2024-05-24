@@ -21,14 +21,18 @@ def plot_emission_maps(planet_names, nlat, nlon):
 
         base = "../Spectral-Processing/FINISHED_SPECTRA/Spec_0_"
 
-        full_df = pd.read_csv(base + file + "_phase_0.0_inc_0.00.00.0000.00_emission_map.dat",
+        phase = '180.0'
+
+        full_df = pd.read_csv(base + file + "_phase_" + phase + "_inc_0.0000.00_emission_map.dat",
                         names=['tau_index', 'wavelength_m', 'lon', 'lat', 'pressure_pa', 'temp', 'vlos'],
                         delim_whitespace=True)
 
         wavelengths = list(set(full_df["wavelength_m"]))
+        wavelengths = sorted(wavelengths)
 
-        print(full_df)
-        exit(0)
+        print(wavelengths)
+        wavelengths = wavelengths[3:4]
+
 
         # colormap
         cm_name = 'lajolla'
@@ -65,18 +69,25 @@ def plot_emission_maps(planet_names, nlat, nlon):
             #                    cmap=my_colors)
 
             emap = map.contourf(x, y, temps,
-                                levels=6,
+                                levels=np.linspace(1300, 2000, 100),
                                 cmap=my_colors)
 
-            map.contour(x, y, vlos, levels=[0], colors='white', linewidths=2.0, zorder=3)
-            map.contour(x, y, vlos, levels=[-2000, -1500, -1000, -500], colors='red', alpha=1.0, linewidths=2.0, linestyles='solid', zorder=3)
-            map.contour(x, y, vlos, levels=[500, 1000, 1500, 2000],  alpha=1.0, colors='#2c6fbb', linewidths=2.0,zorder=5)
+            #map.contour(x, y, vlos, levels=[0], colors='white', linewidths=2.0, zorder=3)
+            #map.contour(x, y, vlos, levels=[-2000, -1500, -1000, -500], colors='red', alpha=1.0, linewidths=2.0, linestyles='solid', zorder=3)
+            #map.contour(x, y, vlos, levels=[500, 1000, 1500, 2000],  alpha=1.0, colors='#2c6fbb', linewidths=2.0,zorder=5)
 
             wav_str = str(np.round(wavelengths[i] * 1e6, 3))
-            cb = map.colorbar(emap,
-                              location='bottom',
-                              label=r'$\tau$=2/3 Temperature at ' + wav_str + ' $\mu$m')
 
+            cb = fig.colorbar(emap, location='bottom', aspect=15, pad=0.02, fraction=0.06)
+            cb.outline.set_linewidth(2)
+            cb.set_label(label=r'$\tau$=2/3 Temperature at ' + wav_str + ' $\mu$m', fontsize=28)
+            cb.ax.tick_params(labelsize=28) 
             cb.ax.minorticks_on()
 
-            plt.savefig('../Figures/{}_temperature_emission_map_{}.png'.format(file, wav_str), bbox_inches='tight', dpi=200)
+            # Set 5 tick labels
+            ticks = np.linspace(1300, 2000, 6)  # Generate 5 linearly spaced ticks from 1000 to 2000
+            cb.set_ticks(ticks)  # Set these ticks on the colorbar
+            cb.set_ticklabels([f"{tick:.0f}" for tick in ticks])  # Optional: format tick labels
+
+
+            plt.savefig('../Figures/{}_temperature_emission_map_{}_phase_{}.png'.format(file, wav_str, phase), bbox_inches='tight', dpi=200)

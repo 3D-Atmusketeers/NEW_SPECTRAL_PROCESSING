@@ -53,6 +53,12 @@ axes.prop_cycle: cycler('color', ['black', '7e1e9c', '15b01a', '448ee4', 'ff7fa7
 #font.serif : Palatino
 
 
+font.family         : serif
+font.style          : normal
+font.variant        : normal
+font.weight         : normal
+font.stretch        : normal
+
 
 ### LINES
 # See http://matplotlib.org/api/artist_api.html#module-matplotlib.lines for more

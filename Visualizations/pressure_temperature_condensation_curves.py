@@ -180,19 +180,20 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
 
             cloud_colors = pl.cm.gnuplot(np.linspace(0, 1, 13))
             cloud_colors = pl.cm.nipy_spectral(np.linspace(0, 1, 13))
+            cloud_colors = pl.cm.Greys(np.linspace(0, 1, 10))
 
             #colors = ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4',
             #          '#f032e6', '#bfef45', '#fabed4', '#469990', '#dcbeff', '#9A6324', '#fffac8',
             #          '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#a9a9a9', '#ffffff']
 
-            axes.semilogy(f_kcl(new_pressures), new_pressures, lw=2, label='KCl', color='#03719c', linestyle='dotted')
-            #axes.semilogy(f_cr(new_pressures), new_pressures, lw=2, label='Cr', color=cloud_colors[1])
-            #axes.semilogy(f_sio2(new_pressures), new_pressures, lw=2, label=r'SiO$_2$', color=cloud_colors[2])
-            #axes.semilogy(f_mg2sio4(new_pressures), new_pressures, lw=2, label=r'Mg$_2$SiO$_4$', color=cloud_colors[3])
-            #axes.semilogy(f_vo(new_pressures), new_pressures, lw=2, label='VO', color=cloud_colors[4])
-            #axes.semilogy(f_ca2sio4(new_pressures), new_pressures, lw=2, label=r'Ca$_2$SiO$_4$', color=cloud_colors[5])
-            #axes.semilogy(f_catio3(new_pressures), new_pressures, lw=2, label=r'CaTiO$_3$', color=cloud_colors[6])
-            #axes.semilogy(f_al2o3(new_pressures), new_pressures, lw=2, label=r'Al$_2$O$_3$', color=cloud_colors[7])
+            axes.semilogy(f_kcl(new_pressures), new_pressures, lw=2, label='KCl', color=cloud_colors[2], linestyle='dashed')
+            axes.semilogy(f_cr(new_pressures), new_pressures, lw=2, label='Cr', color=cloud_colors[3], linestyle='dashed')
+            axes.semilogy(f_sio2(new_pressures), new_pressures, lw=2, label=r'SiO$_2$', color=cloud_colors[4], linestyle='dashed')
+            axes.semilogy(f_mg2sio4(new_pressures), new_pressures, lw=2, label=r'Mg$_2$SiO$_4$', color=cloud_colors[5], linestyle='dashed')
+            axes.semilogy(f_vo(new_pressures), new_pressures, lw=2, label='VO', color=cloud_colors[6], linestyle='dashed')
+            axes.semilogy(f_ca2sio4(new_pressures), new_pressures, lw=2, label=r'Ca$_2$SiO$_4$', color=cloud_colors[7], linestyle='dashed')
+            axes.semilogy(f_catio3(new_pressures), new_pressures, lw=2, label=r'CaTiO$_3$', color=cloud_colors[8], linestyle='dashed')
+            axes.semilogy(f_al2o3(new_pressures), new_pressures, lw=2, label=r'Al$_2$O$_3$', color=cloud_colors[9], linestyle='dashed')
 
             if not nucleation_lim:
                 axes.semilogy(f_fe(new_pressures), new_pressures, lw=2, label=r'Fe', color=cloud_colors[8])
@@ -204,7 +205,7 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
             axes.legend(fontsize=14, ncol=2, labelspacing=0.0, loc='lower left')
 
         axes.set_ylim(np.max(data[24][0][:, 4]), np.min(data[24][0][:, 4]))
-        axes.set_xlim([0, 1250])
+        axes.set_xlim([251, 2499])
 
         axes.xaxis.set_ticks_position('bottom')
         axes.xaxis.set_label_position('bottom')

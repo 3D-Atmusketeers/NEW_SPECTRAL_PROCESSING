@@ -21,17 +21,22 @@ def plot_emission_maps(planet_names, nlat, nlon):
 
         base = "../Spectral-Processing/FINISHED_SPECTRA/Spec_0_"
 
-        #full_df = pd.read_csv(base + file + "_phase_0.0_inc_0.00.00.0000.00_emission_map.dat",
-        #                names=['tau_index', 'wavelength_m', 'lon', 'lat', 'pressure_pa', 'temp', 'vlos'],
-        #                delim_whitespace=True)
-        full_df = pd.read_csv(base + file + "_phase_180.0_inc_0.00.00.0000.00_emission_map.dat",
-                        names=['tau_index', 'wavelength_m', 'lon', 'lat', 'pressure_pa'],
+        phase = '180.0'
+
+        full_df = pd.read_csv(base + file + "_phase_" + phase + "_inc_0.0000.00_emission_map.dat",
+                        names=['tau_index', 'wavelength_m', 'lon', 'lat', 'pressure_pa', 'temp', 'vlos'],
                         delim_whitespace=True)
 
-        wavelengths = list(set(full_df["wavelength_m"]))
 
+        #full_df = pd.read_csv(base + file + "_phase_180.0_inc_0.0000.00_emission_map.dat",
+        #                names=['tau_index', 'wavelength_m', 'lon', 'lat', 'pressure_pa', 'temp', 'vlos'],
+        #                delim_whitespace=True)
+
+        wavelengths = list(set(full_df["wavelength_m"]))
         wavelengths = sorted(wavelengths)
-        wavelengths = wavelengths[7:8]
+
+        #print(wavelengths)
+        #wavelengths = wavelengths[3:4]
 
         # colormap
         cm_name = 'lapaz'
@@ -62,7 +67,7 @@ def plot_emission_maps(planet_names, nlat, nlon):
             # , locator=ticker.LogLocator()
             # This is in mbar, thats where the 1e2 comes from. 1e5 to Pa, 1e3 to mbar
             emap = map.contourf(x, y, pressure/1e2,
-                                levels=6,
+                                levels=50,
                                 cmap=my_colors)
 
 
@@ -73,5 +78,4 @@ def plot_emission_maps(planet_names, nlat, nlon):
 
             cb.ax.minorticks_on()
 
-
-            plt.savefig('../Figures/{}_pressure_emission_map_{}.png'.format(file, wav_str), bbox_inches='tight', dpi=200)
+            plt.savefig('../Figures/{}_pressure_emission_map_{}_phase_{}.png'.format(file, wav_str, phase), bbox_inches='tight', dpi=200)

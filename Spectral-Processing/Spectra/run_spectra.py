@@ -54,7 +54,7 @@ smoothing = True
 
 # These are the planet files that you need to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["HD189-DOGRAY"]
+planet_names = ["GJ1214b-none-0clouds-100met"]
 
 # The options are lowres and hires
 # Isaac Malsky is still working on highres
@@ -93,7 +93,6 @@ if missing_species:
 ##################################################
 ######        SET THE OPAC SPECIES        ########
 ##################################################
-opacity_species = ['H2O']
 
 print("\n" + "="*60)
 print("WARNING: Using a limited subset of available species!")
@@ -110,12 +109,16 @@ else:
     print("Warning: You're missing the cloud files that should be in DATA/Aerosol_Data")
     exit()
 
+cloud_wavelength = 5.00
+wav_loc = np.absolute(wavelength_grid-cloud_wavelength).argmin()
+"""
 if opacity_set_id == 'Low-Res':
     cloud_wavelength = 0.500
     wav_loc = np.absolute(wavelength_grid-cloud_wavelength).argmin()
 else:
     cloud_wavelength = 2.00
     wav_loc = np.absolute(wavelength_grid-cloud_wavelength).argmin()
+"""
 
 for q in range(len(planet_names)):
     print()
@@ -158,9 +161,9 @@ for q in range(len(planet_names)):
     print("="*40 + "\n")
 
     # Check if the substring 'soot_2xpi0' is in HAZE_TYPE
-    if 'soot_2xpi0' in HAZE_TYPE:
+    if '2xpi0' in planet_name:
         # Replace 'soot_2xpi0' with 'soot-2xpi0'
-        HAZE_TYPE = HAZE_TYPE.replace('soot_2xpi0', 'soot-2xpi0')
+        HAZE_TYPE = 'soot-2xpi0'
 
     # Whether  there are clouds
     # 0 is no clouds, 1 is clouds
@@ -207,7 +210,8 @@ for q in range(len(planet_names)):
     print(f"\tGas Constant: {gasconst} J/(K*mol)")
     print(f"\tPlanet Radius: {R_PLANET} km")
     print(f"\tOrbital Period: {P_ROT} days")
-    print(f"\tMetallicity (MTLX): {MTLX}")
+    print(f"\tMetallicity: {MET_X_SOLAR}")
+    print(f"\tCloud Condensation Fraction: {MTLX}")
     print(f"\tHazes Present: {'Yes' if HAZES else 'No'}")
     print(f"\t{aerosol_layers} Cloud Layers")
     print(f"\tHaze Type: {HAZE_TYPE}")
@@ -228,7 +232,6 @@ for q in range(len(planet_names)):
     print(f"\tStar Temp: {STELLAR_TEMP} K")
     print(f"\tStar Radius: {R_STAR / 695700000:.2f} Solar Radii")
     print("="*60 + "\n\n")
-
 
     # Are these used?
     surfp = 100 #surface pressure, in bars
@@ -324,9 +327,9 @@ for q in range(len(planet_names)):
     inclination_strs = []
     phase_strs = []
 
-    STEP_ONE = False
-    STEP_TWO = False
-    STEP_THREE = True
+    STEP_ONE = True
+    STEP_TWO = True
+    STEP_THREE = False
 
     if STEP_ONE:
         # Convert the fort files to the correct format
