@@ -9,7 +9,7 @@ Figures/*
 
 # Ignore some stuff in Visualizations
 #Visualizations/DATA/
-Visualizations/DATA/*.fits
+Visualizations/DATA/*
 Visualizations/OUTPUT_DATA/*
 ##Visualizations/ScientificColourMaps7/*
 
