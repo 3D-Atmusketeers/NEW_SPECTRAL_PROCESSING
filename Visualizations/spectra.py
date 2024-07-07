@@ -1059,18 +1059,19 @@ def plot_fp_fs_spectra(planet_names, planet_radii, num_phases, transmission_filt
                 fp_fs_ratio = np.asarray(reduceSpectralResolution(list(planet_spectra.wavelength),list(fp_fs_ratio),
                                                                   R_low=resolution, R_high=None, lambda_mid=None, n=4))
 
+
             ax.plot(planet_spectra.wavelength.values * 1e6,
-                    fp_fs_ratio.values * 1e6,
+                    fp_fs_ratio * 1e6,
                     color=my_colors(i / num_phases),
                     linewidth=2,
                     zorder=1,
                     label=str(np.round(rot_val * i / 360., 3)))
 
-            #pd.DataFrame({'Wavelength (microns)': planet_spectra.wavelength * 1e6, 'Fp_Fs_pmm': fp_fs_ratio * 1e6}
-            #             ).to_csv('OUTPUT_DATA/Fp_Fs_Spectra_{}_Spectra_{}.txt'.format(str(i * rot_val), planet_name), sep=' ')
-            
             pd.DataFrame({'Wavelength (microns)': planet_spectra.wavelength * 1e6, 'Fp_Fs_pmm': fp_fs_ratio * 1e6}
-                         ).to_csv('OUTPUT_DATA/Blackbody_test.txt', sep=' ')
+                         ).to_csv('OUTPUT_DATA/Fp_Fs_Spectra_{}_Spectra_{}.txt'.format(str(i * rot_val), planet_name), sep=' ')
+            
+            #pd.DataFrame({'Wavelength (microns)': planet_spectra.wavelength * 1e6, 'Fp_Fs_pmm': fp_fs_ratio * 1e6}
+            #             ).to_csv('OUTPUT_DATA/Blackbody_test.txt', sep=' ')
 
 
 
@@ -1145,7 +1146,7 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
             # Load in the planet spectra
             planet_spectra = pd.read_csv(file_path.format(str(i * rot_val)), header=None,
                                          sep='\s+', names=['wavelength', 'flux', 'reflected'])
-            
+                        
             planet_spectra.flux = planet_spectra.flux * (3.0e8 / planet_spectra.wavelength ** 2) / 1e6
 
             # Reset the index
@@ -1166,7 +1167,7 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
                                                            R_low=resolution, R_high=None, lambda_mid=None, n=4))
 
             ax.plot(planet_spectra.wavelength.values * 1e6,
-                    flux.values,
+                    list(flux),
                     color=my_colors(i / num_phases),
                     linewidth=2.0,
                     label=str(np.round(rot_val * i / 360., 3)))
@@ -1186,9 +1187,9 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
              fmt='o-', label='Fp_night', capsize=2, linewidth=2)
         """
         #ax.set_xscale('log')
-        ax.set_yscale('log') 
-        ax.set_xlim(2.3105, 2.3135)
-        ax.set_ylim(2e2, 2e5)
+        #ax.set_yscale('log') 
+        #ax.set_xlim(2.3105, 2.3135)
+        #ax.set_ylim(2e2, 2e5)
         ax.minorticks_on()  # This enables minor ticks
 
         legend = ax.legend(fontsize=12, loc=(0, 1.03), ncol=6, title='Orbital Phase', mode='expand',title_fontsize=18)

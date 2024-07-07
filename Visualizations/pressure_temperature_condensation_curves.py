@@ -56,7 +56,8 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
         # plot all TP-profiles (expensive)
         for i in range(nlat):
             for j in range(nlon):
-                axes.semilogy(data[i][j][:, 5], data[i][j][:, 4], alpha=1.0, color='gray', linewidth=1)
+                axes.semilogy(data[i][j][:, 5], data[i][j][:, 4], lw=0.4,
+                              alpha=1.0, color='gray')
 
         # colormap
         cm_name = 'bamO'
@@ -71,7 +72,7 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
         # plot colored equatorial TP-profiles
         for i in range(96):
             axes.semilogy(data[24][i][:, 5], data[24][i][:, 4],
-                          '-', lw=2.0, alpha=1.0, color=my_colors(colors[color_idx]))
+                          '-', lw=1.0, alpha=1.0, color=my_colors(colors[color_idx]))
 
             color_idx += 1
             if (color_idx > 95):
@@ -186,14 +187,14 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
             #          '#f032e6', '#bfef45', '#fabed4', '#469990', '#dcbeff', '#9A6324', '#fffac8',
             #          '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#a9a9a9', '#ffffff']
 
-            axes.semilogy(f_kcl(new_pressures), new_pressures, lw=2, label='KCl', color=cloud_colors[2], linestyle='dashed')
-            axes.semilogy(f_cr(new_pressures), new_pressures, lw=2, label='Cr', color=cloud_colors[3], linestyle='dashed')
-            axes.semilogy(f_sio2(new_pressures), new_pressures, lw=2, label=r'SiO$_2$', color=cloud_colors[4], linestyle='dashed')
-            axes.semilogy(f_mg2sio4(new_pressures), new_pressures, lw=2, label=r'Mg$_2$SiO$_4$', color=cloud_colors[5], linestyle='dashed')
-            axes.semilogy(f_vo(new_pressures), new_pressures, lw=2, label='VO', color=cloud_colors[6], linestyle='dashed')
-            axes.semilogy(f_ca2sio4(new_pressures), new_pressures, lw=2, label=r'Ca$_2$SiO$_4$', color=cloud_colors[7], linestyle='dashed')
-            axes.semilogy(f_catio3(new_pressures), new_pressures, lw=2, label=r'CaTiO$_3$', color=cloud_colors[8], linestyle='dashed')
-            axes.semilogy(f_al2o3(new_pressures), new_pressures, lw=2, label=r'Al$_2$O$_3$', color=cloud_colors[9], linestyle='dashed')
+            #axes.semilogy(f_kcl(new_pressures), new_pressures, lw=2, label='KCl', color=cloud_colors[2], linestyle='dashed')
+            #axes.semilogy(f_cr(new_pressures), new_pressures, lw=2, label='Cr', color=cloud_colors[3], linestyle='dashed')
+            #axes.semilogy(f_sio2(new_pressures), new_pressures, lw=2, label=r'SiO$_2$', color=cloud_colors[4], linestyle='dashed')
+            #axes.semilogy(f_mg2sio4(new_pressures), new_pressures, lw=2, label=r'Mg$_2$SiO$_4$', color=cloud_colors[5], linestyle='dashed')
+            #axes.semilogy(f_vo(new_pressures), new_pressures, lw=2, label='VO', color=cloud_colors[6], linestyle='dashed')
+            #axes.semilogy(f_ca2sio4(new_pressures), new_pressures, lw=2, label=r'Ca$_2$SiO$_4$', color=cloud_colors[7], linestyle='dashed')
+            #axes.semilogy(f_catio3(new_pressures), new_pressures, lw=2, label=r'CaTiO$_3$', color=cloud_colors[8], linestyle='dashed')
+            #axes.semilogy(f_al2o3(new_pressures), new_pressures, lw=2, label=r'Al$_2$O$_3$', color=cloud_colors[9], linestyle='dashed')
 
             if not nucleation_lim:
                 axes.semilogy(f_fe(new_pressures), new_pressures, lw=2, label=r'Fe', color=cloud_colors[8])
@@ -205,7 +206,7 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
             axes.legend(fontsize=14, ncol=2, labelspacing=0.0, loc='lower left')
 
         axes.set_ylim(np.max(data[24][0][:, 4]), np.min(data[24][0][:, 4]))
-        axes.set_xlim([251, 2499])
+        axes.set_xlim([0, 1250])
 
         axes.xaxis.set_ticks_position('bottom')
         axes.xaxis.set_label_position('bottom')

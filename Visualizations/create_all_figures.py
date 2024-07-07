@@ -34,14 +34,23 @@ plt.style.use('science.mplstyle')
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
 
+planet_names = ['GJ1214b-none-0clouds-1met',
+                'GJ1214b-none-0clouds-100met',
+
+                'GJ1214b-soot-0clouds-1met',
+                'GJ1214b-soot-0clouds-100met',
+
+                'GJ1214b-none-50clouds-1met',
+                'GJ1214b-none-50clouds-100met',
+
+                'GJ1214b-soot-50clouds-1met',
+                'GJ1214b-soot-50clouds-100met',
+
+                'GJ1214b-soot_2xpi0-50clouds-1met',
+                'GJ1214b-soot_2xpi0-50clouds-100met'
+                ]
 
 
-planet_names = ['HD189-DOGRAY',
-                'HD189-DOGRAY-NUC-CLOUDS-COMPACT',
-                'HD189-DOGRAY-NUC-CLOUDS',
-                'HD189-PICKET',
-                'HD189-PICKET-NUC-CLOUDS-COMPACT',
-                'HD189-PICKET-NUC-CLOUDS']
 
 #inclination needs to be a string in radians (sorry)
 inclination = '0.00'
@@ -142,31 +151,28 @@ else:
 #spectra.plot_spectra_simple(planet_names, num_phases=4, inclination)
 
 
-
-
 # The options are "SPITZER_3_6, SPITZER_4_5, MIRI"
-for filter_name in ['None']:
+for filter_name in ['MIRI']:
     if filter_name != 'None':
         print()
         print(filter_name)
 
         #spectra.plot_filters(planet_names, transmission_filter_name=filter_name, inclination)
 
-    spectra.plot_fp_spectra(planet_names,
-                            num_phases=6,
-                            transmission_filter_name=filter_name,
-                            wav_subset=[0, 100],
-                            resolution=0,
-                            INC_STRING=inclination)
+    #spectra.plot_fp_spectra(planet_names,
+    #                        num_phases=1,
+    #                        transmission_filter_name=filter_name,
+    #                        wav_subset=[0, 1],
+    #                        resolution=1000,
+    #                        INC_STRING=inclination)
 
-    #spectra.plot_fp_fs_spectra(planet_names,
-    #                            planet_radii,
-    #                            num_phases=4,
-    #                            transmission_filter_name=filter_name,
-    #                            wav_subset=[5e-6, 12e-6],
-    #                            resolution=0,
-    #                            INC_STRING=inclination)
-
+    spectra.plot_fp_fs_spectra(planet_names,
+                                planet_radii,
+                                num_phases=4,
+                                transmission_filter_name=filter_name,
+                                wav_subset=[5e-6, 12e-6],
+                                resolution=100,
+                                INC_STRING=inclination)
 
     #spectra.plot_dayside(planet_names,
     #                            planet_radii,
@@ -183,13 +189,13 @@ for filter_name in ['None']:
     #                        wav_subset=[0, 100],
     #                        INC_STRING=inclination)
 
-    #spectra.plot_fp_fs_phase_curves(planet_names,
-    #                        planet_name_char_len,
-    #                        planet_radii,
-    #                        num_phases=24,
-    #                        transmission_filter_name=filter_name,
-    #                        wav_subset=[5e-6, 12e-6],
-    #                        INC_STRING=inclination)
+    spectra.plot_fp_fs_phase_curves(planet_names,
+                            planet_name_char_len,
+                            planet_radii,
+                            num_phases=24,
+                            transmission_filter_name=filter_name,
+                            wav_subset=[5e-6, 12.0e-6],
+                            INC_STRING=inclination)
 
 # Notes
 # if the transmission filter name is set to 'None', then it will plot the full spectrum

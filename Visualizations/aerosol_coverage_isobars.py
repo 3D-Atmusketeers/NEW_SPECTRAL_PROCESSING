@@ -151,16 +151,18 @@ def plot_aerosol_coverage_isobars(
         test_y = np.linspace(min(lats), max(lats), len(lats))
 
         temp_map = axes.contourf(lons,
-                                 lats, np.concatenate([temps, temps], axis=1),
-                                 cmap=temperature_colors, levels=np.linspace(600, 2000, 100))
+                                 lats, np.concatenate([temps, temps], axis=1), extend='both',
+                                 cmap=temperature_colors, levels=np.linspace(250, 750, 100))
         temp_cbar = fig.colorbar(
         temp_map,
         aspect=30,
         pad=0.015,
         orientation='horizontal')
 
+        print(np.amin(temps), np.amax(temps))
             
         temp_cbar.set_label('Temperature (K)', fontsize=26)
+        
 
         temp_cbar.ax.xaxis.set_minor_locator(AutoMinorLocator(5))
         
@@ -201,7 +203,7 @@ def plot_aerosol_coverage_isobars(
         plt.savefig('../Figures/Temperature_Isobars_{}_bar_{}.png'.format(
             P_phots[0], planet_name), bbox_inches='tight', dpi=250)
 
-
+        """
         if any(i > 1e-20 for i in molef) or hazes:
             plt.clf()
             fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(12, 9))
@@ -209,7 +211,7 @@ def plot_aerosol_coverage_isobars(
 
             cloud_map = axes.contourf(lons, lats,
                                       np.concatenate([taus, taus], axis=1),
-                                      cmap=cloud_colors, levels=np.linspace(0, 1, 100))
+                                      cmap=cloud_colors, levels=100)
 
             # format axes
             # for ax in axes:#.flatten():
@@ -257,9 +259,10 @@ def plot_aerosol_coverage_isobars(
 
 
             if plot_hazes:
-                cloud_cbar.set_label('Cumulative Cloud Optical Depth, ' + str(cloud_wavelength) + ' $\\mu$m',fontsize=26)
+                cloud_cbar.set_label('Cumulative Cloud and Haze Optical Depth, ' + str(cloud_wavelength) + ' $\\mu$m',fontsize=26)
             else:
                 cloud_cbar.set_label('Cumulative Cloud Optical Depth, ' + str(cloud_wavelength) + ' $\\mu$m', fontsize=26)
 
             plt.savefig('../Figures/Cloud_Coverage_Isobars_{}_bar_{}.png'.format(
                 P_phots[0], planet_name), bbox_inches='tight', dpi=250)
+        """
