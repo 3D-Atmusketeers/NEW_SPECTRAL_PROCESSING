@@ -54,7 +54,7 @@ smoothing = True
 
 # These are the planet files that you need to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-none-0clouds-100met"]
+planet_names = ["GJ1214b-none-0clouds-30met"]
 
 # The options are lowres and hires
 # Isaac Malsky is still working on highres
@@ -63,9 +63,9 @@ opacity_set_id = 'Low-Res'
 # Specify the wavelength range that you'd like to calculate
 # If values aren't given, or if they're negative -1 for both
 # Then it will calculate the entire grid
-WAVELENGTH_START_APPROX = 0.54675e-6
-WAVELENGTH_END_APPROX = 0.5468e-6
-full_wavelength_range = True
+WAVELENGTH_START_APPROX = 5.00000000e-06
+WAVELENGTH_END_APPROX = 5.00049890e-06
+full_wavelength_range = False
 LAMBDA_START, LAMBDA_END, START_WAVELENGTH, END_WAVELENGTH, NLAMBDA = find_closest_wavelength_indices(opacity_set_id,
                                                                                              full_wavelength_range,
                                                                                              WAVELENGTH_START_APPROX,
@@ -77,6 +77,10 @@ opacity_files_directory = os.path.join('DATA', opacity_set_id)
 # Adjust the list comprehension to parse filenames
 opacity_species = [file[4:-4] for file in os.listdir(opacity_files_directory)
                    if file.startswith("opac") and "CIA" not in file and file.endswith(".dat")]
+
+opacity_species = ['CO', 'H2S', 'NH3', 'CH4', 'HCN', 'CO2', 'H2O', 'TiO', 'VO']
+#opacity_species = ['H2O']
+
 
 # Check if H2O, CO, and CO2 are included
 required_species = ["H2O"]
@@ -144,6 +148,9 @@ for q in range(len(planet_names)):
     HAZES = grab_input_data.get_input_data(path, runname, "fort.7", "HAZES")[0] == 'T'
     MOLEF          = grab_input_data.get_input_data(path, runname, "fort.7","MOLEF")
     HAZE_TYPE = next((s for s in ['soot', 'soot_2xpi0', 'sulfur', 'tholin'] if s in runname.lower()), 'None')
+
+    if aerosol_layers == 0:
+        MOLEF = [0 for x in MOLEF]
 
 
     GAS_CONSTANT_R = 8.314462618
@@ -232,6 +239,8 @@ for q in range(len(planet_names)):
     print(f"\tStar Temp: {STELLAR_TEMP} K")
     print(f"\tStar Radius: {R_STAR / 695700000:.2f} Solar Radii")
     print("="*60 + "\n\n")
+
+
 
     # Are these used?
     surfp = 100 #surface pressure, in bars
@@ -327,9 +336,9 @@ for q in range(len(planet_names)):
     inclination_strs = []
     phase_strs = []
 
-    STEP_ONE = True
-    STEP_TWO = True
-    STEP_THREE = False
+    STEP_ONE = False
+    STEP_TWO = False
+    STEP_THREE = True
 
     if STEP_ONE:
         # Convert the fort files to the correct format

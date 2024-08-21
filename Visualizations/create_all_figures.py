@@ -34,20 +34,58 @@ plt.style.use('science.mplstyle')
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
 
-planet_names = ['GJ1214b-none-0clouds-1met',
-                'GJ1214b-none-0clouds-100met',
+planet_names = [
+                "GJ1214b-none-0clouds-1met",
+                "GJ1214b-soot-0clouds-1met",
+                "GJ1214b-tholin-0clouds-1met",
+                "GJ1214b-soot_2xpi0-0clouds-1met",
 
-                'GJ1214b-soot-0clouds-1met',
-                'GJ1214b-soot-0clouds-100met',
+                "GJ1214b-none-0clouds-30met",
+                "GJ1214b-soot-0clouds-30met",
+                "GJ1214b-tholin-0clouds-30met",
+                "GJ1214b-soot_2xpi0-0clouds-30met",
 
-                'GJ1214b-none-50clouds-1met',
-                'GJ1214b-none-50clouds-100met',
+                "GJ1214b-none-0clouds-100met",
+                "GJ1214b-soot-0clouds-100met",
+                "GJ1214b-tholin-0clouds-100met",
+                "GJ1214b-soot_2xpi0-0clouds-100met",
 
-                'GJ1214b-soot-50clouds-1met',
-                'GJ1214b-soot-50clouds-100met',
+                "GJ1214b-none-25clouds-1met",
+                "GJ1214b-soot-25clouds-1met",
+                "GJ1214b-tholin-25clouds-1met",
+                "GJ1214b-soot_2xpi0-25clouds-1met",
 
-                'GJ1214b-soot_2xpi0-50clouds-1met',
-                'GJ1214b-soot_2xpi0-50clouds-100met'
+                "GJ1214b-none-25clouds-30met",
+                "GJ1214b-soot-25clouds-30met",
+                "GJ1214b-tholin-25clouds-30met",
+                "GJ1214b-soot_2xpi0-25clouds-30met",
+
+                "GJ1214b-none-25clouds-100met",
+                "GJ1214b-soot-25clouds-100met",
+                "GJ1214b-tholin-25clouds-100met",
+                "GJ1214b-soot_2xpi0-25clouds-100met",
+
+                "GJ1214b-none-50clouds-1met",
+                "GJ1214b-soot-50clouds-1met",
+                "GJ1214b-tholin-50clouds-1met",
+                "GJ1214b-soot_2xpi0-50clouds-1met",
+
+                "GJ1214b-none-50clouds-30met",
+                "GJ1214b-soot-50clouds-30met",
+                "GJ1214b-tholin-50clouds-30met",
+                "GJ1214b-soot_2xpi0-50clouds-30met",
+
+                "GJ1214b-none-50clouds-100met",
+                "GJ1214b-soot-50clouds-100met",
+                "GJ1214b-tholin-50clouds-100met",
+                "GJ1214b-soot_2xpi0-50clouds-100met",
+                ]
+
+
+planet_names = [
+                "GJ1214b-none-0clouds-1met",
+                "GJ1214b-none-0clouds-30met",
+                "GJ1214b-none-0clouds-100met",
                 ]
 
 
@@ -120,7 +158,7 @@ else:
 
 
 # Plot the ptc curves
-#pressure_temperature_condensation_curves.plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
+pressure_temperature_condensation_curves.plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
 
 
 # Plot other planet characteristics
@@ -152,7 +190,7 @@ else:
 
 
 # The options are "SPITZER_3_6, SPITZER_4_5, MIRI"
-for filter_name in ['MIRI']:
+for filter_name in ['None']:
     if filter_name != 'None':
         print()
         print(filter_name)
@@ -160,19 +198,19 @@ for filter_name in ['MIRI']:
         #spectra.plot_filters(planet_names, transmission_filter_name=filter_name, inclination)
 
     #spectra.plot_fp_spectra(planet_names,
-    #                        num_phases=1,
+    #                        num_phases=2,
     #                        transmission_filter_name=filter_name,
     #                        wav_subset=[0, 1],
-    #                        resolution=1000,
+    #                        resolution=100,
     #                        INC_STRING=inclination)
 
-    spectra.plot_fp_fs_spectra(planet_names,
-                                planet_radii,
-                                num_phases=4,
-                                transmission_filter_name=filter_name,
-                                wav_subset=[5e-6, 12e-6],
-                                resolution=100,
-                                INC_STRING=inclination)
+    #spectra.plot_fp_fs_spectra(planet_names,
+    #                            planet_radii,
+    #                            num_phases=24,
+    #                            transmission_filter_name=filter_name,
+    #                            wav_subset=[5e-6, 12e-6],
+    #                            resolution=100,
+    #                            INC_STRING=inclination)
 
     #spectra.plot_dayside(planet_names,
     #                            planet_radii,
@@ -182,20 +220,20 @@ for filter_name in ['MIRI']:
     #                            resolution=100,
     #                            INC_STRING=inclination)
 
-    #spectra.plot_fp_phase_curves(planet_names,
-    #                        planet_name_char_len,
-    #                        num_phases=24,
-    #                        transmission_filter_name=filter_name,
-    #                        wav_subset=[0, 100],
-    #                        INC_STRING=inclination)
-
-    spectra.plot_fp_fs_phase_curves(planet_names,
+    spectra.plot_fp_phase_curves(planet_names,
                             planet_name_char_len,
-                            planet_radii,
                             num_phases=24,
                             transmission_filter_name=filter_name,
-                            wav_subset=[5e-6, 12.0e-6],
+                            wav_subset=[0, 100],
                             INC_STRING=inclination)
+
+    #spectra.plot_fp_fs_phase_curves(planet_names,
+    #                        planet_name_char_len,
+    #                        planet_radii,
+    #                        num_phases=24,
+    #                        transmission_filter_name=filter_name,
+    #                        wav_subset=[5e-6, 12.0e-6],
+    #                        INC_STRING=inclination)
 
 # Notes
 # if the transmission filter name is set to 'None', then it will plot the full spectrum

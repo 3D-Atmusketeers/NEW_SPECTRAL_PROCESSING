@@ -17,7 +17,7 @@ from astropy.modeling.models import BlackBody
 from astropy.io import fits
 
 # GLOBAL PARAMS
-h = 6.6260701e-34
+#h = 6.6260701e-34
 c = 3e8
 
 
@@ -89,7 +89,7 @@ def get_filter(which_filter):
 
 def get_star_spectra(planet_name):
     if "gj1214" in planet_name.replace("_", "").replace("-", "").lower():
-        print("Using a GJ1214 stellar spectrum")
+        #print("Using a GJ1214 stellar spectrum")
         # Get the initial flux
         stellar_spectrum_1 = pd.read_csv(
             'DATA/GJ1214b_stellar_spectrum.txt',
@@ -771,7 +771,7 @@ def plot_fp_fs_phase_curves(planet_names, planet_name_char_len, planet_radii, nu
     #ax.set_ylim(0.1, 2000)
 
     ax.set_xlim(min(phases), max(phases))
-    ax.legend(fontsize=11, loc=(0, 1.03), ncol=3, mode='expand')
+    ax.legend(fontsize=9, loc=(0, 1.03), ncol=3, mode='expand')
     ax.set_xlabel('Orbital Phase')
     ax.set_ylabel(r'F$_p$/F$_s$(%)')
     plt.savefig('../Figures/Fp_Fs_Phase_Curves_{}.jpg'.format(transmission_filter_name), dpi=200, bbox_inches='tight')
@@ -809,6 +809,7 @@ def plot_fp_phase_curves(planet_names, planet_name_char_len, num_phases,
         # Get the star spectra
         star_spectra, star_radius = get_star_spectra(planet_name)
 
+        running_flux_sum = []
         for i in range(num_phases):
             # For reading in the file names
             rot_val = 360. / num_phases
@@ -824,7 +825,13 @@ def plot_fp_phase_curves(planet_names, planet_name_char_len, num_phases,
             # Load in the planet spectra
             planet_spectra = pd.read_csv(file_path.format(str(i * rot_val)), header=None,
                                          sep='\s+', names=['wavelength', 'flux', 'reflected'])
-            planet_spectra.flux = planet_spectra.flux * (3.0e8 / planet_spectra.wavelength ** 2) / 1e6
+            
+            planet_spectra['flux_all']   = planet_spectra.flux      * (3.0e8 / planet_spectra.wavelength ** 2) / 1e6
+            planet_spectra['flux_refl']  = planet_spectra.reflected * (3.0e8 / planet_spectra.wavelength ** 2) / 1e6
+            planet_spectra['flux']       = planet_spectra.flux_all - planet_spectra.flux_refl
+
+            running_flux_sum.append(np.sum(planet_spectra.flux))
+            
 
             # Reset the index
             planet_spectra = planet_spectra.reset_index(drop=True)
@@ -839,6 +846,9 @@ def plot_fp_phase_curves(planet_names, planet_name_char_len, num_phases,
 
             # Integrate the total planet planet flux
             integrated_planet_spectra[i] = trapz(planet_spectra.flux, x=planet_spectra.wavelength * 1e6)
+        
+        running_flux_sum = np.asarray(running_flux_sum)
+        print(np.sum(running_flux_sum))
 
         # Convert both the signal and the star signal to arrays
         integrated_planet_spectra = np.asarray(integrated_planet_spectra)
@@ -847,7 +857,7 @@ def plot_fp_phase_curves(planet_names, planet_name_char_len, num_phases,
         fp = integrated_planet_spectra
 
         # Save the data
-        pd.DataFrame({'Phase': np.arange(0, 360, rot_val), 'fp W/m2/micron': fp}
+        pd.DataFrame({'Phase': np.arange(0, 360, rot_val), 'fp W/m2': fp}
                      ).to_csv('OUTPUT_DATA/Fp_{}_Phase_Curves.txt'.format(planet_name), sep=' ')
 
         # Plot the data
@@ -859,10 +869,11 @@ def plot_fp_phase_curves(planet_names, planet_name_char_len, num_phases,
                 label=planet_name)
 
     # Figure legend stuff
-    ax.set_xlim(min(phases), max(phases))
+    ax.set_xlim(0, max(phases))
+    ax.set_ylim(0, 7000)
     ax.legend(fontsize=12, loc=(0, 1.03), ncol=2, mode='expand')
     ax.set_xlabel('Orbital Phase')
-    ax.set_ylabel(r'Planet Flux (W/m$^2$/micron)')
+    ax.set_ylabel(r'Planet Flux (W/m$^2$)')
     plt.savefig('../Figures/Fp_Phase_Curves_{}.jpg'.format(transmission_filter_name), dpi=200, bbox_inches='tight')
     plt.clf()
     return None

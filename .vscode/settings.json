@@ -1,4 +1,7 @@
 {
     "python.analysis.typeCheckingMode": "off",
-    "terminal.integrated.enableMultiLinePasteWarning": false
+    "terminal.integrated.enableMultiLinePasteWarning": false,
+    "files.associations": {
+        "random": "c"
+    }
 }

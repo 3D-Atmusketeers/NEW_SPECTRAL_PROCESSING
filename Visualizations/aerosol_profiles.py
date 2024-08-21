@@ -26,13 +26,19 @@ def plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude
     for planet_name in planet_names:
         gravity = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name,'fort.7' ,'GA')
 
+
         ir_absorbtion_coefficient = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name,'fort.7' ,'ABSLW')
         ir_photosphere_pressure_bars = (2./3.) * (gravity/ir_absorbtion_coefficient) / 10000
         ir_photosphere_pressure_bars = np.round(ir_photosphere_pressure_bars, 3)
 
         vis_absorbtion_coefficient = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name,'fort.7' ,'ABSSW')
+        print(gravity, vis_absorbtion_coefficient)
+
         vis_photosphere_pressure_bars = (2./3.) * (gravity/vis_absorbtion_coefficient) / 10000
         vis_photosphere_pressure_bars = np.round(vis_photosphere_pressure_bars, 3)
+
+        
+
 
         i = 0
         file = '../Spectral-Processing/PLANET_MODELS/' + planet_name +  '_with_clouds_and_wavelength_dependence.txt'
@@ -113,17 +119,17 @@ def plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude
         cum_haze_optical_depths_2 = np.cumsum(list(haze_optical_depths_2))
 
 
-        ax[0].plot(df1.pres, haze_optical_depths_1 / layer_pressures, color='red', linewidth=2, linestyle='dashed', label=r'Haze,substellar profile')
-        ax[0].plot(df2.pres, haze_optical_depths_2 / layer_pressures, color='black', linewidth=2, linestyle='dashed',label=r'Haze, antistellar profile')
+        ax[0].plot(df1.pres.values, haze_optical_depths_1.values / layer_pressures, color='red', linewidth=2, linestyle='dashed', label=r'Haze,substellar profile')
+        ax[0].plot(df2.pres.values, haze_optical_depths_2.values / layer_pressures, color='black', linewidth=2, linestyle='dashed',label=r'Haze, antistellar profile')
 
-        ax[0].plot(df1.pres, df1.aero_tau_1 / layer_pressures, color='red', linewidth=2, label='KCl, substellar profile')
-        ax[0].plot(df2.pres, df2.aero_tau_1 / layer_pressures, color='black', linewidth=2, label='KCl, antistellar profile')
+        ax[0].plot(df1.pres.values, df1.aero_tau_1.values / layer_pressures, color='red', linewidth=2, label='KCl, substellar profile')
+        ax[0].plot(df2.pres.values, df2.aero_tau_1.values / layer_pressures, color='black', linewidth=2, label='KCl, antistellar profile')
 
-        ax[1].plot(df1.pres, cum_optical_depths_1, color='red', linewidth=2)
-        ax[1].plot(df2.pres, cum_optical_depths_2, color='black', linewidth=2)
+        ax[1].plot(df1.pres.values, cum_optical_depths_1, color='red', linewidth=2)
+        ax[1].plot(df2.pres.values, cum_optical_depths_2, color='black', linewidth=2)
 
-        ax[1].plot(df2.pres, cum_haze_optical_depths_1, color='red', linewidth=2,linestyle='dashed')
-        ax[1].plot(df2.pres, cum_haze_optical_depths_2, color='black', linewidth=2,linestyle='dashed')
+        ax[1].plot(df2.pres.values, cum_haze_optical_depths_1, color='red', linewidth=2,linestyle='dashed')
+        ax[1].plot(df2.pres.values, cum_haze_optical_depths_2, color='black', linewidth=2,linestyle='dashed')
 
         """
         np.savetxt('y_values_haze_sub.txt', haze_optical_depths_1 / layer_pressures, delimiter=',')
@@ -136,10 +142,10 @@ def plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude
         np.savetxt('y_values_cum_haze_optical_depths_2.txt', cum_haze_optical_depths_2, delimiter=',')
         """
 
-        ax[2].plot(df1.pres, df1.temp, color='red', linewidth=2, label='Substellar profile')
-        ax[2].plot(df2.pres, df2.temp, color='black', linewidth=2, label='Antistellar profile')
+        ax[2].plot(df1.pres.values, df1.temp.values, color='red', linewidth=2, label='Substellar profile')
+        ax[2].plot(df2.pres.values, df2.temp.values, color='black', linewidth=2, label='Antistellar profile')
 
-        ax[2].plot(df1.pres, kcl_100x_condensation_curve, color='#03719c',
+        ax[2].plot(df1.pres.values, kcl_100x_condensation_curve, color='#03719c',
                    linestyle='dashdot',label='KCl Condensation Curve', linewidth=3)
 
         ax[0].set_xscale('log')
@@ -168,13 +174,13 @@ def plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude
         ax[1].set_xlabel(r'Pressure (bar)', fontsize=24)
         ax[2].set_xlabel(r'Pressure (bar)', fontsize=24)
 
-        #ax[2].axvline(x=ir_photosphere_pressure_bars,color='#c79fef', linestyle='dashed', linewidth=2)
-        #ax[1].axvline(x=ir_photosphere_pressure_bars, color='#c79fef', linestyle='dashed',label='IR Photosphere', linewidth=2)
-        #ax[0].axvline(x=ir_photosphere_pressure_bars, color='#c79fef', linestyle='dashed',  linewidth=2)
+        ax[2].axvline(x=ir_photosphere_pressure_bars,color='#c79fef', linestyle='dashed', linewidth=2)
+        ax[1].axvline(x=ir_photosphere_pressure_bars, color='#c79fef', linestyle='dashed',label='IR Photosphere', linewidth=2)
+        ax[0].axvline(x=ir_photosphere_pressure_bars, color='#c79fef', linestyle='dashed',  linewidth=2)
 
-        ax[2].axvline(x=vis_photosphere_pressure_bars,color='#06c2ac', linestyle='dashed', linewidth=2)
-        ax[1].axvline(x=vis_photosphere_pressure_bars, color='#06c2ac', linestyle='dashed',label='Optical Photosphere', linewidth=2)
-        ax[0].axvline(x=vis_photosphere_pressure_bars, color='#06c2ac', linestyle='dashed',  linewidth=2)
+        #ax[2].axvline(x=vis_photosphere_pressure_bars, color='#06c2ac', linestyle='dashed', linewidth=2)
+        #ax[1].axvline(x=vis_photosphere_pressure_bars, color='#06c2ac', linestyle='dashed',label='Optical Photosphere', linewidth=2)
+        #ax[0].axvline(x=vis_photosphere_pressure_bars, color='#06c2ac', linestyle='dashed',  linewidth=2)
 
 
         plt.rcParams['legend.title_fontsize'] = 'small'

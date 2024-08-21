@@ -89,7 +89,7 @@ def get_planet_df(planet_name, nlat, nlon, nlev, base):
 
                 rayleigh_reflected = TOAALB * float(sw_in_val)
                 swout[ind] = float(sw) + rayleigh_reflected
-                swin[ind] = float(sw_in_val) + rayleigh_reflected
+                swin[ind] = float(sw_in_val)
                 ind += 1
             l += 1
     f.close()
@@ -240,6 +240,8 @@ def plot_thermal_phasecurves(planet_names, nlon, two_sets_of_planets):
         # Plot each phase curve
         temp_name = planet_names[j].replace("_", "-")
         phases = np.linspace(0, 1, nlon, endpoint=True)
+
+        print('Thermal flux sum', lw_phase_curve, np.mean(lw_phase_curve))
         ax.plot(phases, lw_phase_curve, linewidth=2, label=temp_name, linestyle=linestyle_str, color=colors[z])
 
     ax.legend(fontsize=14, loc=(0, 1.05), ncol=2, mode='expand')

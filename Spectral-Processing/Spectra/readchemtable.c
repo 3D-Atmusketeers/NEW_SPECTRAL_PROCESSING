@@ -402,6 +402,25 @@ chem.total = malloc(NPRESSURE*sizeof(double));
 
   printf("======================================================\n\n");
 
+
+  printf("======================================================");
+  printf("\n==== Debug Chem Information ====\n");
+  printf("Read in chemtable.\n");
+  printf("Printing out an example:\n");
+  printf("\tTemperature Range: %.2f to %.2f\n", chem.T[0], chem.T[NTEMP-1]);
+  printf("\tPressure Range: %.2f to %.2f\n", chem.P[0], chem.P[NPRESSURE-1]);
+  //printf("\tH2O abundance at a pressure of %.2f and a temperature of %.2f : %.4e\n", chem.P[0], chem.T[0], chem.CH4[0][0]);
+  printf("\tCH4 abundance at a pressure of %.2f and a temperature of %.2f : %.4e\n", chem.P[NPRESSURE-1], chem.T[NTEMP-1], chem.CH4[NPRESSURE-1][NTEMP-1]);
+  printf("\tCH4 abundance at a pressure of %.2f and a temperature of %.2f : %.4e\n", chem.P[NPRESSURE-1], chem.T[NTEMP-2], chem.CH4[NPRESSURE-1][NTEMP-2]);
+
+  printf("\tCH4 abundance at a pressure of %.2f and a temperature of %.2f : %.4e\n", chem.P[NPRESSURE-2], chem.T[NTEMP-1], chem.CH4[NPRESSURE-2][NTEMP-1]);
+  printf("\tCH4 abundance at a pressure of %.2f and a temperature of %.2f : %.4e\n", chem.P[NPRESSURE-2], chem.T[NTEMP-2], chem.CH4[NPRESSURE-2][NTEMP-2]);
+
+  printf("\tPH3 abundance at a pressure of %.2f and a temperature of %.2f : %.4e\n", chem.P[NPRESSURE-1], chem.T[NTEMP-1], chem.PH3[NPRESSURE-1][NTEMP-1]);
+  printf("\tPH3 abundance at a pressure of %.2f and a temperature of %.2f : %.4e\n", chem.P[NPRESSURE-1], chem.T[NTEMP-2], chem.PH3[NPRESSURE-1][NTEMP-2]);
+
+  printf("======================================================\n\n");
+
   return;
 
 }

@@ -98,19 +98,19 @@ def plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude
             pass
         else:
             if 'ALL'.lower() in planet_name.lower():
-                ax[0,0].plot(df1.pres, df1.aero_tau_2 / layer_pressures, color=colors[8], linewidth=3, label='ZnS')
-                ax[0,0].plot(df1.pres, df1.aero_tau_3 / layer_pressures, color=colors[9], linewidth=3, label=r'Na$_2$S')
-                ax[0,0].plot(df1.pres, df1.aero_tau_4 / layer_pressures, color=colors[10], linewidth=3, label='MnS')
-                ax[0,0].plot(df1.pres, df1.aero_tau_9 / layer_pressures, color=colors[11], linewidth=3, label='Ni')
-                ax[0,0].plot(df1.pres, df1.aero_tau_10 / layer_pressures, color=colors[12], linewidth=3, label='Fe')
+                ax[0,0].plot(df1.pres, df1.aero_tau_2.values / layer_pressures, color=colors[8], linewidth=3, label='ZnS')
+                ax[0,0].plot(df1.pres, df1.aero_tau_3.values / layer_pressures, color=colors[9], linewidth=3, label=r'Na$_2$S')
+                ax[0,0].plot(df1.pres, df1.aero_tau_4.values / layer_pressures, color=colors[10], linewidth=3, label='MnS')
+                ax[0,0].plot(df1.pres, df1.aero_tau_9.values / layer_pressures, color=colors[11], linewidth=3, label='Ni')
+                ax[0,0].plot(df1.pres, df1.aero_tau_10.values / layer_pressures, color=colors[12], linewidth=3, label='Fe')
 
-                ax[0,1].plot(df2.pres, df1.aero_tau_2 / layer_pressures, color=colors[8], linewidth=3, label='ZnS')
-                ax[0,1].plot(df2.pres, df1.aero_tau_3 / layer_pressures, color=colors[9], linewidth=3, label=r'Na$_2$S')
-                ax[0,1].plot(df2.pres, df1.aero_tau_4 / layer_pressures, color=colors[10], linewidth=3, label='MnS')
-                ax[0,1].plot(df2.pres, df1.aero_tau_9 / layer_pressures, color=colors[11], linewidth=3, label='Ni')
-                ax[0,1].plot(df2.pres, df1.aero_tau_10 / layer_pressures, color=colors[12], linewidth=3, label='Fe')
+                ax[0,1].plot(df2.pres, df1.aero_tau_2.values / layer_pressures, color=colors[8], linewidth=3, label='ZnS')
+                ax[0,1].plot(df2.pres, df1.aero_tau_3.values / layer_pressures, color=colors[9], linewidth=3, label=r'Na$_2$S')
+                ax[0,1].plot(df2.pres, df1.aero_tau_4.values / layer_pressures, color=colors[10], linewidth=3, label='MnS')
+                ax[0,1].plot(df2.pres, df1.aero_tau_9.values / layer_pressures, color=colors[11], linewidth=3, label='Ni')
+                ax[0,1].plot(df2.pres, df1.aero_tau_10.values / layer_pressures, color=colors[12], linewidth=3, label='Fe')
 
-            ax[0,0].plot(df1.pres, df1.aero_tau_1 / layer_pressures, color=colors[0], linewidth=3, label='KCl')
+            ax[0,0].plot(df1.pres, df1.aero_tau_1.values / layer_pressures, color=colors[0], linewidth=3, label='KCl')
             #ax[0,0].plot(df1.pres, df1.aero_tau_5 / layer_pressures, color=colors[1], linewidth=3, label='Cr')
             #ax[0,0].plot(df1.pres, df1.aero_tau_6 / layer_pressures, color=colors[2], linewidth=3, label='SiO$_2$')
             #ax[0,0].plot(df1.pres, df1.aero_tau_7 / layer_pressures, color=colors[3], linewidth=3, label=r'Mg$_2$SiO$_4$')
@@ -118,10 +118,10 @@ def plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude
             #ax[0,0].plot(df1.pres, df1.aero_tau_11 / layer_pressures, color=colors[5], linewidth=3, label=r'Ca$_2$SiO$_4$')
             #ax[0,0].plot(df1.pres, df1.aero_tau_12 / layer_pressures, color=colors[6], linewidth=3, label=r'CaTiO3')
             #ax[0,0].plot(df1.pres, df1.aero_tau_13 / layer_pressures, color=colors[7], linewidth=3, label=r'Al$_2$O$_3$')
-            ax[0,0].plot(df1.pres, haze_optical_depths_1 / layer_pressures, color='black', linewidth=3, linestyle='dashed', label=r'Haze')
+            ax[0,0].plot(df1.pres, haze_optical_depths_1.values / layer_pressures, color='black', linewidth=3, linestyle='dashed', label=r'Haze')
 
 
-            ax[0,1].plot(df2.pres, df2.aero_tau_1 / layer_pressures, color=colors[0], linewidth=3, label='KCl')
+            ax[0,1].plot(df2.pres, df2.aero_tau_1.values / layer_pressures, color=colors[0], linewidth=3, label='KCl')
             #ax[0,1].plot(df2.pres, df2.aero_tau_5 / layer_pressures, color=colors[1], linewidth=3)
             #ax[0,1].plot(df2.pres, df2.aero_tau_6 / layer_pressures, color=colors[2], linewidth=3)
             #ax[0,1].plot(df2.pres, df2.aero_tau_7 / layer_pressures, color=colors[3], linewidth=3)
@@ -129,7 +129,7 @@ def plot_aersol_profiles(planet_names, nlat, nlon, nlev, num_orders_of_magnitude
             #ax[0,1].plot(df2.pres, df2.aero_tau_11 / layer_pressures, color=colors[5], linewidth=3)
             #ax[0,1].plot(df2.pres, df2.aero_tau_12 / layer_pressures, color=colors[6], linewidth=3)
             #ax[0,1].plot(df2.pres, df2.aero_tau_13 / layer_pressures, color=colors[7], linewidth=3)
-            ax[0,1].plot(df2.pres, haze_optical_depths_2 / layer_pressures, color='black', linewidth=3, linestyle='dashed',label=r'Haze')
+            ax[0,1].plot(df2.pres, haze_optical_depths_2.values / layer_pressures, color='black', linewidth=3, linestyle='dashed',label=r'Haze')
 
 
             ax[1,0].plot(df1.pres, cum_optical_depths_1, color='black', linewidth=3, label='Clouds, Substellar Point')

@@ -106,6 +106,18 @@ void ReadOpacTable(struct Opac opac, char *filename) {
       }
     }
 
+
+    // Fill in the opacities for each species
+
+    //printf("=====================================================\n");
+    //printf("\n==== Debugging H2O Opacities ====\n");
+    //printf("\tAt lambda index 0, pressure index 0, and temperature index 0:\n");
+    //printf("\tTemperature: %lf K\n", opacH2O.T[0]);
+    //printf("\tPressure: %le Pa\n", opacH2O.P[0]);
+    //printf("\tAbundance: %le\n", opac.kappa[0][0][0]);
+    //printf("=====================================================n\n");
+
+
     fclose(f1);
     //printf("opac %e %e %e\n", atmos.lambda[NLAMBDA-1], opac.P[0], opac.T[0]);
     break;

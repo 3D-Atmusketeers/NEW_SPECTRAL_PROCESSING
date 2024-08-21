@@ -36,6 +36,10 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
         plt.subplots_adjust(wspace=0.02, hspace=0.03)
 
         molef = grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name, 'fort.7', 'MOLEF')
+        aerosol_layers = int(grab_input_data.get_input_data('../Spectral-Processing/GCM-OUTPUT/', planet_name, "fort.7", "AERLAYERS"))
+
+        if aerosol_layers == 0:
+            molef = [0 for x in molef]
 
         clouds = False
         if any(i > 1e-20 for i in molef):
@@ -187,7 +191,9 @@ def plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude):
             #          '#f032e6', '#bfef45', '#fabed4', '#469990', '#dcbeff', '#9A6324', '#fffac8',
             #          '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#a9a9a9', '#ffffff']
 
-            #axes.semilogy(f_kcl(new_pressures), new_pressures, lw=2, label='KCl', color=cloud_colors[2], linestyle='dashed')
+            axes.semilogy(f_kcl(new_pressures), new_pressures, lw=2,
+                          label='KCl', color='blue', linestyle='dashed',
+                          alpha=0.6)
             #axes.semilogy(f_cr(new_pressures), new_pressures, lw=2, label='Cr', color=cloud_colors[3], linestyle='dashed')
             #axes.semilogy(f_sio2(new_pressures), new_pressures, lw=2, label=r'SiO$_2$', color=cloud_colors[4], linestyle='dashed')
             #axes.semilogy(f_mg2sio4(new_pressures), new_pressures, lw=2, label=r'Mg$_2$SiO$_4$', color=cloud_colors[5], linestyle='dashed')

@@ -120,7 +120,7 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
   double gweight[] = {0.0157479145, 0.0739088701, 0.1463869871, 0.1671746381, 0.0967815902};
   int num_gangle = 5;
 
-  //double gangle[] = {1};
+  //double gangle[] = {1.0};
   //double gweight[] = {0.5};
   //int num_gangle = 1;
 
@@ -170,7 +170,6 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
     DIRECT_QUADRATURE[J]  = mu_0 * PI * FLUX_SURFACE_QUADRATURE * exp(-1.0 * (TAUCS[J] + TAULS[J]) / mu_0);
     DIRECT_HEMISPHERIC[J] = 0.0;
   }
-
   TEMPS[NLAYER] = TEMPS[NLAYER - 1];
 
 
@@ -214,14 +213,13 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
     GAMMA[J]  =  y2[J] / (y1[J] + LAMBDAS[J]);
 
     temp_e_val[J]   =  exp(-LAMBDAS[J] * TAULS[J]);
-    exptrm_positive[J] = exp(fmin(LAMBDAS[J] * TAULS[J], 15));
+    exptrm_positive[J] = exp(fmin(LAMBDAS[J] * TAULS[J], 35));
     exptrm_negative[J] = 1.0 / exptrm_positive[J];
 
     e1[J]   =  exptrm_positive[J] + GAMMA[J] * temp_e_val[J];  //e1
     e2[J]   =  exptrm_positive[J] - GAMMA[J] * temp_e_val[J];  //e2
     e3[J]   =  GAMMA[J]*exptrm_positive[J] + temp_e_val[J];        //e3
     e4[J]   =  GAMMA[J]*exptrm_positive[J] - temp_e_val[J];        //e4
-
   }
 
 
@@ -385,19 +383,26 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
                         SOURCE_H[Z]/(LAMBDAS[Z]*mu+1.0) * (1.0 - exptrm_negative[Z]*exp(-TAULS[Z]/mu)) + \
                         ALPHA_1[Z] * (1.0 - exp(-TAULS[Z]/mu)) + \
                         ALPHA_2[Z] * (mu - ((TAULS[Z] + mu) * (exp(-TAULS[Z]/mu))));
+      
     }
   }
 
-    // Calculate the weighted sum for each layer
-    for(int J = 0; J < NLAYER; J++)
+
+  // Calculate the weighted sum for each layer
+  for(int J = 0; J < NLAYER; J++)
+  {
+    double weighted_sum = 0.0;
+    for(int g = 0; g < num_gangle; g++)
     {
-        double weighted_sum = 0.0;
-        for(int g = 0; g < num_gangle; g++)
-        {
-            weighted_sum += INTENSITY_UP[J][g] * gweight[g];
-        }
-        HEMISPHERIC_SOURCE_FNC[J] = weighted_sum;
+      weighted_sum += INTENSITY_UP[J][g] * gweight[g];
     }
+    HEMISPHERIC_SOURCE_FNC[J] = weighted_sum;
+  }
+
+  for(int J=0; J<NLAYER; J++)
+  {
+    printf("%d, %0.5e, \n", J, HEMISPHERIC_SOURCE_FNC[J] * 2);
+  }
 
   //***************************************************************************************
   //***************************************************************************************

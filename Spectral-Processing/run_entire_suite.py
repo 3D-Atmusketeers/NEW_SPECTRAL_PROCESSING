@@ -13,11 +13,16 @@ clean_spectra_directory()
 
 #phases in degrees, inclinations in radians (sorry, alex still hasn't fixed this)
 phases = [0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0, 105.0, 120.0, 135.0, 150.0, 165.0, 180.0, 195.0, 210.0, 225.0, 240.0, 255.0, 270.0, 285.0, 300.0, 315.0, 330.0, 345.0]
+#phases = [0.0, 15.0]
 
 # An inclination of 0 corresponds to edge on
-
 inclinations = [0.0]
+
+#where the GCM's are located
+#keep in mind one planet only (sorry)
 gcm_folder = 'GCM-OUTPUT'
+
+#don't change this
 source_file_name = "Run_sbatch"
 
 @contextlib.contextmanager
@@ -39,6 +44,7 @@ def runsbatch(phases, source_file_name, finished_gcm, step, dependency = 'none')
             shutil.copy(source_file_name, new_file_name)
             temp_file_name = f"{new_file_name}_temp"
             with open(new_file_name, "r") as file, open(temp_file_name, "w") as temp_file:
+                #copies over bash script
                 for line in file:
                     if line.startswith("#SBATCH --job-name=spectra"):
                         stepname = step.replace('step','')
@@ -49,7 +55,7 @@ def runsbatch(phases, source_file_name, finished_gcm, step, dependency = 'none')
                     temp_file.write(line)
 
             shutil.move(temp_file_name, new_file_name)
-            
+            #creates the string to make the jobs submit after one another
             if dependency == 'none':
                 sbatch = 'sbatch'
                 name = new_file_name
@@ -63,6 +69,8 @@ def runsbatch(phases, source_file_name, finished_gcm, step, dependency = 'none')
                 afterok = f'afterok{dependstring}'
                 name = new_file_name
                 run = subprocess.run([sbatch, d, afterok, name], stdout = subprocess.PIPE)
+
+            #the output of the subprocess includes a lot of gibberish that gets cut here
             job = run.stdout.decode('utf-8')
             print(job)
             jobnum.append(str(job[20:-1]).strip())

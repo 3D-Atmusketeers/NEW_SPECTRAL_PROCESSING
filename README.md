@@ -8,11 +8,15 @@ This guide outlines how to use the code for creating emission spectra. The proce
 
 Before initiating the processing, ensure that the necessary data files are in place. These files are too large for GitHub storage but have been made available on Turbo.
 
-- Run `download_all_data_files_from_turbo.py` to download the required files. Check the `files_to_download` list at the bottom of this script to see which files are being retrieved.
-- Once downloaded, move the opacity and chemistry and aerosol scattering data to the correct location
-- The chemistry file should go in the DATA folder
+
+- Download the chem data, the opacity data, and the aerosol data. Only download what you need, these folders are quite large:
+  - https://umd.app.box.com/s/klmnqdvri73wxxyylxk279bx5s6e7kxz
+  - https://umd.app.box.com/s/k1g8ge5vtpji9ngn3mgiwkvyi2btzqn6
+  - https://umd.app.box.com/s/32q22kh73zugvkh264msi1enf6dhr5kz
+- The chemistry files should go in the DATA folder, and in a folder called chemistry_grid
+- The aerosol data should go in the DATA folder, and in a folder called Aerosol_DATA
 - The opacity data (including the CIA opacities) should go in a folder withing DATA, called Low-Res or High-Res
-- The scattering data should go in the SCATTERING_DATA folder, the same level as the DATA folder
+- Most of the time the opacity data is too big. This will cause memory and time issues. Therefore, an extra step is needed. Within the High-Res or Low-Res folders, make a new folder called Full-Set. Then run the file called crop_opacity_file.ipynb, and choose exactly what species and wavelengths you'll want. This has the benefit of dramatically reducing the size of the data files.
 - Place all the General Circulation Models (GCMs) you wish to process in the `GCM-OUTPUT` directory.
 
 ## How to Run
@@ -31,6 +35,12 @@ The suite comprises three main steps:
 These steps are executed serially. The suite checks if altitude regridding and init files are present before proceeding, ensuring no overwrites in `/PLANET_MODELS/` or `/Spectra/DATA/`. To regenerate these files, you must manually remove or relocate the existing ones.
 
 The suite leverages `Spectra/run_spectra.py` to perform regridding, interpolation, and post-processing. Important parameters include `NLAT` (the final number of model layers, recommend 250 or 500) and `opacity_files` (the set of opacity files in use). The `fort.7` file provides all necessary model information.
+
+You can use these lines to only run specific wavelengths, which is helpful to double check if the code is working correctly. These values are in meters.
+
+WAVELENGTH_START_APPROX = 0.54675e-6
+WAVELENGTH_END_APPROX = 0.5468e-6
+full_wavelength_range = True
 
 For cloud-dependent wavelength properties adjustments, modifications in `run_spectra.py` are necessary.
 
@@ -57,16 +67,16 @@ The post-processing automatically extracts necessary information from `fort.7`, 
 
 The suite supports various resolution and temperature regimes, necessitating appropriate EOS, opacity files, and additional data files for comprehensive atmospheric modeling. While swapping out these files for different simulations is straightforward, extensive modifications to the codebase to accommodate new versions are not recommended. The relevant files are organized within the `OPAC_CODE_VERSIONS` and `DATA` directories, and further distinctions are made between different types of files:
 
-- `SET_1`: Medium Resolution Opacity files for general-purpose simulations.
-- `SET_3`: High-resolution files for detailed analysis.
+- `Low-Res`: Medium Resolution Opacity files for general-purpose simulations.
+- `High-Res`: High-resolution files for detailed analysis.
 
 ### CIA Files
 
-The CIA (Collisionally Induced Absorption) files are crucial for providing the opacity data related to molecular interactions that are not captured by line transitions alone. These files account for the absorption caused by collisions between atmospheric molecules, contributing significantly to the overall opacity in dense, cooler parts of an atmosphere. CIA files are specific to each set of opacity files and reside within the corresponding `SET_X` directories under `OPAC_CODE_VERSIONS`.
+The CIA (Collisionally Induced Absorption) files are crucial for providing the opacity data related to molecular interactions that are not captured by line transitions alone. These files account for the absorption caused by collisions between atmospheric molecules, contributing significantly to the overall opacity in dense, cooler parts of an atmosphere.
 
 ### Chem Files
 
-Chem files detail the atmospheric abundances of various molecules and elements. Unlike the CIA files, chem files are shared between opacity sets. These files are located in a common directory accessible to all opacity sets.
+Chem files detail the atmospheric abundances of various molecules and elements. Chem files are shared between opacity sets. These files are located in a common directory accessible to all opacity sets. There are a number of chem files available based on metallicity. If your naming conventions are correct, then it should automatically select the closet one.
 
 ### Rayleigh Scattering
 

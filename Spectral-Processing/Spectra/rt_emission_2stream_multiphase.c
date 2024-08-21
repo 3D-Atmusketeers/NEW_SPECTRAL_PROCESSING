@@ -1404,6 +1404,7 @@ int RT_Emit_3D(double PHASE)
                         kappa_nu_array[l][m][j] = kappa_nu;
                         dtau_em[l][m][j] = kappa_nu * dl[l][m][j];
                         pressure_array[l][m][j] = pressure;
+
                         if(CLOUDS == 1 || HAZES == 1)
                         {
                             if (j == 0)
@@ -1658,6 +1659,10 @@ int RT_Emit_3D(double PHASE)
 
                     num_tau_layers = NTAU;
 
+
+                    //for (j = kmin; j < NTAU; j++)
+                    //{printf("%d %0.3e, %0.3e, %0.3e \n", j, tau_em[l][m][j], pressure_array[l][m][j] / 1e5, temperature_3d[l][m][j]);}                    
+
                     two_stream(num_tau_layers, NTAU - kmin - 1, kmin + 1, pi0_tot[l][m], \
                                asym_tot[l][m], temperature_3d[l][m], tau_em[l][m], \
                                CLIGHT / atmos.lambda[i], \
@@ -1668,7 +1673,6 @@ int RT_Emit_3D(double PHASE)
                     //{
                     //    printf("%d %le %le %le\n",j, pi0_tot[l][m][j], asym_tot[l][m][j], intensity_vals[1]);
                     //}
-
 
                     // The first index is the thermal intensity, the second is the reflected light
                     intensity[l][m] = intensity_vals[0] + intensity_vals[1];
