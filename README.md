@@ -9,19 +9,20 @@ This guide outlines how to use the code for creating emission spectra. The proce
 Before initiating the processing, ensure that the necessary data files are in place. These files are too large for GitHub storage but have been made available on Turbo.
 
 
-- Download the chem data, the opacity data, and the aerosol data. Only download what you need, these folders are quite large:
+- Download the chem data, the opacity data (including the CIA DATA), and the aerosol data. Only download what you need, these folders are quite large:
   - https://umd.app.box.com/s/klmnqdvri73wxxyylxk279bx5s6e7kxz
   - https://umd.app.box.com/s/k1g8ge5vtpji9ngn3mgiwkvyi2btzqn6
   - https://umd.app.box.com/s/32q22kh73zugvkh264msi1enf6dhr5kz
 - The chemistry files should go in the DATA folder, and in a folder called chemistry_grid
-- The aerosol data should go in the DATA folder, and in a folder called Aerosol_DATA
-- The opacity data (including the CIA opacities) should go in a folder withing DATA, called Low-Res or High-Res
-- Most of the time the opacity data is too big. This will cause memory and time issues. Therefore, an extra step is needed. Within the High-Res or Low-Res folders, make a new folder called Full-Set. Then run the file called crop_opacity_file.ipynb, and choose exactly what species and wavelengths you'll want. This has the benefit of dramatically reducing the size of the data files.
+- The aerosol data should go in the DATA folder, and in a folder called Aerosol_Data
+- The opacity data (including the CIA opacities) should go in a folder withing DATA, called Low-Res or High-Res. Then make a folder called Full-Set and put all the opac data there.
+- There should also be a Wavelenghts.txt file that you need. Ping isaacmalsky@gmail.com if you don't have it. Sorry, this is a work in progress.
+- Most of the time the opacity data is too big. This will cause memory and time issues. Therefore, an extra step is needed. Run the file called crop_opacity_file.ipynb, and choose exactly what species and wavelengths you'll want. This has the benefit of dramatically reducing the size of the data files.
 - Place all the General Circulation Models (GCMs) you wish to process in the `GCM-OUTPUT` directory.
 
 ## How to Run
 
-The spectral processing suite is initiated with `run_entire_suite.py`, which can be started by executing `sbatch Run_all_sbatch` in the terminal. It usually needs at least 24 hours for runtime depending on the number of phases. Its mostly parallel.
+The spectral processing suite is initiated with `run_entire_suite.py`, which can be started by executing `sbatch Run_all_sbatch` in the terminal. It usually needs at least 24 hours for runtime depending on the number of phases. Its mostly parallel. Make sure that the stuff you want to run is set correctly and the outputs are correct from run_spectra.py.
 
 The code can also be run on a single core with run_spectra.py
 This is easier than running on greatlakes, so do this unless you need a lot of models run.

@@ -69,3 +69,8 @@ Spectral-Processing/Spectra/slurm*.out
 # Ignore anything in __pycache__
 Spectral-Processing/Spectra/__pycache__/
 Spectral-Processing/Spectra/__pycache__/*
+Spectral-Processing/.DS_Store
+Spectral-Processing/.DS_Store
+Spectral-Processing/Spectra/.DS_Store
+Visualizations/.DS_Store
+.DS_Store
