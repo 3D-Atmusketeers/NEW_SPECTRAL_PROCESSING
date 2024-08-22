@@ -65,7 +65,7 @@ opacity_set_id = 'Low-Res'
 # Then it will calculate the entire grid
 WAVELENGTH_START_APPROX = 5.00000000e-06
 WAVELENGTH_END_APPROX = 5.00049890e-06
-full_wavelength_range = False
+full_wavelength_range = True
 LAMBDA_START, LAMBDA_END, START_WAVELENGTH, END_WAVELENGTH, NLAMBDA = find_closest_wavelength_indices(opacity_set_id,
                                                                                              full_wavelength_range,
                                                                                              WAVELENGTH_START_APPROX,
@@ -77,9 +77,6 @@ opacity_files_directory = os.path.join('DATA', opacity_set_id)
 # Adjust the list comprehension to parse filenames
 opacity_species = [file[4:-4] for file in os.listdir(opacity_files_directory)
                    if file.startswith("opac") and "CIA" not in file and file.endswith(".dat")]
-
-opacity_species = ['CO', 'H2S', 'NH3', 'CH4', 'HCN', 'CO2', 'H2O', 'TiO', 'VO']
-#opacity_species = ['H2O']
 
 
 # Check if H2O, CO, and CO2 are included
