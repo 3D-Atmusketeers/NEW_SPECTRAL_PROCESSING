@@ -15,8 +15,7 @@ Before initiating the processing, ensure that the necessary data files are in pl
   - https://umd.app.box.com/s/32q22kh73zugvkh264msi1enf6dhr5kz
 - The chemistry files should go in the DATA folder, and in a folder called chemistry_grid
 - The aerosol data should go in the DATA folder, and in a folder called Aerosol_Data
-- The opacity data (including the CIA opacities) should go in a folder withing DATA, called Low-Res or High-Res. Then make a folder called Full-Set and put all the opac data there.
-- There should also be a Wavelenghts.txt file that you need. Ping isaacmalsky@gmail.com if you don't have it. Sorry, this is a work in progress.
+- The opacity data (including the CIA opacities) should go in a folder withing DATA, called Low-Res or High-Res. Then make a folder called Full-Set and put all the opac data there. Also put the Wavelengths.txt file in the Full-Set folder
 - Most of the time the opacity data is too big. This will cause memory and time issues. Therefore, an extra step is needed. Run the file called crop_opacity_file.ipynb, and choose exactly what species and wavelengths you'll want. This has the benefit of dramatically reducing the size of the data files.
 - Place all the General Circulation Models (GCMs) you wish to process in the `GCM-OUTPUT` directory.
 
