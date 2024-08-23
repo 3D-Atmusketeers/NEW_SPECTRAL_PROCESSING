@@ -1706,13 +1706,6 @@ int RT_Emit_3D(double PHASE)
                             j = j + 1;
                         }
                         tau_index = j;
-                        fprintf(emission_map_file, "%d %le %le %le %le %le %le\n", tau_index,
-                                                                           atmos.lambda[i],
-                                                                           atmos.lon[m],
-                                                                           atmos.lat[l],
-                                                                           pressure_array[l][m][tau_index],
-                                                                           temperature_3d[l][m][tau_index],
-                                                                           v_los_3D[l][m][tau_index]);
                     }
 
                 }

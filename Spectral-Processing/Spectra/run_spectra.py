@@ -54,7 +54,7 @@ smoothing = True
 
 # These are the planet files that you need to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-none-0clouds-30met"]
+planet_names = ["GJ1214b-none-0clouds-1met"]
 
 # The options are lowres and hires
 # Isaac Malsky is still working on highres
