@@ -1687,8 +1687,6 @@ int RT_Emit_3D(double PHASE)
                     //    printf("\n\n");
                     //}
 
-                    //printf("%d %d %d %.3e %.3e %.3e %.3e\n", j, l, m, temperature_3d[l][m][kmin], tau_em[l][m][kmin], dtau_em[l][m][kmin], intensity[l][m]);
-
                     if (reflected_intensity[l][m] < 1e-50)
                     {
                         reflected_intensity[l][m] = 0.0;
@@ -1700,14 +1698,20 @@ int RT_Emit_3D(double PHASE)
                         j = kmin;
 
                         // This should get the tau = 2/3 level
-                        while(tau_sum < 0.6666666 && j <NTAU)
+                        while(tau_sum < 0.6666666 && j < NTAU)
                         {
                             tau_sum = tau_sum + dtau_em[l][m][j];
                             j = j + 1;
                         }
                         tau_index = j;
+                        fprintf(emission_map_file, "%d %le %le %le %le %le %le\n", tau_index,
+                                                    atmos.lambda[i],
+                                                    atmos.lon[m],
+                                                    atmos.lat[l],
+                                                    pressure_array[l][m][tau_index],
+                                                    temperature_3d[l][m][tau_index],
+                                                    v_los_3D[l][m][tau_index]);
                     }
-
                 }
             }
         }

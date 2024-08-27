@@ -63,9 +63,9 @@ opacity_set_id = 'Low-Res'
 # Specify the wavelength range that you'd like to calculate
 # If values aren't given, or if they're negative -1 for both
 # Then it will calculate the entire grid
-WAVELENGTH_START_APPROX = 5.00000000e-06
-WAVELENGTH_END_APPROX = 5.00049890e-06
-full_wavelength_range = True
+WAVELENGTH_START_APPROX = 2.00007265e-06
+WAVELENGTH_END_APPROX = 2.01997071e-06
+full_wavelength_range = False
 LAMBDA_START, LAMBDA_END, START_WAVELENGTH, END_WAVELENGTH, NLAMBDA = find_closest_wavelength_indices(opacity_set_id,
                                                                                              full_wavelength_range,
                                                                                              WAVELENGTH_START_APPROX,

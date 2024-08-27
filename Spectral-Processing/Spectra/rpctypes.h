@@ -70,19 +70,23 @@ typedef unsigned long rpcport_t;
 #endif
 
 #ifndef __u_char_defined
-typedef __u_char u_char;
-typedef __u_short u_short;
-typedef __u_int u_int;
-typedef __u_long u_long;
-typedef __quad_t quad_t;
-typedef __u_quad_t u_quad_t;
-typedef __fsid_t fsid_t;
-# define __u_char_defined
+// Use standard types or define them as needed
+typedef unsigned char u_char;
+typedef unsigned short u_short;
+typedef unsigned int u_int;
+typedef unsigned long u_long;
+typedef long long quad_t;   
+typedef unsigned long long u_quad_t; 
+typedef struct { int val[2]; } fsid_t;
+
+// Define __u_char_defined to prevent redefinition
+#define __u_char_defined
 #endif
+
 #ifndef __daddr_t_defined
-typedef __daddr_t daddr_t;
-typedef __caddr_t caddr_t;
-# define __daddr_t_defined
+typedef int daddr_t; // daddr_t might be a simple int or another type
+typedef char *caddr_t; // caddr_t is commonly used as a pointer to char
+#define __daddr_t_defined
 #endif
 
 #include <sys/time.h>
