@@ -25,12 +25,13 @@ def plot_emission_maps(planet_names, nlat, nlon):
 
         full_df = pd.read_csv(base + file + "_phase_" + phase + "_inc_0.0000.00_emission_map.dat",
                         names=['tau_index', 'wavelength_m', 'lon', 'lat', 'pressure_pa', 'temp', 'vlos'],
-                        delim_whitespace=True)
+                        sep='\s+')
+        
+        
+        
 
         wavelengths = list(set(full_df["wavelength_m"]))
         wavelengths = sorted(wavelengths)
-
-        print(wavelengths)
         wavelengths = wavelengths[3:4]
 
 

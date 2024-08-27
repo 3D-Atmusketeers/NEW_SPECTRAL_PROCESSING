@@ -25,9 +25,7 @@ import basemap_hemispheric_projections
 
 import cross_correlation
 
-
-import scienceplots
-plt.style.use('science.mplstyle')
+plt.style.use('science')
 #plt.style.use('astrophysics.mplstyle')
 #plt.style.use(['science','nature'])
 
@@ -82,12 +80,7 @@ planet_names = [
                 ]
 
 
-planet_names = [
-                "GJ1214b-none-0clouds-1met",
-                "GJ1214b-none-0clouds-30met",
-                "GJ1214b-none-0clouds-100met",
-                ]
-
+planet_names = ["GJ1214b-none-0clouds-1met", "GJ1214b-none-0clouds-30met", "GJ1214b-none-0clouds-100met"]
 
 
 #inclination needs to be a string in radians (sorry)
@@ -158,7 +151,7 @@ else:
 
 
 # Plot the ptc curves
-pressure_temperature_condensation_curves.plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
+#pressure_temperature_condensation_curves.plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
 
 
 # Plot other planet characteristics
@@ -170,7 +163,7 @@ pressure_temperature_condensation_curves.plot_PTC_curves(planet_names, nlat, nlo
 
 # Plotting the emission maps
 #emission_maps_pressure.plot_emission_maps(planet_names, nlat, nlon)
-#emission_maps_temperature.plot_emission_maps(planet_names, nlat, nlon)
+emission_maps_temperature.plot_emission_maps(planet_names, nlat, nlon)
 #basemap_hemispheric_projections.plot_observer_projection(planet_names, nlat, nlon,planet_radii, pressure_in_mbar=10)
 #cross_correlation.plot_cross_correlations(planet_names, num_phases=24)
 
@@ -220,12 +213,12 @@ for filter_name in ['None']:
     #                            resolution=100,
     #                            INC_STRING=inclination)
 
-    spectra.plot_fp_phase_curves(planet_names,
-                            planet_name_char_len,
-                            num_phases=24,
-                            transmission_filter_name=filter_name,
-                            wav_subset=[0, 100],
-                            INC_STRING=inclination)
+    #spectra.plot_fp_phase_curves(planet_names,
+    #                        planet_name_char_len,
+    #                        num_phases=24,
+    #                        transmission_filter_name=filter_name,
+    #                        wav_subset=[0, 100],
+    #                        INC_STRING=inclination)
 
     #spectra.plot_fp_fs_phase_curves(planet_names,
     #                        planet_name_char_len,

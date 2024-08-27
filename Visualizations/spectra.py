@@ -17,7 +17,7 @@ from astropy.modeling.models import BlackBody
 from astropy.io import fits
 
 # GLOBAL PARAMS
-#h = 6.6260701e-34
+h = 6.6260701e-34
 c = 3e8
 
 
@@ -839,6 +839,7 @@ def plot_fp_phase_curves(planet_names, planet_name_char_len, num_phases,
             # Call the function to get the filtered star and planet spectra
             planet_spectra, star_spectra = filter_spectra(planet_spectra, star_spectra, filt, transmission_filter_name, wav_subset, phase_degrees)
 
+
             if interp_function is None:
                 planet_spectra.flux = planet_spectra.flux
             else:
@@ -847,8 +848,8 @@ def plot_fp_phase_curves(planet_names, planet_name_char_len, num_phases,
             # Integrate the total planet planet flux
             integrated_planet_spectra[i] = trapz(planet_spectra.flux, x=planet_spectra.wavelength * 1e6)
         
-        running_flux_sum = np.asarray(running_flux_sum)
-        print(np.sum(running_flux_sum))
+        #running_flux_sum = np.asarray(running_flux_sum)
+        #print('Flux running sum', np.sum(running_flux_sum))
 
         # Convert both the signal and the star signal to arrays
         integrated_planet_spectra = np.asarray(integrated_planet_spectra)
@@ -870,7 +871,7 @@ def plot_fp_phase_curves(planet_names, planet_name_char_len, num_phases,
 
     # Figure legend stuff
     ax.set_xlim(0, max(phases))
-    ax.set_ylim(0, 7000)
+    ax.set_ylim(0, 1e4)
     ax.legend(fontsize=12, loc=(0, 1.03), ncol=2, mode='expand')
     ax.set_xlabel('Orbital Phase')
     ax.set_ylabel(r'Planet Flux (W/m$^2$)')
@@ -1159,6 +1160,7 @@ def plot_fp_spectra(planet_names, num_phases, transmission_filter_name, wav_subs
                                          sep='\s+', names=['wavelength', 'flux', 'reflected'])
                         
             planet_spectra.flux = planet_spectra.flux * (3.0e8 / planet_spectra.wavelength ** 2) / 1e6
+
 
             # Reset the index
             planet_spectra = planet_spectra.reset_index(drop=True)

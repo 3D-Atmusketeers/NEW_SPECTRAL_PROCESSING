@@ -25,7 +25,7 @@ def plot_emission_maps(planet_names, nlat, nlon):
 
         full_df = pd.read_csv(base + file + "_phase_" + phase + "_inc_0.0000.00_emission_map.dat",
                         names=['tau_index', 'wavelength_m', 'lon', 'lat', 'pressure_pa', 'temp', 'vlos'],
-                        delim_whitespace=True)
+                        sep='\s+')
 
 
         #full_df = pd.read_csv(base + file + "_phase_180.0_inc_0.0000.00_emission_map.dat",

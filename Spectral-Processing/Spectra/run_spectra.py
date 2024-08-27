@@ -78,6 +78,8 @@ opacity_files_directory = os.path.join('DATA', opacity_set_id)
 opacity_species = [file[4:-4] for file in os.listdir(opacity_files_directory)
                    if file.startswith("opac") and "CIA" not in file and file.endswith(".dat")]
 
+opacity_species = ['CO', 'H2S', 'NH3', 'CH4', 'CO2', 'H2O']
+
 
 # Check if H2O, CO, and CO2 are included
 required_species = ["H2O"]
