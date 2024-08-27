@@ -1692,7 +1692,7 @@ int RT_Emit_3D(double PHASE)
                         reflected_intensity[l][m] = 0.0;
                     }
 
-                    if (i % 2000 == 0)
+                    if (i % 1000 == 0)
                     {
                         tau_sum = 0.0;
                         j = kmin;

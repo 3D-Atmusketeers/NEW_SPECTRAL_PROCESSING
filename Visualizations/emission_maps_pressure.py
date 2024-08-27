@@ -21,7 +21,7 @@ def plot_emission_maps(planet_names, nlat, nlon):
 
         base = "../Spectral-Processing/FINISHED_SPECTRA/Spec_0_"
 
-        phase = '180.0'
+        phase = '0.0'
 
         full_df = pd.read_csv(base + file + "_phase_" + phase + "_inc_0.0000.00_emission_map.dat",
                         names=['tau_index', 'wavelength_m', 'lon', 'lat', 'pressure_pa', 'temp', 'vlos'],
@@ -72,10 +72,10 @@ def plot_emission_maps(planet_names, nlat, nlon):
 
 
             wav_str = str(np.round(wavelengths[i] * 1e6, 3))
-            cb = map.colorbar(emap,
-                              location='bottom',
-                              label=r'$\tau$=2/3 Pressure at ' + wav_str + ' $\mu$m (mbar)')
-
+            cb = fig.colorbar(emap, location='bottom', aspect=15, pad=0.02, fraction=0.06)
+            cb.outline.set_linewidth(2)
+            cb.set_label(label=r'$\tau$=2/3 Pressure at ' + wav_str + ' $\mu$m', fontsize=28)
+            cb.ax.tick_params(labelsize=28) 
             cb.ax.minorticks_on()
 
             plt.savefig('../Figures/{}_pressure_emission_map_{}_phase_{}.png'.format(file, wav_str, phase), bbox_inches='tight', dpi=200)

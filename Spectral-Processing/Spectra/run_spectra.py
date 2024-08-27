@@ -54,7 +54,11 @@ smoothing = True
 
 # These are the planet files that you need to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-planet_names = ["GJ1214b-none-0clouds-1met"]
+planet_names = [
+                "GJ1214b-none-0clouds-1met",
+                "GJ1214b-none-0clouds-30met",
+                "GJ1214b-none-0clouds-100met"
+                ]
 
 # The options are lowres and hires
 # Isaac Malsky is still working on highres
@@ -64,7 +68,7 @@ opacity_set_id = 'Low-Res'
 # If values aren't given, or if they're negative -1 for both
 # Then it will calculate the entire grid
 WAVELENGTH_START_APPROX = 2.00007265e-06
-WAVELENGTH_END_APPROX = 2.01997071e-06
+WAVELENGTH_END_APPROX = 2.02997071e-06
 full_wavelength_range = False
 LAMBDA_START, LAMBDA_END, START_WAVELENGTH, END_WAVELENGTH, NLAMBDA = find_closest_wavelength_indices(opacity_set_id,
                                                                                              full_wavelength_range,

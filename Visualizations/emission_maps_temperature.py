@@ -6,6 +6,8 @@ import matplotlib.colors as mcolors
 from numpy import ma
 from matplotlib import ticker, cm
 
+params = {'text.usetex': False, 'mathtext.fontset': 'stixsans'}
+plt.rcParams.update(params)
 
 try:
     from inspect import cleandoc as dedent
@@ -21,19 +23,14 @@ def plot_emission_maps(planet_names, nlat, nlon):
 
         base = "../Spectral-Processing/FINISHED_SPECTRA/Spec_0_"
 
-        phase = '180.0'
+        phase = '0.0'
 
         full_df = pd.read_csv(base + file + "_phase_" + phase + "_inc_0.0000.00_emission_map.dat",
                         names=['tau_index', 'wavelength_m', 'lon', 'lat', 'pressure_pa', 'temp', 'vlos'],
                         sep='\s+')
         
-        
-        
 
         wavelengths = list(set(full_df["wavelength_m"]))
-        wavelengths = sorted(wavelengths)
-        wavelengths = wavelengths[3:4]
-
 
         # colormap
         cm_name = 'lajolla'
@@ -70,7 +67,7 @@ def plot_emission_maps(planet_names, nlat, nlon):
             #                    cmap=my_colors)
 
             emap = map.contourf(x, y, temps,
-                                levels=np.linspace(1300, 2000, 100),
+                                #levels=np.linspace(300, 1000, 100),
                                 cmap=my_colors)
 
             #map.contour(x, y, vlos, levels=[0], colors='white', linewidths=2.0, zorder=3)
@@ -86,9 +83,9 @@ def plot_emission_maps(planet_names, nlat, nlon):
             cb.ax.minorticks_on()
 
             # Set 5 tick labels
-            ticks = np.linspace(1300, 2000, 6)  # Generate 5 linearly spaced ticks from 1000 to 2000
-            cb.set_ticks(ticks)  # Set these ticks on the colorbar
-            cb.set_ticklabels([f"{tick:.0f}" for tick in ticks])  # Optional: format tick labels
+            #ticks = np.linspace(1300, 2000, 6)  # Generate 5 linearly spaced ticks from 1000 to 2000
+            #cb.set_ticks(ticks)  # Set these ticks on the colorbar
+            #cb.set_ticklabels([f"{tick:.0f}" for tick in ticks])  # Optional: format tick labels
 
 
             plt.savefig('../Figures/{}_temperature_emission_map_{}_phase_{}.png'.format(file, wav_str, phase), bbox_inches='tight', dpi=200)

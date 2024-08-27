@@ -26,8 +26,6 @@ import basemap_hemispheric_projections
 import cross_correlation
 
 plt.style.use('science')
-#plt.style.use('astrophysics.mplstyle')
-#plt.style.use(['science','nature'])
 
 # Figure out what planets!
 planet_names = [name for name in os.listdir('../Spectral-Processing/GCM-OUTPUT/') if os.path.isdir(os.path.join('../Spectral-Processing/GCM-OUTPUT/', name))]
@@ -162,7 +160,7 @@ else:
 
 
 # Plotting the emission maps
-#emission_maps_pressure.plot_emission_maps(planet_names, nlat, nlon)
+emission_maps_pressure.plot_emission_maps(planet_names, nlat, nlon)
 emission_maps_temperature.plot_emission_maps(planet_names, nlat, nlon)
 #basemap_hemispheric_projections.plot_observer_projection(planet_names, nlat, nlon,planet_radii, pressure_in_mbar=10)
 #cross_correlation.plot_cross_correlations(planet_names, num_phases=24)
