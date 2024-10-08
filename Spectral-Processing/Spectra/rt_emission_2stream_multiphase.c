@@ -1661,7 +1661,12 @@ int RT_Emit_3D(double PHASE)
 
 
                     //for (j = kmin; j < NTAU; j++)
-                    //{printf("%d %0.3e, %0.3e, %0.3e \n", j, tau_em[l][m][j], pressure_array[l][m][j] / 1e5, temperature_3d[l][m][j]);}                    
+                    //{
+                    //    if (pi0_tot[l][m][j] > 0)
+                    //    {
+                    //        printf("%d %0.3e %0.3e\n", j, tau_em[l][m][j], pi0_tot[l][m][j]);
+                    //    }
+                    //}                    
 
                     two_stream(num_tau_layers, NTAU - kmin - 1, kmin + 1, pi0_tot[l][m], \
                                asym_tot[l][m], temperature_3d[l][m], tau_em[l][m], \

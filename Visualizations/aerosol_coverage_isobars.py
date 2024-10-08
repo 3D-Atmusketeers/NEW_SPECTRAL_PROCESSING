@@ -152,23 +152,25 @@ def plot_aerosol_coverage_isobars(
 
         temp_map = axes.contourf(lons,
                                  lats, np.concatenate([temps, temps], axis=1), #extend='both',
-                                 cmap=temperature_colors, levels=np.linspace(250, 750, 100))
+                                 cmap=temperature_colors, levels=100)
         temp_cbar = fig.colorbar(
         temp_map,
         aspect=30,
         pad=0.015,
         orientation='horizontal')
-
-        print(np.amin(temps), np.amax(temps))
+        
+        print()
+        print(np.shape(temps))
+        print('Delta T', np.amax(temps[23,:]) - np.amin(temps[23,:]))
             
         temp_cbar.set_label('Temperature (K)', fontsize=26)
         
         # Set tick marks every 50 K
-        ticks = np.arange(250, 751, 50)
-        temp_cbar.set_ticks(ticks)
+        #ticks = np.arange(250, 751, 50)
+        #temp_cbar.set_ticks(ticks)
 
 
-        temp_cbar.ax.xaxis.set_minor_locator(AutoMinorLocator(6))
+        #temp_cbar.ax.xaxis.set_minor_locator(AutoMinorLocator(6))
         
         axes.streamplot(test_x, test_y,
                                np.concatenate([EW_vels, EW_vels], axis=1),

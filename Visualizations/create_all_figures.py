@@ -77,9 +77,13 @@ planet_names = [
                 "GJ1214b-soot_2xpi0-50clouds-100met",
                 ]
 
-
-planet_names = ["GJ1214b-none-0clouds-1met", "GJ1214b-none-0clouds-30met", "GJ1214b-none-0clouds-100met"]
-
+planet_names = [
+                #"55cnce_thick_100x_clear", 
+                #"55cnce_thick_100x_clouds",
+                #"55cnce_thick_3000x_clear",
+                #"55cnce_thin_100x_clear",
+                "55cnce_thin_3000x_clear"
+                ]
 
 #inclination needs to be a string in radians (sorry)
 inclination = '0.00'
@@ -112,6 +116,9 @@ for planet_name in planet_names:
             planet_radii.append(8.603e7)
         elif "wasp-121" in planet_name.lower():
             planet_radii.append(1.304e8)
+
+        elif "55cnc" in planet_name.lower():
+            planet_radii.append(12402180.0)
         else:
             print("WARNING! fort.7 file not found for " + planet_name)
             exit(0)
@@ -144,12 +151,14 @@ else:
 # Plot the isobaric cloud maps
 # If the extra_pressure level is greater than 0, its plots it also
 # If it is 0, then it plots the IR photosphere pressure
-#aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes=False, extra_pressure_level_bar=0)
+#aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes=False, extra_pressure_level_bar=1e-4)
 #aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes = True, extra_pressure_level_bar = 1e-3)
+#aerosol_coverage_isobars.plot_aerosol_coverage_isobars(planet_names, nlat, nlon, nlev, cloud_wavelength, plot_hazes = True, extra_pressure_level_bar = 1e-2)
+
 
 
 # Plot the ptc curves
-#pressure_temperature_condensation_curves.plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
+pressure_temperature_condensation_curves.plot_PTC_curves(planet_names, nlat, nlon, nlev, num_orders_of_magnitude)
 
 
 # Plot other planet characteristics
@@ -160,8 +169,8 @@ else:
 
 
 # Plotting the emission maps
-emission_maps_pressure.plot_emission_maps(planet_names, nlat, nlon)
-emission_maps_temperature.plot_emission_maps(planet_names, nlat, nlon)
+#emission_maps_pressure.plot_emission_maps(planet_names, nlat, nlon)
+#emission_maps_temperature.plot_emission_maps(planet_names, nlat, nlon)
 #basemap_hemispheric_projections.plot_observer_projection(planet_names, nlat, nlon,planet_radii, pressure_in_mbar=10)
 #cross_correlation.plot_cross_correlations(planet_names, num_phases=24)
 
@@ -175,13 +184,13 @@ emission_maps_temperature.plot_emission_maps(planet_names, nlat, nlon)
 #spectra.plot_blackbody_phase_curve(planet_name,planet_radii,num_phases=4,transmission_filter_name='MIRI',wav_subset=[5e-6, 12e-6],resolution=100,temp=600)
 
 #spectra.plot_planet_spectra_blackbody_comparison_hz(planet_names,black_body_temperatures=[553], num_phases=4, inclination)
-#spectra.plot_planet_spectra_blackbody_comparison_microns(planet_names,black_body_temperatures=[553],num_phases=2, inclination)
+#spectra.plot_planet_spectra_blackbody_comparison_microns(planet_names,inclination,black_body_temperatures=[3000],num_phases=2)
 #spectra.plot_star_spectra_test(planet_names)
 #spectra.plot_spectra_simple(planet_names, num_phases=4, inclination)
 
 
 # The options are "SPITZER_3_6, SPITZER_4_5, MIRI"
-for filter_name in ['None']:
+for filter_name in ['MIRI']:
     if filter_name != 'None':
         print()
         print(filter_name)
@@ -189,19 +198,19 @@ for filter_name in ['None']:
         #spectra.plot_filters(planet_names, transmission_filter_name=filter_name, inclination)
 
     #spectra.plot_fp_spectra(planet_names,
-    #                        num_phases=2,
+    #                        num_phases=4,
     #                        transmission_filter_name=filter_name,
-    #                        wav_subset=[0, 1],
+    #                        wav_subset=[5e-6, 12e-6],
     #                        resolution=100,
     #                        INC_STRING=inclination)
 
-    #spectra.plot_fp_fs_spectra(planet_names,
-    #                            planet_radii,
-    #                            num_phases=24,
-    #                            transmission_filter_name=filter_name,
-    #                            wav_subset=[5e-6, 12e-6],
-    #                            resolution=100,
-    #                            INC_STRING=inclination)
+    spectra.plot_fp_fs_spectra(planet_names,
+                                planet_radii,
+                                num_phases=4,
+                                transmission_filter_name=filter_name,
+                                wav_subset=[5e-6, 12e-6],
+                                resolution=1000,
+                                INC_STRING=inclination)
 
     #spectra.plot_dayside(planet_names,
     #                            planet_radii,
@@ -218,13 +227,15 @@ for filter_name in ['None']:
     #                        wav_subset=[0, 100],
     #                        INC_STRING=inclination)
 
-    #spectra.plot_fp_fs_phase_curves(planet_names,
-    #                        planet_name_char_len,
-    #                        planet_radii,
-    #                        num_phases=24,
-    #                        transmission_filter_name=filter_name,
-    #                        wav_subset=[5e-6, 12.0e-6],
-    #                        INC_STRING=inclination)
+    spectra.plot_fp_fs_phase_curves(planet_names,
+                            planet_name_char_len,
+                            planet_radii,
+                            num_phases=24,
+                            transmission_filter_name=filter_name,
+                            wav_subset=[5e-6, 12.0e-6],
+                            INC_STRING=inclination)
+
+    pass
 
 # Notes
 # if the transmission filter name is set to 'None', then it will plot the full spectrum
