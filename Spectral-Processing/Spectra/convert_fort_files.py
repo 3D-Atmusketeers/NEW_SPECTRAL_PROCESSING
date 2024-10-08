@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 import os
 
-def convert_to_correct_format(path, runname, planet_name, INITIAL_NTAU, surfp, oom, grav, gasconst, NLAT, NLON):
-    def readfortfiles(path,runname,fort26,fort50,nlay,gasconst,oom,grav): 
+def convert_to_correct_format(path, runname, planet_name,INITIAL_NTAU, surfp, oom, tgr, grav, gasconst, NLAT, NLON):
+    def readfortfiles(path,runname,fort26,fort50,nlay,gasconst,oom,grav,tgr): 
         with open(path+runname+'/'+fort26) as f:
             first_line=f.readline()
             nlat,nlon,nlev=first_line.split()
@@ -80,6 +80,7 @@ def convert_to_correct_format(path, runname, planet_name, INITIAL_NTAU, surfp, o
                             specificp[bcount][acount]=((float(p[2]))+1)*surfp
                             bcount=bcount+1
 
+
         sigma=np.empty([nlay])*0.0
         if oom>0: #setting up pressure values 
             stp=-1.0*oom/nlay
@@ -91,9 +92,8 @@ def convert_to_correct_format(path, runname, planet_name, INITIAL_NTAU, surfp, o
         sp=specificp
 
         z=np.zeros((nlat,nlon,nlay,2))#one for z value, one for prssure
-        z[:,:,nlay-1,0]=(gasconst/grav) *.5*(temps[nlay-1,:,:].T) * np.log(surfp/sp/sigma[nlay-1])
+        z[:,:,nlay-1,0]=(gasconst/grav) *.5*(temps[nlay-1,:,:].T + tgr) * np.log(surfp/sp/sigma[nlay-1])
         z[:,:,-1,1]=p_BAR[-1]
-
 
         #integrate hydrostatic to solve for higher levels
         start=nlay-2
@@ -101,23 +101,22 @@ def convert_to_correct_format(path, runname, planet_name, INITIAL_NTAU, surfp, o
             z[:,:,start,0]=z[:,:,start+1,0] + (gasconst/grav) *0.5*(temps[start,:,:].T+temps[start+1,:,:].T) * np.log(sigma[start+1]/sigma[start])
             z[:,:,start,1]=p_BAR[start] 
             start=start - 1
-
+     
         return data_26,nlon,nlat,nlev,nparam,z
 
 
     levs=INITIAL_NTAU
     if os.path.isfile(path+runname+'/fort.2600'):
-        data_26,nlon,nlat,nlev,nparam,z=readfortfiles(path,runname,'fort.2600','fort.5000',levs,gasconst,oom,grav)
+        data_26,nlon,nlat,nlev,nparam,z=readfortfiles(path,runname,'fort.2600','fort.5000',levs,gasconst,oom,grav,tgr)
         print ("Using the fort.2600 and fort.5000 files")
     else:
-        data_26,nlon,nlat,nlev,nparam,z=readfortfiles(path,runname,'fort.26','fort.50',levs,gasconst,oom,grav)
+        data_26,nlon,nlat,nlev,nparam,z=readfortfiles(path,runname,'fort.26','fort.50',levs,gasconst,oom,grav,tgr)
         print ("Using the fort.26 and fort.50 files")
 
 
     # Reshape the array to be 2D
-    # It looks like there are INITIAL_NTAU levels, 48 lats and 96 lons
-    num_variables = 6
-    df = data_26.reshape(levs * NLON * NLAT, num_variables)
+    # It looks like there are INITIAL_NTAU levels, NLAT lats and NLON lons
+    df = data_26.reshape(levs * NLON * NLAT, 6)
 
     # Make it a pandas dataframe
     pd_df = pd.DataFrame(df, columns=['lon', 'lat', 'level', 'u', 'v', 'temps'])
@@ -144,7 +143,6 @@ def convert_to_correct_format(path, runname, planet_name, INITIAL_NTAU, surfp, o
     data = data[['lat', 'lon', 'level','alt','pressure', 'temps', 'u', 'v', 'w']]
 
     data = data.sort_values(by=['lat', 'lon', 'level'], axis=0, ascending=[False, True, True])
-
 
     # Save the reformatted data
     np.savetxt('../PLANET_MODELS/' + planet_name + '.txt', data.values, fmt='%5.4f %6.4f %3d %9.4E %9.4E %9.4E %9.4E %9.4E %9.4E')

@@ -28,6 +28,10 @@ NTAU = 250
 # DONT MESS WITH THIS, ISAAC HASN'T FULLY CODED IT!!!!!
 max_pressure_bar = 100
 
+# Please don't touch these
+NLAT = 48
+NLON = 96
+
 # 0 is off
 # 1 is everything
 # 2 is Wind only
@@ -50,14 +54,7 @@ smoothing = True
 
 # These are the planet files that you need to run the code
 # They should be pretty big files, and don't include the .txt with the names here
-
-planet_names = ["55cnce_thin_3000x_clear"]
-NLAT = 48
-NLON = 96
-
-#planet_names = ["WASP-43b-0-layers"]
-#NLAT = 48
-#NLON = 96
+planet_names = ["55cnce_thick_atmo"]
 
 # The options are lowres and hires
 # Isaac Malsky is still working on highres
@@ -66,8 +63,8 @@ opacity_set_id = 'Low-Res'
 # Specify the wavelength range that you'd like to calculate
 # If values aren't given, or if they're negative -1 for both
 # Then it will calculate the entire grid
-WAVELENGTH_START_APPROX = 0.8e-6
-WAVELENGTH_END_APPROX = 0.99e-6
+WAVELENGTH_START_APPROX = 2.00007265e-06
+WAVELENGTH_END_APPROX = 2.02997071e-06
 full_wavelength_range = True
 LAMBDA_START, LAMBDA_END, START_WAVELENGTH, END_WAVELENGTH, NLAMBDA = find_closest_wavelength_indices(opacity_set_id,
                                                                                              full_wavelength_range,
@@ -80,9 +77,6 @@ opacity_files_directory = os.path.join('DATA', opacity_set_id)
 # Adjust the list comprehension to parse filenames
 opacity_species = [file[4:-4] for file in os.listdir(opacity_files_directory)
                    if file.startswith("opac") and "CIA" not in file and file.endswith(".dat")]
-
-opacity_species = ['CO', 'H2S', 'NH3', 'CH4', 'CO2', 'H2O']
-
 
 # Check if H2O, CO, and CO2 are included
 required_species = ["H2O"]
@@ -139,14 +133,15 @@ for q in range(len(planet_names)):
     runname     = planet_name + '/Planet_Run'
     path        = '../GCM-OUTPUT/'
 
-
     aerosol_layers = int(grab_input_data.get_input_data(path, runname,"fort.7", "AERLAYERS"))
     grav           = grab_input_data.get_input_data(path, runname, "fort.7","GA")
-    gasconst       = grab_input_data.get_input_data(path, runname, "fort.7","GASCON")
     surfp          = grab_input_data.get_input_data(path, runname, "fort.7","P0") / 1e5
+    gasconst       = grab_input_data.get_input_data(path, runname, "fort.7","GASCON")
     R_PLANET       = grab_input_data.get_input_data(path, runname, "fort.7","RADEA")
     P_ROT          = (grab_input_data.get_input_data(path, runname, "fort.7","WW") / (2.0*np.pi)*(24*3600)) ** -1.0
     oom            = grab_input_data.get_input_data(path, runname, "fort.7","OOM_IN")
+    initial_temps  = grab_input_data.get_input_data(path, runname, "fort.7","RESTTT")
+    tgr            = grab_input_data.get_input_data(path, runname, "fort.7","TGR")
     MTLX           = grab_input_data.get_input_data(path, runname, "fort.7","MTLX")
     MET_X_SOLAR    = 10.0 ** grab_input_data.get_input_data(path, runname, "fort.7","METALLICITY")
     HAZES = grab_input_data.get_input_data(path, runname, "fort.7", "HAZES")[0] == 'T'
@@ -220,7 +215,7 @@ for q in range(len(planet_names)):
     print(f"\tGravity: {grav} m/s^2")
     print(f"\tNumber of Orders of Magnitude (OOM): {oom}")
     print(f"\tGas Constant: {gasconst} J/(K*mol)")
-    print(f"\tPlanet Radius: {R_PLANET} m")
+    print(f"\tPlanet Radius: {R_PLANET} km")
     print(f"\tOrbital Period: {P_ROT} days")
     print(f"\tMetallicity: {MET_X_SOLAR}")
     print(f"\tCloud Condensation Fraction: {MTLX}")
@@ -230,6 +225,7 @@ for q in range(len(planet_names)):
     print(f"\tGCM Layers: {INITIAL_NTAU}")
     print(f"\tMean Molecular Weight: {MEAN_MOLECULAR_WEIGHT}")
     print(f"\tCloud wavelength (microns): {cloud_wavelength}")
+    print(f"\Surface Temperature: {tgr}")
 
     print("\nOpacity and Chemistry information")
     print(f"\tMetallicity relative to solar (METALLICITY): {MET_X_SOLAR}")
@@ -244,7 +240,6 @@ for q in range(len(planet_names)):
     print(f"\tStar Temp: {STELLAR_TEMP} K")
     print(f"\tStar Radius: {R_STAR / 695700000:.2f} Solar Radii")
     print("="*60 + "\n\n")
-
 
     # This is specifically for the regridding
     # You can change the grid density
@@ -338,13 +333,13 @@ for q in range(len(planet_names)):
 
     STEP_ONE = True
     STEP_TWO = True
-    STEP_THREE = False
+    STEP_THREE = True
 
     if STEP_ONE:
         # Convert the fort files to the correct format
 
         if USE_FORT_FILES == True:
-            convert_fort_files.convert_to_correct_format(path, runname, planet_name, INITIAL_NTAU, surfp, oom, grav, gasconst, NLAT, NLON)
+            convert_fort_files.convert_to_correct_format(path, runname, planet_name, INITIAL_NTAU, surfp, oom, tgr, grav, gasconst, NLAT, NLON)
             print ("Converted the fort files to the new format")
         else:
             pass
