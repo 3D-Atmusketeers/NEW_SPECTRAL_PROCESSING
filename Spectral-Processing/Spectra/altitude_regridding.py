@@ -540,7 +540,7 @@ def regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, NTAU, NLON
     # double all data, then save to new output file
 
     np.savetxt(new_file, data_new.reshape(NLAT * NLON * NTAU_new, NPARAMS),
-               fmt=' '.join(['%5.4f']*2 + ['%3d']*1 + ['%9.4E']*6 + ['%9.4E']*42 + ['\t']))
+               fmt=' '.join(['%5.4f']*2 + ['%3d']*1 + ['%9.6e']*1 + ['%9.4E']*5 + ['%9.4E']*42 + ['\t']))
     return None
 
 

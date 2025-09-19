@@ -145,6 +145,6 @@ def convert_to_correct_format(path, runname, planet_name,INITIAL_NTAU, surfp, oo
     data = data.sort_values(by=['lat', 'lon', 'level'], axis=0, ascending=[False, True, True])
 
     # Save the reformatted data
-    np.savetxt('../PLANET_MODELS/' + planet_name + '.txt', data.values, fmt='%5.4f %6.4f %3d %9.4E %9.4E %9.4E %9.4E %9.4E %9.4E')
+    np.savetxt('../PLANET_MODELS/' + planet_name + '.txt', data.values, fmt='%5.4f %6.4f %3d %9.6E %9.4E %9.4E %9.4E %9.4E %9.4E')
 
 

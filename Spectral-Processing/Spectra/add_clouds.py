@@ -354,7 +354,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
 
         
     planet_file_with_clouds = '../PLANET_MODELS/' + planet_name + '_with_clouds.txt'
-    np.savetxt(planet_file_with_clouds, df.values, fmt=' '.join(['%5.4f']*2 + ['%3d']*1 + ['%9.4E']*6 + ['%9.4E']*42 + ['\t']))
+    np.savetxt(planet_file_with_clouds, df.values, fmt=' '.join(['%5.4f']*2 + ['%3d']*1 + ['%9.6E']*1 + ['%9.4E']*5 + ['%9.4E']*42 + ['\t']))
     
     planet_file_with_clouds = '../PLANET_MODELS/' + planet_name + '_with_clouds_and_wavelength_dependence.txt'
-    np.savetxt(planet_file_with_clouds, df_copy.values, fmt=' '.join(['%5.4f']*2 + ['%3d']*1 + ['%9.4E']*6 + ['%9.4E']*42 + ['\t']))
+    np.savetxt(planet_file_with_clouds, df_copy.values, fmt=' '.join(['%5.4f']*2 + ['%3d']*1 + ['%9.6E']*1 + ['%9.4E']*5 + ['%9.4E']*42 + ['\t']))

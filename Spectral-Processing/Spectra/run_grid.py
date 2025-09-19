@@ -10,7 +10,7 @@ def run_all_grid(planet_name, phases, inclinations, system_obliquity, NTAU, NLAT
 
     def df_to_txt(file, df):
         np.savetxt(file, df.values,
-                   fmt=' '.join(['%7.4f']*2 + ['%3d']*1 + ['%10.3E']*6 + ['%9.2E']*42 + ['%5.2f'] + ['\t']))
+                   fmt=' '.join(['%7.4f']*2 + ['%3d']*1 + ['%9.6E']*1 + ['%10.3E']*5 + ['%9.2E']*42 + ['%5.2f'] + ['\t']))
 
     planet_file = '../PLANET_MODELS/' + planet_name + '_with_clouds_regridded.txt'
 
