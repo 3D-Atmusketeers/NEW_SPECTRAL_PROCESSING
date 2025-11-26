@@ -42,7 +42,7 @@ int num_tau_layers;
 // C HARADA -- update for 2stream //
 void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, double *g0_array, \
                   const double *temperature_array, const double *tau_array, \
-                  double NU, double NU_BIN, double incident_frac, double *dtau_array, double intensity_vals[]);
+                  double NU, double NU_BIN, double incident_frac, double *dtau_array, double intensity_vals[], double PHASE);
 
 /* ------- begin ---------------- RT_Emit -------------------- */
 
@@ -1672,7 +1672,8 @@ int RT_Emit_3D(double PHASE)
                                asym_tot[l][m], temperature_3d[l][m], tau_em[l][m], \
                                CLIGHT / atmos.lambda[i], \
                                CLIGHT / atmos.lambda[i] - CLIGHT / atmos.lambda[i+1], \
-                               atmos.incident_frac[l][m][NTAU-10], dtau_em[l][m], intensity_vals);
+                               atmos.incident_frac[l][m][NTAU-10], dtau_em[l][m], intensity_vals, \
+                               PHASE);
 
                     //for (j = kmin; j<NTAU; j++)
                     //{

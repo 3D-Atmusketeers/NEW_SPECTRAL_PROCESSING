@@ -6,7 +6,7 @@ double Planck(double T, double lambda);
 void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, double *g0_array, \
                  const double *temperature_array, const double *tau_array, \
                  double NU, double NU_BIN, double incident_frac, double *dtau_array, \
-                 double intensity_vals[])
+                 double intensity_vals[], double PHASE)
 {
   double mu_1;  // Param for Quadrature or Hemispheric Mean constant
   double mu_0;  // Incident angle of the solar beam
@@ -149,11 +149,21 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
   temp_val_2 = exp(h_constant * NU / (bolz_constant * STELLAR_TEMP)) - 1.0;
   STELLAR_BB = temp_val_1 * (1.0 / temp_val_2);
 
+  /* needs to be phase-dependent, 1 is correct for dayside. It's not clear to me what should happen near quadrature, 
+  where the angle of incidence of the starlight is very nearly 90 deg against the line-of-sight, or past quadratures (Phases 270-90), where the angle is greater than
+  90 degrees w.r.t. the LOS (i.e., the path we're tracking is "backlit"). For now, it's set so it's the angle it ~should be for phases 90-270 (mostly-dayside) and 
+  otherwise incdent starlight is set to 0. This is wrong, but most of the reflected light information should be in the mostly-dayside phases */
+  mu_0 = cos(180.0 - PHASE); 
+  if (mu_0 < 0.0) {
+    incident_frac = 0.0;
+    mu_0 = 0.0;
+  }
+
   // Get the flux at the surface of the atmosphere
   FLUX_SURFACE_HEMISPHERIC = 0;
   FLUX_SURFACE_QUADRATURE = incident_frac * PI * STELLAR_BB * pow((R_STAR / ORB_SEP), 2.0);
 
-  mu_0 = 1.0;
+
 
   // Assign arrays for the characteristics of the atmosphere based on the input arrays
   TAUCS[0] = 0.0;
