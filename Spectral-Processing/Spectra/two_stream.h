@@ -153,7 +153,7 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
   where the angle of incidence of the starlight is very nearly 90 deg against the line-of-sight, or past quadratures (Phases 270-90), where the angle is greater than
   90 degrees w.r.t. the LOS (i.e., the path we're tracking is "backlit"). For now, it's set so it's the angle it ~should be for phases 90-270 (mostly-dayside) and 
   otherwise incdent starlight is set to 0. This is wrong, but most of the reflected light information should be in the mostly-dayside phases */
-  mu_0 = cos(180.0 - PHASE); 
+  mu_0 = cos((180.0 - PHASE)*PI / 180.0); 
   if (mu_0 < 0.0) {
     incident_frac = 0.0;
     mu_0 = 0.0;
