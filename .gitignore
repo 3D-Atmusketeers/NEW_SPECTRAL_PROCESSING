@@ -23,7 +23,10 @@ Spectral-Processing/FINISHED_SPECTRA/*
 Spectral-Processing/FINISHED_SPECTRA*/*
 Spectral-Processing/GCM-OUTPUT/*
 Spectral-Processing/PLANET_MODELS/*
-Spectral-Processing/Spectra/DATA/*
+Spectral-Processing/Spectra/DATA/Aerosol_Data/*
+Spectral-Processing/Spectra/DATA/Low-Res/*
+Spectral-Processing/Spectra/DATA/chemistry_grid/*
+Spectral-Processing/Spectra/DATA/init*
 Spectral-Processing/Spectra/SCATTERING_DATA/*
 Spectral-Processing/Spectra/OUT/*
 
@@ -38,6 +41,9 @@ Spectral-Processing/Spectra/*.o
 
 # Ignore a specific file
 Spectral-Processing/Spectra/input.h
+
+# include files in condcurves folder, which are needed to run the code, but ignore the rest of the DATA folder
+!Spectral-Processing/Spectra/DATA/condcurves/**
 
 
 # Keep the folders
