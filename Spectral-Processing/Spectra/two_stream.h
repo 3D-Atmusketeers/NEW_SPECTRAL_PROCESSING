@@ -116,13 +116,13 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
 
   double b_top;
 
-  double gangle[] = {0.0985350858, 0.3045357266, 0.5620251898, 0.8019865821, 0.9601901429};
-  double gweight[] = {0.0157479145, 0.0739088701, 0.1463869871, 0.1671746381, 0.0967815902};
-  int num_gangle = 5;
+  // double gangle[] = {0.0985350858, 0.3045357266, 0.5620251898, 0.8019865821, 0.9601901429};
+  // double gweight[] = {0.0157479145, 0.0739088701, 0.1463869871, 0.1671746381, 0.0967815902};
+  // int num_gangle = 5;
 
-  //double gangle[] = {1.0};
-  //double gweight[] = {0.5};
-  //int num_gangle = 1;
+  double gangle[] = {1.0};
+  double gweight[] = {0.5};
+  int num_gangle = 1;
 
   // Upward and downwards intensities
   double INTENSITY_DOWN[num_tau_layers - kmin + 2][num_gangle];
