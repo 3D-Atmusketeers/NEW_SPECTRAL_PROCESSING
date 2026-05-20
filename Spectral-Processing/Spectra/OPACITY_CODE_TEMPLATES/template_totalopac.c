@@ -52,7 +52,7 @@ void TotalOpac() {
          **opac_CIA_N2N2, **opac_CIA_O2CO2, **opac_CIA_O2N2, **opac_CIA_O2O2, **opac_CIA_Hel;
   double *t_CIA, *lambda_CIA, **opac_CIA;
   int i, j, k, a, b, dum;
-  char filename[65];
+  char filename[100];
 
   FILE *f1;
 
@@ -118,6 +118,7 @@ void TotalOpac() {
 
   if(f1 == NULL){
     printf("\n totalopac.c:\nError opening CIA file: -- No such file or directory\n\n");
+    exit(1);
   }
   opacCIA.T = dvector(0, NTEMP-1);
   opacCIA.P = dvector(0, NPRESSURE-1);
@@ -166,12 +167,13 @@ void TotalOpac() {
   opacCIA.kappa = (double ***)malloc(NLAMBDA * sizeof(double **));
   if (opacCIA.kappa == NULL) {
       printf("Failed to allocate memory for opacCIA.kappa (outer dimension)\n");
-      // Handle the error appropriately, e.g., return or exit the function
+      exit(1);
   }
   for (i = 0; i < NLAMBDA; i++) {
       opacCIA.kappa[i] = (double **)malloc(NPRESSURE * sizeof(double *));
       if (opacCIA.kappa[i] == NULL) {
           printf("Failed to allocate memory for opacCIA.kappa[%d] (middle dimension)\n", i);
+          exit(1);
           // Handle the error appropriately, e.g., free previously allocated memory and return or exit the function
       }
       for (j = 0; j < NPRESSURE; j++) {
