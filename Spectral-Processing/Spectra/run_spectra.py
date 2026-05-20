@@ -14,6 +14,9 @@ from get_wavelength_grid import find_closest_wavelength_indices
 from chemistry_file_selector import find_closest_chemistry_file
 #import Clean_suite
 
+# path_to_data = '/nfs/turbo/lsa-erausche/thomak/NEW_SPECTRAL_PROCESSING/Spectral-Processing-clear/Spectra/DATA/' # 'DATA/'
+path_to_data = 'DATA/'
+
 # Phases in degrees, inclination in radians (sorry)
 # An inclination of 0 corresponds to edge on
 phases = [0.0]
@@ -22,7 +25,7 @@ system_obliquity = 0
 
 # I recommend leaving these as is
 # The NLAT and NLON can be changed, but these values work well
-NTAU = 250
+NTAU = 1000
 
 # Cut of the bottom of the atmosphere if needed
 # DONT MESS WITH THIS, ISAAC HASN'T FULLY CODED IT!!!!!
@@ -65,14 +68,14 @@ opacity_set_id = 'Low-Res'
 # Then it will calculate the entire grid
 WAVELENGTH_START_APPROX = 2.00007265e-06
 WAVELENGTH_END_APPROX = 2.02997071e-06
-full_wavelength_range = True
+full_wavelength_range = False
 LAMBDA_START, LAMBDA_END, START_WAVELENGTH, END_WAVELENGTH, NLAMBDA = find_closest_wavelength_indices(opacity_set_id,
                                                                                              full_wavelength_range,
                                                                                              WAVELENGTH_START_APPROX,
-                                                                                             WAVELENGTH_END_APPROX)
+                                                                                             WAVELENGTH_END_APPROX, path_to_data=path_to_data)
 
 # Construct the path to the directory
-opacity_files_directory = os.path.join('DATA', opacity_set_id)
+opacity_files_directory = os.path.join(path_to_data, opacity_set_id)
 
 # Adjust the list comprehension to parse filenames
 opacity_species = [file[4:-4] for file in os.listdir(opacity_files_directory)
@@ -102,7 +105,7 @@ print("="*60 + "\n")
 
 # Set the wavelength to evaluate the clouds at for plotting!
 # This could be put in a better place I think
-cloud_file = 'DATA/Aerosol_Data/wavelength_array_for_cloud_scattering_data_in_microns.txt'
+cloud_file = os.path.join(path_to_data, 'Aerosol_Data', 'wavelength_array_for_cloud_scattering_data_in_microns.txt')
 if os.path.exists(cloud_file):
     wavelength_grid = np.loadtxt(cloud_file)
 else:
@@ -156,7 +159,7 @@ for q in range(len(planet_names)):
     MEAN_MOLECULAR_WEIGHT = np.round((GAS_CONSTANT_R/gasconst) * 1000, 4)
 
     # This is the path to the chemistry file
-    chemistry_file_path = find_closest_chemistry_file(MET_X_SOLAR)
+    chemistry_file_path = find_closest_chemistry_file(MET_X_SOLAR, path_to_data=path_to_data)
 
     print("\n" + "="*40)
     print("======== RUNNING SIMULATION ========")
@@ -254,7 +257,7 @@ for q in range(len(planet_names)):
             for inc in inclinations:
                 phase = str(phase)
                 inc = str(inc)
-                input_paths.append('DATA/init_' + planet_name + '_phase_{}_inc_{}.txt'.format(phase, inc))
+                input_paths.append(os.path.join('DATA', 'init_' + planet_name + '_phase_{}_inc_{}.txt'.format(phase, inc)))
                 inclination_strs.append(inc)
                 phase_strs.append(phase)
 
@@ -269,7 +272,7 @@ for q in range(len(planet_names)):
         replace_files(opacity_set_id)
 
         # Generate output paths based on input paths and doppler value
-        output_paths = ['OUT/Spec_' + str(doppler_val) + '_' + path[10:-4] for path in input_paths]
+        output_paths = [os.path.join('OUT', 'Spec_' + str(doppler_val) + '_' + path[10:-4]) for path in input_paths]
 
         for i, input_path in enumerate(input_paths):
             # Construct modifications dictionary for this run
@@ -301,10 +304,10 @@ for q in range(len(planet_names)):
                 }
 
             # Call the function to modify 'input.h' for this run
-            modify_input_h(modifications, opacity_set_id)
+            modify_input_h(modifications, opacity_set_id, path_to_data=path_to_data)
 
             # Update the input.h file for the species desired
-            insert_opacity_definitions('input.h', 'DATA/' + opacity_set_id, opacity_species)
+            insert_opacity_definitions('input.h', os.path.join(path_to_data, opacity_set_id), opacity_species)
 
             # Modify totalopac.c
             modify_totalopac(opacity_species)
@@ -347,7 +350,7 @@ for q in range(len(planet_names)):
         add_clouds.add_clouds_to_gcm_output(path, runname, planet_name,
                                             grav, MTLX, CLOUDS, MOLEF,
                                             aerosol_layers, INITIAL_NTAU,
-                                            gasconst, HAZE_TYPE, HAZES, wav_loc, MET_X_SOLAR)
+                                            gasconst, HAZE_TYPE, HAZES, wav_loc, MET_X_SOLAR, path_to_data=path_to_data)
 
 
         # Regrid the file to constant altitude and the correct number of layers

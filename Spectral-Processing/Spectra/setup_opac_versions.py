@@ -46,7 +46,7 @@ def replace_files(opacity_set_number):
         fcntl.flock(lock_file, fcntl.LOCK_UN)
 
 
-def modify_input_h(modifications, opacity_set_number):
+def modify_input_h(modifications, opacity_set_number, path_to_data='DATA/'):
     inputs_file = 'input.h'
     lock_file_path = 'file_lock.lock'
 
@@ -72,7 +72,7 @@ def modify_input_h(modifications, opacity_set_number):
 
             # Find the index of the line containing #endif, then insert the CIA_FILE definition before it
             endif_index = next((i for i, line in enumerate(lines) if '#endif' in line), None)
-            cia_file_line = f'#define CIA_FILE "DATA/{opacity_set_number}/opacCIA.dat"\n'
+            cia_file_line = f'#define CIA_FILE "{os.path.join(path_to_data, str(opacity_set_number))}/opacCIA.dat"\n'
             
             if endif_index is not None:
                 lines.insert(endif_index, cia_file_line)

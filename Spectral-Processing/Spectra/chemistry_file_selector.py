@@ -1,12 +1,13 @@
 import glob
 import math
+import os
 
-def find_closest_chemistry_file(MET_X_SOLAR):
+def find_closest_chemistry_file(MET_X_SOLAR, path_to_data='DATA/'):
     # Calculate the log10 of MET_X_SOLAR
     log_MET_X_SOLAR = math.log10(MET_X_SOLAR)
 
     # Use glob to find all files that match the pattern in the DATA/chemistry_grid folder
-    file_paths = glob.glob('DATA/chemistry_grid/fastchem_grid_allspecies_ions_lotemp_Z_*0.55.dat')
+    file_paths = glob.glob(os.path.join(path_to_data, 'chemistry_grid', 'fastchem_grid_allspecies_ions_lotemp_Z_*0.55.dat'))
 
     # Function to extract the Z value from a file path
     def extract_z_value(file_path):

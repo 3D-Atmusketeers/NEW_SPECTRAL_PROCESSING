@@ -1681,6 +1681,10 @@ int RT_Emit_3D(double PHASE)
                     //}
 
                     // The first index is the thermal intensity, the second is the reflected light
+                    if ((isnan(intensity_vals[1])) || intensity_vals[1] < 0)
+                    {
+                        intensity_vals[1] = 0.0;
+                    }
                     intensity[l][m] = intensity_vals[0] + intensity_vals[1];
                     reflected_intensity[l][m] = intensity_vals[1];
 
@@ -1773,7 +1777,7 @@ int RT_Emit_3D(double PHASE)
 
         if(i % 100 == 0)
         {
-            printf("%d out of %d lines (phase: %06.2f)\n", i, LAMBDA_END - LAMBDA_START, PHASE);
+            printf("%d out of %d lines (phase: %06.2f)\n", i - LAMBDA_START, LAMBDA_END - LAMBDA_START, PHASE);
         }
 
         fprintf(finished_output_file, "%10.8le %le %le\n", atmos.lambda[i], flux_pl[i] * PI/solid, flux_reflected[i] * PI/solid);

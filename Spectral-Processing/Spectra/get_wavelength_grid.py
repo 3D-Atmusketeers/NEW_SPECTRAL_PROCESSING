@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
+import os
 
-def find_closest_wavelength_indices(opacity_set_id, full_wavelength_range, WAVELENGTH_START_APPROX=None, WAVELENGTH_END_APPROX=None):
+def find_closest_wavelength_indices(opacity_set_id, full_wavelength_range, WAVELENGTH_START_APPROX=None, WAVELENGTH_END_APPROX=None, path_to_data='DATA/'):
     """
     Finds the closest wavelength indices in a dataset for a specified range.
 
@@ -18,7 +19,7 @@ def find_closest_wavelength_indices(opacity_set_id, full_wavelength_range, WAVEL
     - END_WAVELENGTH: Value of the end wavelength.
     """
     # Construct the file path from the given opacity set ID
-    file_path = f'DATA/{opacity_set_id}/Wavelengths.txt'
+    file_path = os.path.join(path_to_data, opacity_set_id, 'Wavelengths.txt')
 
     # Read the first column as wavelengths from the file
     df = pd.read_csv(file_path, header=None, usecols=[0])

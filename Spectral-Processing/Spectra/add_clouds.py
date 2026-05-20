@@ -6,7 +6,7 @@ pd.options.mode.chained_assignment = None  # default='warn'
 
 
 def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOLEF,
-                             aerosol_layers, INITIAL_NTAU, GASCON, HAZE_TYPE, HAZES, wav_loc, MET_X_SOLAR):
+                             aerosol_layers, INITIAL_NTAU, GASCON, HAZE_TYPE, HAZES, wav_loc, MET_X_SOLAR, path_to_data='DATA/'):
     column_names = ['lat' , 'lon', 'level' , 'altitude(m)',
                     'pressure(bars)', 'temp(k)',
                     'EW vel(m/s)','NS vel','vert vel']
@@ -145,70 +145,70 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
         metstr = '300xsolar'
     else:
         print("Error in setting condensation curves")
-    Tconds = np.loadtxt('DATA/condcurves/condcurves_' + metstr + '_new.txt', usecols=range(1,14)).T # first column is pressure axis
+    Tconds = np.loadtxt(os.path.join('DATA', 'condcurves', f'condcurves_{metstr}_new.txt'), usecols=range(1,14)).T # first column is pressure axis
 
-    qe0  = np.loadtxt('DATA/Aerosol_Data/KCl_wav_qext.txt')
-    g00  = np.loadtxt('DATA/Aerosol_Data/KCl_wav_gg.txt')
-    pi00 = np.loadtxt('DATA/Aerosol_Data/KCl_wav_pi0.txt')
+    qe0  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'KCl_wav_qext.txt'))
+    g00  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'KCl_wav_gg.txt'))
+    pi00 = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'KCl_wav_pi0.txt'))
 
-    qe1  = np.loadtxt('DATA/Aerosol_Data/ZnS_wav_qext.txt')
-    g01  = np.loadtxt('DATA/Aerosol_Data/ZnS_wav_gg.txt')
-    pi01 = np.loadtxt('DATA/Aerosol_Data/ZnS_wav_pi0.txt')
+    qe1  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'ZnS_wav_qext.txt'))
+    g01  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'ZnS_wav_gg.txt'))
+    pi01 = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'ZnS_wav_pi0.txt'))
 
-    qe2  = np.loadtxt('DATA/Aerosol_Data/Na2S_wav_qext.txt')
-    g02  = np.loadtxt('DATA/Aerosol_Data/Na2S_wav_gg.txt')
-    pi02 = np.loadtxt('DATA/Aerosol_Data/Na2S_wav_pi0.txt')
+    qe2  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'Na2S_wav_qext.txt'))
+    g02  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'Na2S_wav_gg.txt'))
+    pi02 = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'Na2S_wav_pi0.txt'))
 
-    qe3  = np.loadtxt('DATA/Aerosol_Data/MnS_wav_qext.txt')
-    g03  = np.loadtxt('DATA/Aerosol_Data/MnS_wav_gg.txt')
-    pi03 = np.loadtxt('DATA/Aerosol_Data/MnS_wav_pi0.txt')
+    qe3  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'MnS_wav_qext.txt'))
+    g03  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'MnS_wav_gg.txt'))
+    pi03 = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'MnS_wav_pi0.txt'))
 
-    qe4  = np.loadtxt('DATA/Aerosol_Data/Cr_wav_qext.txt')
-    g04  = np.loadtxt('DATA/Aerosol_Data/Cr_wav_gg.txt')
-    pi04 = np.loadtxt('DATA/Aerosol_Data/Cr_wav_pi0.txt')
+    qe4  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'Cr_wav_qext.txt'))
+    g04  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'Cr_wav_gg.txt'))
+    pi04 = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'Cr_wav_pi0.txt'))
 
-    qe5  = np.loadtxt('DATA/Aerosol_Data/SiO2_wav_qext.txt')
-    g05  = np.loadtxt('DATA/Aerosol_Data/SiO2_wav_gg.txt')
-    pi05 = np.loadtxt('DATA/Aerosol_Data/SiO2_wav_pi0.txt')
+    qe5  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'SiO2_wav_qext.txt'))
+    g05  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'SiO2_wav_gg.txt'))
+    pi05 = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'SiO2_wav_pi0.txt'))
 
-    qe6  = np.loadtxt('DATA/Aerosol_Data/Mg2SiO4_wav_qext.txt')
-    g06  = np.loadtxt('DATA/Aerosol_Data/Mg2SiO4_wav_gg.txt')
-    pi06 = np.loadtxt('DATA/Aerosol_Data/Mg2SiO4_wav_pi0.txt')
+    qe6  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'Mg2SiO4_wav_qext.txt'))
+    g06  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'Mg2SiO4_wav_gg.txt'))
+    pi06 = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'Mg2SiO4_wav_pi0.txt'))
 
-    qe7  = np.loadtxt('DATA/Aerosol_Data/VO_wav_qext.txt')
-    g07  = np.loadtxt('DATA/Aerosol_Data/VO_wav_gg.txt')
-    pi07 = np.loadtxt('DATA/Aerosol_Data/VO_wav_pi0.txt')
+    qe7  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'VO_wav_qext.txt'))
+    g07  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'VO_wav_gg.txt'))
+    pi07 = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'VO_wav_pi0.txt'))
 
-    qe8  = np.loadtxt('DATA/Aerosol_Data/Ni_wav_qext.txt')
-    g08  = np.loadtxt('DATA/Aerosol_Data/Ni_wav_gg.txt')
-    pi08 = np.loadtxt('DATA/Aerosol_Data/Ni_wav_pi0.txt')
+    qe8  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'Ni_wav_qext.txt'))
+    g08  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'Ni_wav_gg.txt'))
+    pi08 = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'Ni_wav_pi0.txt'))
 
-    qe9  = np.loadtxt('DATA/Aerosol_Data/Fe_wav_qext.txt')
-    g09  = np.loadtxt('DATA/Aerosol_Data/Fe_wav_gg.txt')
-    pi09 = np.loadtxt('DATA/Aerosol_Data/Fe_wav_pi0.txt')
+    qe9  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'Fe_wav_qext.txt'))
+    g09  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'Fe_wav_gg.txt'))
+    pi09 = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'Fe_wav_pi0.txt'))
 
-    qe10  = np.loadtxt('DATA/Aerosol_Data/CaSiO4_wav_qext.txt')
-    g010  = np.loadtxt('DATA/Aerosol_Data/CaSiO4_wav_gg.txt')
-    pi010 = np.loadtxt('DATA/Aerosol_Data/CaSiO4_wav_pi0.txt')
+    qe10  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'CaSiO4_wav_qext.txt'))
+    g010  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'CaSiO4_wav_gg.txt'))
+    pi010 = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'CaSiO4_wav_pi0.txt'))
 
-    qe11  = np.loadtxt('DATA/Aerosol_Data/CaTiO3_wav_qext.txt')
-    g011  = np.loadtxt('DATA/Aerosol_Data/CaTiO3_wav_gg.txt')
-    pi011 = np.loadtxt('DATA/Aerosol_Data/CaTiO3_wav_pi0.txt')
+    qe11  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'CaTiO3_wav_qext.txt'))
+    g011  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'CaTiO3_wav_gg.txt'))
+    pi011 = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'CaTiO3_wav_pi0.txt'))
 
-    qe12  = np.loadtxt('DATA/Aerosol_Data/Al2O3_wav_qext.txt')
-    g012  = np.loadtxt('DATA/Aerosol_Data/Al2O3_wav_gg.txt')
-    pi012 = np.loadtxt('DATA/Aerosol_Data/Al2O3_wav_pi0.txt')
+    qe12  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'Al2O3_wav_qext.txt'))
+    g012  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'Al2O3_wav_gg.txt'))
+    pi012 = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'Al2O3_wav_pi0.txt'))
 
     if (HAZES == True):
         print ('haze_' + HAZE_TYPE + '_wav_tau_per_bar.txt')
-        tau_haze = np.loadtxt('DATA/Aerosol_Data/haze_' + HAZE_TYPE + '_wav_tauperbar.txt')
-        g0_haze  = np.loadtxt('DATA/Aerosol_Data/haze_'  + HAZE_TYPE  + '_wav_gg.txt')
-        pi0_haze = np.loadtxt('DATA/Aerosol_Data/haze_'  + HAZE_TYPE  + '_wav_pi0.txt')
+        tau_haze = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'haze_' + HAZE_TYPE + '_wav_tauperbar.txt'))
+        g0_haze  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'haze_'  + HAZE_TYPE  + '_wav_gg.txt'))
+        pi0_haze = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'haze_'  + HAZE_TYPE  + '_wav_pi0.txt'))
     else:
-        tau_haze = np.loadtxt('DATA/Aerosol_Data/haze_tholin_wav_tauperbar.txt')
-        g0_haze  = np.loadtxt('DATA/Aerosol_Data/haze_tholin_wav_gg.txt')
-        pi0_haze = np.loadtxt('DATA/Aerosol_Data/haze_tholin_wav_pi0.txt')
-    
+        tau_haze = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'haze_tholin_wav_tauperbar.txt'))
+        g0_haze  = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'haze_tholin_wav_gg.txt'))
+        pi0_haze = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'haze_tholin_wav_pi0.txt'))
+
         tau_haze = tau_haze * 0
         g0_haze  = g0_haze  * 0
         pi0_haze = pi0_haze * 0
@@ -222,7 +222,7 @@ def add_clouds_to_gcm_output(path, runname, planet_name, grav, MTLX, CLOUDS, MOL
     
     G = grav
 
-    pressure_array_for_cloud_scattering_data_in_pascals = np.loadtxt('DATA/Aerosol_Data/pressure_array_for_cloud_scattering_data_in_pascals.txt')
+    pressure_array_for_cloud_scattering_data_in_pascals = np.loadtxt(os.path.join(path_to_data, 'Aerosol_Data', 'pressure_array_for_cloud_scattering_data_in_pascals.txt'))
 
     print ("Adding Clouds, no scattering params, this just fills in 0s unless MOLEF is specified")
     
