@@ -143,6 +143,10 @@ def regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, NTAU, NLON
             print (param_new)
         """
 
+        # Cloud tau columns (one per species: 13 species × 3 params each, tau at every 3rd col)
+        # These are layer-integrated (extensive) quantities. All other columns are intensive.
+        cloud_tau_cols = {9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45}
+        dz_new = abs(z_new[0] - z_new[1])
 
         for i in range(NLAT):
 
@@ -157,11 +161,19 @@ def regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, NTAU, NLON
 
                 param_old = data[i][j][:,param_col]
 
-
-
-                # linear interpolation function created from old altitudes and parameter values
-
-                param_interp = interpolate.interp1d(z_old, param_old, kind="linear", bounds_error=False, fill_value=0)
+                if param_col in cloud_tau_cols:
+                    # Cloud tau is extensive (total tau integrated over one GCM layer).
+                    # Convert to tau/m density so linear interpolation is correct,
+                    # then multiply by the new uniform layer thickness to recover tau.
+                    dz_old = np.abs(np.diff(z_old))
+                    tau_density = np.where(dz_old > 0, param_old[:-1] / dz_old, 0.0)
+                    param_interp = interpolate.interp1d(
+                        z_old[:-1], tau_density, kind="linear",
+                        bounds_error=False, fill_value=0.0)
+                    param_new = param_interp(z_new) * dz_new
+                else:
+                    param_interp = interpolate.interp1d(
+                        z_old, param_old, kind="linear", bounds_error=False, fill_value=0)
 
 
 
@@ -173,10 +185,7 @@ def regrid_gcm_to_constant_alt(path, CLOUDS, planet_name, NLAT, NLON, NTAU, NLON
 
                 # change parameter values in data array to the new interpolated values
                 for k in range(NTAU_new):
-                    if (param_col == 9 or param_col == 12 or param_col == 15 or param_col == 18):
-                        data_new[i][j][k][param_col] = param_new[k] #/ (NTAU_new / NTAU)# optical depth
-                    else:
-                        data_new[i][j][k][param_col] = param_new[k]
+                    data_new[i][j][k][param_col] = param_new[k]
 
         return data_new
 
