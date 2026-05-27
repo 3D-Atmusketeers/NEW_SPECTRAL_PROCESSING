@@ -171,16 +171,23 @@ void two_stream(int num_tau_layers, int NLAYER, int kmin, double *w0_array, doub
   {
     W0[J] = w0_array[J+kmin-1];
     G0[J] = g0_array[J+kmin-1];
-
     TAULS[J]   = dtau_array[J+kmin-1];
     TAUCS[J+1] = TAUCS[J]+dtau_array[J+kmin-1];
-
-    TEMPS[J] = temperature_array[J+kmin-1];
-
     DIRECT_QUADRATURE[J]  = mu_0 * PI * FLUX_SURFACE_QUADRATURE * exp(-1.0 * (TAUCS[J] + TAULS[J]) / mu_0);
     DIRECT_HEMISPHERIC[J] = 0.0;
   }
-  TEMPS[NLAYER] = TEMPS[NLAYER - 1];
+  // old way, slow layer convergence
+  // TEMPS[NLAYER] = TEMPS[NLAYER - 1];
+
+  // New way, fast layer convergence.  
+  // Interface temperatures: J=0 is top of first layer, J=NLAYER is bottom of last layer.
+  // Interior interfaces are averages of adjacent layer centers.
+  TEMPS[0] = temperature_array[kmin-1];
+  for (J=1; J<NLAYER; J++)
+  {
+    TEMPS[J] = 0.5 * (temperature_array[J+kmin-2] + temperature_array[J+kmin-1]);
+  }
+  TEMPS[NLAYER] = temperature_array[kmin+NLAYER-2];
 
 
   // Calculate the intensity at the top of the atmosphere
