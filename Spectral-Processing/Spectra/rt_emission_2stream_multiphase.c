@@ -497,7 +497,7 @@ int RT_Emit_3D(double PHASE)
 
 
             fscanf(input_Mg2SiO4_wav_gg_file, "%le", &input_val);
-            Mg2SiO4_wav_pi0[x][y]=input_val;
+            Mg2SiO4_wav_gg[x][y]=input_val;
             fscanf(input_Mg2SiO4_wav_pi0_file, "%le", &input_val);
             Mg2SiO4_wav_pi0[x][y]=input_val;
             fscanf(input_Mg2SiO4_wav_qext_file, "%le", &input_val);
